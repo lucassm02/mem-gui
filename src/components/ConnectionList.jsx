@@ -1,4 +1,4 @@
-import { LinkIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { LinkIcon, SignalSlashIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onClose }) => {
   return (
@@ -29,10 +29,11 @@ const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onC
 
           {/* Nenhuma conexão */}
           {connections.length === 0 && (
-            <div className={`p-4 text-center rounded-xl ${
+            <div className={`p-4 text-center rounded-xl flex flex-col items-center gap-2 ${
               darkMode ? 'bg-gray-700/30 text-gray-400' : 'bg-gray-50 text-gray-500'
             }`}>
-              🛸 Nenhuma conexão encontrada
+              <SignalSlashIcon className="w-8 h-8 text-gray-400" />
+              <p>Nenhuma conexão encontrada</p>
             </div>
           )}
 
