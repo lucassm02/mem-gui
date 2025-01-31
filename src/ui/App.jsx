@@ -9,6 +9,7 @@ import { useDarkMode } from './hooks/useDarkMode';
 import { useConnections } from './hooks/useConnections';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { ConnectionsProvider } from './context/ConnectionsContext';
+import { ModalProvider } from './context/ModalContext';
 
 const AppContent = () => {
   const { currentConnection, isConnected, handleConnect, choseConnection, handleDisconnect, error, savedConnections, handleDeleteConnection } = useConnections();
@@ -56,9 +57,11 @@ const AppContent = () => {
 
 const App = () => (
   <DarkModeProvider>
-    <ConnectionsProvider>
-       <AppContent />
-    </ConnectionsProvider>
+    <ModalProvider>
+      <ConnectionsProvider>
+        <AppContent />
+      </ConnectionsProvider>
+    </ModalProvider>
   </DarkModeProvider>
 );
 

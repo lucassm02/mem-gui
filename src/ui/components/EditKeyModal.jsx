@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useDarkMode } from '../hooks/useDarkMode';
+import { useModal } from '../hooks/useModal';
 
-const EditKeyModal = ({ darkMode, show, onClose, keyData, onSave }) => {
+const EditKeyModal = ({ onClose, keyData, onSave }) => {
 
   const [value, setValue] = useState(keyData?.value || '');
+
+    const { editModalIsOpen , closeEditModal} = useModal()
+    const  {darkMode} = useDarkMode()
+  
 
 
   useEffect(() => {
@@ -16,11 +22,12 @@ const EditKeyModal = ({ darkMode, show, onClose, keyData, onSave }) => {
     e.preventDefault();
     if (value.trim()) {
       onSave({ ...keyData, value });
-      onClose();
+      closeEditModal()
+      onClose?.();
     }
   };
 
-  if (!show || !keyData) return null; 
+  if (!editModalIsOpen || !keyData) return null; 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -29,7 +36,10 @@ const EditKeyModal = ({ darkMode, show, onClose, keyData, onSave }) => {
       }`}>
         {/* Botão de fechar */}
         <button
-          onClick={onClose}
+          onClick={()=> {
+            closeEditModal()
+            onClose?.()
+          }}
           className={`absolute top-4 right-4 p-1 rounded-full ${
             darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
           }`}
@@ -71,7 +81,10 @@ const EditKeyModal = ({ darkMode, show, onClose, keyData, onSave }) => {
           <div className="flex gap-3 justify-end">
             <button
               type="button"
-              onClick={onClose}
+              onClick={()=> {
+                closeEditModal()
+                onClose?.()
+              }}
               className={`px-4 py-2 rounded-lg ${
                 darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
               }`}

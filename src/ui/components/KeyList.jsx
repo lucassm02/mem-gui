@@ -7,9 +7,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { useConnections } from '../hooks/useConnections';
 import { useDarkMode } from '../hooks/useDarkMode';
+import { useModal } from '../hooks/useModal';
 import CreateKeyModal from './CreateKeyModal';
 import EditKeyModal from './EditKeyModal';
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 const KeyList = () => {
   const { darkMode } = useDarkMode();
@@ -17,18 +18,15 @@ const KeyList = () => {
     keys, 
     loadKeys, 
     handleDeleteKey, 
-    handleCreateKey, 
-    showCreateModal, 
-    handleEditKey,
-    setShowCreateModal,
-    editingKey,
-    setEditingKey,
-    openEditModal
+    handleCreateKey,
+    handleEditKey
   } = useConnections();
 
-  useEffect(() => {
-    console.log("🖥️ KeyList renderizou! Estado atual de keys:", keys);
-  }, [keys]);
+
+  const {openCreateModal, openEditModal} = useModal()
+
+
+  const [editingKey, setEditingKey] = useState({})
 
   return (
     <div className="w-full px-6 max-w-7xl mx-auto mt-10">
@@ -39,7 +37,9 @@ const KeyList = () => {
         </h2>
         <div className="flex gap-2">
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              openCreateModal()
+            }}
             className="px-4 py-2 rounded-lg flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white transition-all"
           >
             <PlusIcon className="w-5 h-5" />
@@ -78,7 +78,10 @@ const KeyList = () => {
                   <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.value}</td>
                   <td className="px-6 py-4 text-right">
                     <button 
-                      onClick={() => openEditModal(item)}
+                      onClick={() => {
+                        setEditingKey(item)
+                        openEditModal(item)
+                      }}
                       className={`transition-all mx-2 ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
                       aria-label={`Editar chave ${item.key}`}
                     >
@@ -104,26 +107,16 @@ const KeyList = () => {
           </tbody>
         </table>
       </div>
-
-      {showCreateModal && (
-        <CreateKeyModal 
-          darkMode={darkMode} 
-          show={showCreateModal} 
-          onClose={() => setShowCreateModal(false)} 
-          onCreate={handleCreateKey} 
+      
+        <CreateKeyModal   
+          onSave={handleCreateKey} 
         />
-      )}
-
-      {editingKey && (
+    
         <EditKeyModal
-          darkMode={darkMode}
-          show={!!editingKey}
           keyData={editingKey}
-          onClose={() => setEditingKey(null)}
           onSave={handleEditKey}
+          onClose={()=>setEditingKey({})}
         />
-      )}
-
       
     </div>
 

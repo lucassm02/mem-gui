@@ -49,12 +49,6 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [keys, setKeys] = useState<KeyData[]>([]);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (currentConnection.id) {
-      loadKeys();
-    }
-  }, [currentConnection.id]);
-
   const handleConnect = async ({ host, port, name }: Omit<Connection, 'id'>) => {
     try {
       const response = await api.post('/connections', { host, port });
@@ -80,16 +74,23 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const choseConnection = async ({ name, host, port }: Omit<Connection, 'id'>) => {
     try {
       const connection = savedConnections.find((c) => c.host === host && c.port === port);
+
       if (!connection) {
         await handleConnect({ name, host, port });
         return;
       }
 
       setConnectionId(connection.id);
+      await api.get('/connections');
+
       setIsConnected(true);
       setCurrentConnection(connection);
       await loadKeys();
     } catch (err) {
+      if (err.status === 404) {
+        await handleConnect({ name, host, port });
+        return;
+      }
       setError('Erro ao escolher conexão.');
     }
   };

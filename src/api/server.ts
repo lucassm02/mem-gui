@@ -446,3 +446,5 @@ const PORT = DEFAULT_SERVER_PORT;
 app.listen(PORT, () => {
   logger.info(`Servidor iniciado na porta ${PORT}`);
 });
+
+export default app;

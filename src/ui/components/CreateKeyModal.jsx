@@ -1,17 +1,25 @@
 import { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-const CreateKeyModal = ({ darkMode, show, onClose, onCreate }) => {
+import {useModal} from '../hooks/useModal'
+import {useDarkMode} from '../hooks/useDarkMode'
+
+const CreateKeyModal = ({ onClose, onSave }) => {
   const [formData, setFormData] = useState({ key: '', value: '' });
+
+  const { createModalIsOpen , closeCreateModal} = useModal()
+  const  {darkMode} = useDarkMode()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.key && formData.value) {
-      onCreate(formData);
+      onSave(formData);
+      closeCreateModal()
+      setFormData({})
     }
   };
 
-  return show && (
+  return createModalIsOpen && (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div className={`relative rounded-2xl p-6 w-full max-w-md border-2 ${
         darkMode 
@@ -19,7 +27,10 @@ const CreateKeyModal = ({ darkMode, show, onClose, onCreate }) => {
           : 'bg-white border-gray-200 text-gray-900'
       }`}>
         <button
-          onClick={onClose}
+          onClick={()=> {
+            closeCreateModal();
+            onClose?.();
+          }}
           className={`absolute top-4 right-4 p-1 rounded-xl ${
             darkMode ? 'hover:bg-gray-700/40' : 'hover:bg-gray-100'
           }`}
@@ -63,7 +74,10 @@ const CreateKeyModal = ({ darkMode, show, onClose, onCreate }) => {
           <div className="flex gap-3 justify-end">
             <button
               type="button"
-              onClick={onClose}
+              onClick={()=> {
+                closeCreateModal();
+                onClose?.()
+              }}
               className={`px-4 py-2 rounded-xl ${
                 darkMode 
                   ? 'text-gray-300 hover:bg-gray-700/40' 
