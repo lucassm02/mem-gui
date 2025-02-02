@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mem GUI - Download Page</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-color: #121212;
+        --header-bg: #1e1e1e;
+        --nav-bg: #1e1e1e;
+        --primary-color: #007acc;
+        --primary-hover: #005a9e;
+        --text-color: #e0e0e0;
+        --subtext-color: #a0a0a0;
+        --border-color: #007acc;
+        --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        --transition: 0.3s ease;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+      .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, var(--header-bg), #181818);
+      }
+      .hero img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+      }
+      .hero h1 {
+        font-size: 2.8rem;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+      }
+      .hero p {
+        font-size: 1.2rem;
+        color: var(--subtext-color);
+        max-width: 600px;
+      }
+      nav {
+        position: sticky;
+        top: 0;
+        background-color: var(--nav-bg);
+        padding: 10px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+      }
+      nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      nav ul li {
+        margin: 0 15px;
+      }
+      nav ul li a {
+        text-decoration: none;
+        color: var(--primary-color);
+        font-weight: 500;
+        transition: color var(--transition);
+      }
+      nav ul li a:hover {
+        color: var(--primary-hover);
+      }
+      main {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+      section {
+        margin-bottom: 60px;
+      }
+      section h2 {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--border-color);
+        display: inline-block;
+        padding-bottom: 5px;
+      }
+      section p {
+        margin-bottom: 15px;
+        font-size: 1rem;
+        color: var(--text-color);
+      }
+      section ul {
+        list-style: disc;
+        padding-left: 20px;
+      }
+      section ul li {
+        margin-bottom: 10px;
+        color: var(--text-color);
+      }
+      .download-button {
+        display: inline-block;
+        background-color: var(--primary-color);
+        color: var(--bg-color);
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color var(--transition), transform var(--transition);
+        box-shadow: var(--shadow);
+      }
+      .download-button:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-3px);
+      }
+      .screenshot {
+        text-align: center;
+      }
+      .screenshot img {
+        max-width: 100%;
+        border: 2px solid var(--primary-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        transition: transform var(--transition);
+      }
+      .screenshot img:hover {
+        transform: scale(1.02);
+      }
+      footer {
+        background-color: var(--header-bg);
+        text-align: center;
+        padding: 20px;
+        font-size: 0.9rem;
+        border-top: 1px solid var(--primary-color);
+      }
+      footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color var(--transition);
+      }
+      footer a:hover {
+        color: var(--primary-hover);
+      }
+      @media (max-width: 600px) {
+        .hero h1 {
+          font-size: 2.2rem;
+        }
+        .hero p {
+          font-size: 1rem;
+        }
+        nav ul li {
+          margin: 0 10px;
+        }
+        section h2 {
+          font-size: 1.8rem;
+        }
+        .download-button {
+          padding: 12px 24px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/assets/mem-gui.svg" alt="Mem GUI Logo" />
+      <h1>Mem GUI</h1>
+      <p>Manage and monitor your system's memory in an intuitive and efficient way.</p>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#download">Download</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#license">License</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <main>
+      <section id="about">
+        <h2>About Mem GUI</h2>
+        <p>
+          Mem GUI is a modern and intuitive application for memory management and monitoring.
+          Developed with a focus on performance and usability, it offers a clean and efficient interface to track your system's resources.
+        </p>
+      </section>
+      <section id="features">
+        <h2>Features</h2>
+        <ul>
+          <li>Modern and intuitive interface</li>
+          <li>Real-time memory usage monitoring</li>
+          <li>Low resource consumption</li>
+          <li>Compatible with multiple platforms</li>
+        </ul>
+      </section>
+      <section id="download">
+        <h2>Download</h2>
+        <p>
+          Download the latest version of Mem GUI directly from GitHub. Click the button below to start your download.
+        </p>
+        <a class="download-button" href="https://github.com/lucassm02/mem-gui/releases/latest" target="_blank">
+          Download Mem GUI
+        </a>
+      </section>
+      <section id="example">
+        <h2>Example</h2>
+        <p>See an example of the Mem GUI interface below:</p>
+        <div class="screenshot">
+          <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/screenshots/screnshot-0.png" alt="Mem GUI Screenshot" />
+        </div>
+      </section>
+      <section id="installation">
+        <h2>Installation</h2>
+        <p>
+          After downloading, run the installer and follow the on-screen instructions.
+          The installation is simple and fast, allowing you to start using Mem GUI within minutes.
+        </p>
+      </section>
+      <section id="license">
+        <h2>License</h2>
+        <p>
+          This project is open source and licensed under the
+          <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>.
+        </p>
+      </section>
+      <section id="contact">
+        <h2>Contact</h2>
+        <p>
+          If you have any questions or would like to contribute to the project, please visit the GitHub repository or get in touch.
+        </p>
+        <p>
+          <a href="https://github.com/lucassm02/mem-gui" target="_blank">GitHub Repository</a>
+        </p>
+      </section>
+    </main>
+    <footer>
+      <p>&copy; 2025 Mem GUI. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
