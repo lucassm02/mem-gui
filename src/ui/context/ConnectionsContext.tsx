@@ -13,7 +13,7 @@ interface KeyData {
   key: string;
   value: string;
   timeUntilExpiration: number;
-  size: number;
+  size?: number;
 }
 
 interface ConnectionsContextType {
@@ -115,8 +115,9 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
   const handleCreateKey = async (newKey: KeyData) => {
     try {
-      setKeys((prevKeys) => [...prevKeys, newKey]);
-      await api.post('/keys', newKey);
+      console.log(newKey)
+      setKeys((prevKeys) => [...prevKeys, { ...newKey, size: new Blob([newKey.value]).size, timeUntilExpiration: newKey.timeUntilExpiration ?? 0 }]);
+      await api.post('/keys', { key: newKey.key, value: newKey.value, expires: newKey.timeUntilExpiration });
     } catch (error) {
       setError('Erro ao criar chave.');
     }
@@ -125,9 +126,9 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const handleEditKey = async (updatedKey: KeyData) => {
     try {
       setKeys((prevKeys) =>
-        prevKeys.map((k) => (k.key === updatedKey.key ? updatedKey : k))
+        prevKeys.map((k) => (k.key === updatedKey.key ? { ...updatedKey, size: new Blob([updatedKey.value]).size, timeUntilExpiration: updatedKey.timeUntilExpiration ?? 0 } : k))
       );
-      await api.post(`/keys`, updatedKey);
+      await api.post('/keys', { key: updatedKey.key, value: updatedKey.value, expires: updatedKey.timeUntilExpiration });
     } catch (error) {
       setError('Erro ao editar chave.');
     }

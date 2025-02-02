@@ -5,15 +5,16 @@ import { useModal } from '../hooks/useModal';
 
 const EditKeyModal = ({ onClose, keyData, onSave }) => {
   const [value, setValue] = useState(keyData?.value || '');
-  const [expires, setExpires] = useState(keyData?.expires !== undefined ? keyData.expires : '');
+  const [timeUntilExpiration, setTimeUntilExpiration] = useState(keyData?.timeUntilExpiration !== undefined ? keyData.timeUntilExpiration : '');
 
   const { editModalIsOpen, closeEditModal } = useModal();
   const { darkMode } = useDarkMode();
 
   useEffect(() => {
     if (keyData) {
+      
       setValue(keyData.value || '');
-      setExpires(keyData.expires !== undefined ? keyData.expires : '');
+      setTimeUntilExpiration(keyData.timeUntilExpiration !== undefined ? keyData.timeUntilExpiration : '');
     }
   }, [keyData]);
 
@@ -23,7 +24,7 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
       onSave({ 
         ...keyData, 
         value, 
-        expires: expires ? Number(expires) : undefined 
+        timeUntilExpiration: timeUntilExpiration ? Number(timeUntilExpiration) : undefined 
       });
       closeEditModal();
       onClose?.();
@@ -85,8 +86,8 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
               className={`w-full p-2 rounded-lg border-2 ${
                 darkMode ? 'bg-gray-700 border-gray-600 focus:border-blue-400' : 'border-gray-300 focus:border-blue-500'
               }`}
-              value={expires}
-              onChange={(e) => setExpires(e.target.value)}
+              value={timeUntilExpiration}
+              onChange={(e) => setTimeUntilExpiration(e.target.value)}
               placeholder="Opcional"
             />
           </div>

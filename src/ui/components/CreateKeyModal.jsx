@@ -5,7 +5,7 @@ import { useModal } from '../hooks/useModal';
 import { useDarkMode } from '../hooks/useDarkMode';
 
 const CreateKeyModal = ({ onClose, onSave }) => {
-  const [formData, setFormData] = useState({ key: '', value: '', expires: undefined });
+  const [formData, setFormData] = useState({ key: '', value: '', timeUntilExpiration: undefined });
 
   const { createModalIsOpen, closeCreateModal } = useModal();
   const { darkMode } = useDarkMode();
@@ -15,7 +15,7 @@ const CreateKeyModal = ({ onClose, onSave }) => {
     if (formData.key && formData.value) {
       onSave(formData);
       closeCreateModal();
-      setFormData({ key: '', value: '', expires: undefined });
+      setFormData({ key: '', value: '', timeUntilExpiration: undefined });
     }
   };
 
@@ -80,11 +80,11 @@ const CreateKeyModal = ({ onClose, onSave }) => {
                   ? 'bg-gray-700 border-gray-600 focus:border-blue-400'
                   : 'border-gray-200 focus:border-blue-500'
               }`}
-              value={formData.expires ?? ''}
+              value={formData.timeUntilExpiration ?? ''}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  expires: e.target.value ? Number(e.target.value) : undefined,
+                  timeUntilExpiration: e.target.value ? Number(e.target.value) : undefined,
                 })
               }
               placeholder="Opcional"
