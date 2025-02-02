@@ -10,6 +10,7 @@ import { useConnections } from './hooks/useConnections';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { ConnectionsProvider } from './context/ConnectionsContext';
 import { ModalProvider } from './context/ModalContext';
+import TitleBar from './components/TitleBar';
 
 const AppContent = () => {
   const { currentConnection, isConnected, handleConnect, choseConnection, handleDisconnect, error, savedConnections, handleDeleteConnection } = useConnections();
@@ -21,17 +22,10 @@ const AppContent = () => {
 
     
       {isConnected ? (
-        <ConnectedHeader connection={currentConnection} onDisconnect={handleDisconnect} />
+        <ConnectedHeader connection={currentConnection} onDisconnect={handleDisconnect} onToggleMenu={() => setMenuOpen(true)} />
       ) : (
-        <UnconnectedHeader />
+        <UnconnectedHeader onToggleMenu={() => setMenuOpen(true)} />
       )}
-
-      <button
-        onClick={() => setMenuOpen(true)}
-        className="absolute top-4 left-4 p-2 rounded-md bg-gray-800 text-white hover:bg-gray-700"
-      >
-        <Bars3Icon className="w-6 h-6" />
-      </button>
 
       <main className={`flex-1 ${isConnected ? 'overflow-auto' : 'flex justify-center items-center h-screen overflow-hidden'}`}>
         {isConnected ? (
@@ -59,6 +53,7 @@ const App = () => (
   <DarkModeProvider>
     <ModalProvider>
       <ConnectionsProvider>
+        <TitleBar/>
         <AppContent />
       </ConnectionsProvider>
     </ModalProvider>

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 
@@ -21,11 +21,16 @@ app.whenReady().then(() => {
   const iconPath = path.join(__dirname, '..', '..', 'assets', 'mem-gui.ico');
 
   const mainWindow = new BrowserWindow({
-    width,
-    height,
+    width: width - 100,
+    height: height - 100,
+    frame: false,
+    titleBarStyle: 'hiddenInset',
+    backgroundColor: '#1A1D2A',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      enableRemoteModule: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
     icon: iconPath,
   });
@@ -35,17 +40,48 @@ app.whenReady().then(() => {
     : 'http://localhost:33080/index.html';
 
   mainWindow.loadURL(startURL);
-  mainWindow.maximize();
 
   mainWindow.on('closed', () => {
     if (apiProcess) {
       apiProcess.kill();
     }
   });
+
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('window-maximized');
+  });
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('window-unmaximized');
+  });
 });
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+  }
+});
+
+ipcMain.on('window-close', () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win) win.close();
+});
+
+ipcMain.on('window-minimize', () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win) win.minimize();
+});
+
+ipcMain.on('window-maximize', () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win && !win.isMaximized()) {
+    win.maximize();
+  }
+});
+
+ipcMain.on('window-unmaximize', () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win && win.isMaximized()) {
+    win.unmaximize();
   }
 });

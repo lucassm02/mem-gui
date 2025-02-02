@@ -3,7 +3,6 @@ import { LinkIcon, SignalSlashIcon, TrashIcon, XMarkIcon } from '@heroicons/reac
 const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onClose }) => {
   return (
     <>
-      {/* Fundo escuro quando o menu estiver aberto */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40"
@@ -11,13 +10,12 @@ const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onC
         />
       )}
 
-      {/* Menu lateral flutuante */}
-      <div className={`fixed left-0 top-0 h-screen w-80 z-50 transition-transform duration-300 shadow-lg
+      <div className={`fixed left-0 top-10 h-screen w-80 z-50 transition-transform duration-300 shadow-lg
         ${darkMode ? 'bg-gray-800 border-r border-gray-700' : 'bg-white border-r border-gray-200'}
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-4 space-y-2">
-          {/* Cabeçalho do Menu */}
+
           <div className="flex justify-between items-center">
             <h3 className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               Conexões Salvas
@@ -27,7 +25,6 @@ const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onC
             </button>
           </div>
 
-          {/* Nenhuma conexão */}
           {connections.length === 0 && (
             <div className={`p-4 text-center rounded-xl flex flex-col items-center gap-2 ${
               darkMode ? 'bg-gray-700/30 text-gray-400' : 'bg-gray-50 text-gray-500'
@@ -37,7 +34,7 @@ const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onC
             </div>
           )}
 
-          {/* Lista de Conexões */}
+
           {connections.map((conn) => (
             <div 
               key={`${conn.host}-${conn.port}`}
@@ -58,7 +55,6 @@ const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onC
                 </div>
               </div>
               
-              {/* Botão para deletar conexão */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
