@@ -14,7 +14,6 @@ app.whenReady().then(() => {
 
   const apiProcess = spawn('node', [serverPath], {
     windowsHide: true,
-    detached: true,
     stdio: 'ignore',
   });
 
@@ -41,9 +40,13 @@ app.whenReady().then(() => {
 
   mainWindow.loadURL(startURL);
 
-  mainWindow.on('closed', () => {
+  app.on('quit', () => {
     if (apiProcess) {
-      apiProcess.kill();
+      try {
+        process.kill(apiProcess.pid);
+      } catch (error) {
+        console.error('Erro ao encerrar o subprocesso:', error);
+      }
     }
   });
 
