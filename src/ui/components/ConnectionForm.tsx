@@ -22,13 +22,11 @@ const ConnectionForm = ({ initialConnection, error, onSubmit }) => {
   };
 
   return (
-    <div className="flex justify-center items-center w-full min-h-[90vh]">
+    <div className="flex justify-center items-center w-full h-full">
       <div className={`p-6 rounded-xl shadow-lg w-full max-w-md border ${darkMode
         ? 'bg-gray-800 text-gray-100 border-gray-700'
         : 'bg-white text-gray-900 border-gray-200'
         }`}>
-        {/* ✅ Cabeçalho */}
-        {/* ✅ Cabeçalho */}
         <div className="flex flex-col items-center justify-center text-center mb-4">
           <div className="flex items-center gap-2">
             <ServerIcon className={`w-6 h-6 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
@@ -36,10 +34,7 @@ const ConnectionForm = ({ initialConnection, error, onSubmit }) => {
           </div>
         </div>
 
-
-        {/* ✅ Formulário */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Nome da Conexão */}
           <div>
             <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Nome da Conexão
@@ -58,7 +53,6 @@ const ConnectionForm = ({ initialConnection, error, onSubmit }) => {
             />
           </div>
 
-          {/* Endereço do Servidor */}
           <div>
             <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Endereço do Servidor
@@ -90,14 +84,12 @@ const ConnectionForm = ({ initialConnection, error, onSubmit }) => {
             </div>
           </div>
 
-          {/* Mensagem de erro */}
           {error && (
             <div className={`p-3 rounded-lg ${darkMode ? 'bg-red-900/20 text-red-300' : 'bg-red-100 text-red-700'}`}>
               {error}
             </div>
           )}
 
-          {/* Botão de Conexão */}
           <button
             type="submit"
             className={`w-full p-3 rounded-lg flex items-center justify-center gap-2 transition-all ${darkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
