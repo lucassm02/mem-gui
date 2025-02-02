@@ -1,28 +1,45 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, screen } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 
-const apiPath = path.join(__dirname, '../../dist/api/server.cjs');
-let apiProcess;
+const isDev = !app.isPackaged;
+
+const serverPath = isDev
+  ? path.join(__dirname, '../../dist/server/index.cjs')
+  : path.join(process.resourcesPath, 'server/index.cjs');
 
 app.whenReady().then(() => {
-  apiProcess = spawn('node', [apiPath], { stdio: 'inherit' });
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
 
-  let mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
+  const apiProcess = spawn('node', [serverPath], {
+    windowsHide: true,
+    detached: true,
+    stdio: 'ignore',
+  });
+
+  const iconPath = path.join(__dirname, '..', '..', 'assets', 'mem-gui.ico');
+
+  const mainWindow = new BrowserWindow({
+    width,
+    height,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    icon: iconPath,
   });
 
-  const startURL = 'http://localhost:5173';
+  const startURL = isDev
+    ? 'http://localhost:5173'
+    : 'http://localhost:33080/index.html';
+
   mainWindow.loadURL(startURL);
+  mainWindow.maximize();
 
   mainWindow.on('closed', () => {
     if (apiProcess) {
-      apiProcess.kill(); // Encerra API ao fechar Electron
+      apiProcess.kill();
     }
   });
 });

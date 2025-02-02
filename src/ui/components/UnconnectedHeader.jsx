@@ -1,4 +1,5 @@
-import { MoonIcon, SunIcon, SwatchIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { Bars3Icon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import MemGuiIcon from '/mem-gui.svg';
 import { useDarkMode } from '../hooks/useDarkMode';
 
 const UnconnectedHeader = ({ onToggleMenu }) => {
@@ -7,7 +8,6 @@ const UnconnectedHeader = ({ onToggleMenu }) => {
   return (
     <header className={`p-4 border-b flex items-center justify-between ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
       
-      {/* ✅ Botão de Menu Hamburguer */}
       <button 
         onClick={onToggleMenu} 
         className={`p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
@@ -16,10 +16,7 @@ const UnconnectedHeader = ({ onToggleMenu }) => {
       </button>
 
       <div className="flex items-center gap-2">
-        <SwatchIcon className={`w-6 h-6 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-        <h2 className={`text-lg font-bold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-          MemGUI
-        </h2>
+        <img src={MemGuiIcon}  alt='MemGUI'  className={`w-12 h-12 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
       </div>
 
       <button

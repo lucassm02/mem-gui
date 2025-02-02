@@ -3,6 +3,7 @@ import express from 'express';
 import { body, param, validationResult } from 'express-validator';
 import memjs from 'memjs';
 import net from 'net';
+import path from 'path';
 
 import { promisify } from 'util';
 
@@ -10,8 +11,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 const TELNET_TIMEOUT = 5000;
 const MAX_CONCURRENT_REQUESTS = 10;
-const DEFAULT_SERVER_PORT = 3001;
+const DEFAULT_SERVER_PORT = 33080;
 const CONNECTION_TIMEOUT = 300_000;
+
+const STATIC_FILES_PATH = path.join(__dirname, '..', 'ui');
 
 interface MemcachedConnection {
   id: string;
@@ -19,7 +22,7 @@ interface MemcachedConnection {
   port: number;
   client: memjs.Client;
   lastActive: Date;
-  timer: NodeJS.Timer;
+  timer: NodeJS.Timeout;
 }
 
 interface MemcachedConnection {
@@ -37,6 +40,8 @@ type CacheResponse = {
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static(STATIC_FILES_PATH));
 
 app.use(
   (
@@ -217,13 +222,13 @@ const ConnectionController = {
   },
 
   disconnect: async (req: express.Request, res: express.Response) => {
-    const connection = req.currentConnection;
-    connection!.client.close();
-    clearTimeout(connection!.timer);
-    connections.delete(connection!.id);
+    const connection = req.currentConnection!;
+    connection.client.close();
+    clearTimeout(connection.timer);
+    connections.delete(connection.id);
 
     logger.info('Conexão Memcached encerrada', {
-      connectionId: connection!.id,
+      connectionId: connection.id,
     });
     res.json({ status: 'disconnected', connectionId: connection!.id });
   },

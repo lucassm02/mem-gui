@@ -7,7 +7,7 @@ interface MemcachedConnection {
   port: number;
   client: Client;
   lastActive: Date;
-  timer: NodeJS.Timer;
+  timer: NodeJS.Timeout;
 }
 
 declare module 'express' {
