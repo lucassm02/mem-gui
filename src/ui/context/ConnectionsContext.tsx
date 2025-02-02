@@ -67,7 +67,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       });
 
       setCurrentConnection(newConnection);
-      await loadKeys();
+      await handleLoadKeys();
     } catch (err) {
       setError('Falha na conexão. Verifique os dados e tente novamente.');
     }
@@ -87,7 +87,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
       setIsConnected(true);
       setCurrentConnection(connection);
-      await loadKeys();
+      await handleLoadKeys();
     } catch (err) {
       if (err.status === 404) {
         await handleConnect({ name, host, port });
@@ -104,10 +104,11 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     setCurrentConnection({ host: '', port: 11211, name: '', id: '' });
   };
 
-  const loadKeys = async () => {
+  const handleLoadKeys = async () => {
     try {
       const response = await api.get('/keys');
-      setKeys([...response.data]);
+      const sortedKeys = [...response.data].sort((a, b) => a.key.localeCompare(b.key));
+      setKeys(sortedKeys);
     } catch (err) {
       setError('Erro ao carregar chaves.');
     }
@@ -115,8 +116,8 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
   const handleCreateKey = async (newKey: KeyData) => {
     try {
-      console.log(newKey)
-      setKeys((prevKeys) => [...prevKeys, { ...newKey, size: new Blob([newKey.value]).size, timeUntilExpiration: newKey.timeUntilExpiration ?? 0 }]);
+      const newList = [...keys, { ...newKey, size: new Blob([newKey.value]).size, timeUntilExpiration: newKey.timeUntilExpiration ?? 0 }].sort((a, b) => a.key.localeCompare(b.key))
+      setKeys(newList);
       await api.post('/keys', { key: newKey.key, value: newKey.value, expires: newKey.timeUntilExpiration });
     } catch (error) {
       setError('Erro ao criar chave.');
@@ -161,7 +162,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       handleConnect,
       choseConnection,
       handleDisconnect,
-      loadKeys,
+      loadKeys: handleLoadKeys,
       handleCreateKey,
       handleEditKey,
       handleDeleteKey,
