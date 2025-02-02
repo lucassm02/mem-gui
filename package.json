@@ -1,5 +1,6 @@
 {
   "name": "mem-gui",
+  "description": "A graphical interface (GUI) for managing Memcached databases and cache. Provides an intuitive way to list, create, edit, and delete keys, as well as manage multiple server connections efficiently.",
   "private": false,
   "version": "0.1.0",
   "author": {
