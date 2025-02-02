@@ -12,7 +12,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 const TELNET_TIMEOUT = 5000;
 const MAX_CONCURRENT_REQUESTS = 10;
-const DEFAULT_SERVER_PORT = 33080;
 const CONNECTION_TIMEOUT = 300_000;
 
 const STATIC_FILES_PATH = path.join(__dirname, '..', 'ui');
@@ -47,13 +46,13 @@ interface MemcachedConnection {
   lastActive: Date;
 }
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const server = express();
+server.use(cors());
+server.use(express.json());
 
-app.use(express.static(STATIC_FILES_PATH));
+server.use(express.static(STATIC_FILES_PATH));
 
-app.use(
+server.use(
   (
     err: Error,
     req: express.Request,
@@ -472,7 +471,7 @@ const CacheController = {
   },
 };
 
-app.post(
+server.post(
   '/api/connections',
   validateRequest([
     body('host').isString(),
@@ -481,23 +480,23 @@ app.post(
   ConnectionController.connect
 );
 
-app.delete(
+server.delete(
   '/api/connections',
   checkConnection,
   ConnectionController.disconnect
 );
 
-app.get('/api/connections', checkConnection, ConnectionController.status);
+server.get('/api/connections', checkConnection, ConnectionController.status);
 
-app.get('/api/keys', checkConnection, CacheController.listKeys);
+server.get('/api/keys', checkConnection, CacheController.listKeys);
 
-app.get(
+server.get(
   '/api/keys/:key',
   checkConnection,
   validateRequest([param('key').isString().notEmpty()]),
   CacheController.getKey
 );
-app.post(
+server.post(
   '/api/keys',
   checkConnection,
   validateRequest([
@@ -507,16 +506,11 @@ app.post(
   ]),
   CacheController.setKey
 );
-app.delete(
+server.delete(
   '/api/keys/:key',
   checkConnection,
   validateRequest([param('key').isString().notEmpty()]),
   CacheController.deleteKey
 );
 
-const PORT = DEFAULT_SERVER_PORT;
-app.listen(PORT, () => {
-  logger.info(`Servidor iniciado na porta ${PORT}`);
-});
-
-export default app;
+export { server };

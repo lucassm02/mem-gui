@@ -1,6 +1,6 @@
 {
-  "name": "mem-gui",
-  "description": "A graphical interface (GUI) for managing Memcached databases and cache. Provides an intuitive way to list, create, edit, and delete keys, as well as manage multiple server connections efficiently.",
+  "name": "MemGUI",
+  "description": "GUI for managing Memcached",
   "private": false,
   "version": "0.1.0",
   "author": {
@@ -11,18 +11,19 @@
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "clean": "rimraf dist && rimraf release",
-    "prestart": "yarn clean && tsc && node scripts/fix-server-extension.js",
-    "predev": "yarn clean && tsc && node scripts/fix-server-extension.js",
+    "prestart": "yarn clean && tsc && node scripts/build-server.js",
+    "predev": "yarn clean && tsc && node scripts/build-server.js",
     "dev": "concurrently \"npm run ui\" \"wait-on http://localhost:5173 && npm run electron\"",
     "ui": "vite",
     "server": "tsx src/server/index.ts",
     "electron": "electron .",
     "build:server": "tsc",
     "build:ui": "vite build",
-    "build:all": "yarn clean && yarn build:ui && yarn build:server && node scripts/fix-server-extension.js && electron-builder",
+    "build:all": "yarn clean && yarn build:ui && yarn build:server && node scripts/build-server.js && electron-builder",
     "start": "electron ."
   },
   "build": {
+    "asar": false,
     "extraFiles": [
       {
         "from": "dist/",
@@ -79,6 +80,7 @@
     "electron": "^34.0.2",
     "electron-builder": "^25.1.8",
     "electron-is-dev": "^3.0.1",
+    "esbuild": "^0.24.2",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",

@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
+const net = require('net');
+
+const DEFAULT_SERVER_PORT = 33080;
 
 const isDev = !app.isPackaged;
 
@@ -8,14 +10,45 @@ const serverPath = isDev
   ? path.join(__dirname, '../../dist/server/index.cjs')
   : path.join(process.resourcesPath, 'server/index.cjs');
 
-app.whenReady().then(() => {
+const startURL = isDev
+  ? 'http://localhost:5173'
+  : `http://localhost:${DEFAULT_SERVER_PORT}/index.html`;
+
+async function isPortInUse(port) {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    server.once('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+
+    server.once('listening', () => {
+      server.close();
+      resolve(false);
+    });
+
+    server.listen(port);
+  });
+}
+
+app.whenReady().then(async () => {
+  try {
+    const { server } = require(serverPath);
+
+    const isUsed = await isPortInUse(DEFAULT_SERVER_PORT);
+
+    if (!isUsed) {
+      await server.listen(DEFAULT_SERVER_PORT);
+    }
+  } catch (error) {
+    console.error('Unable to create a new http sever', error);
+  }
+
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
-
-  const apiProcess = spawn('node', [serverPath], {
-    windowsHide: true,
-    stdio: 'ignore',
-  });
 
   const iconPath = path.join(__dirname, '..', '..', 'assets', 'mem-gui.ico');
 
@@ -34,21 +67,7 @@ app.whenReady().then(() => {
     icon: iconPath,
   });
 
-  const startURL = isDev
-    ? 'http://localhost:5173'
-    : 'http://localhost:33080/index.html';
-
   mainWindow.loadURL(startURL);
-
-  app.on('quit', () => {
-    if (apiProcess) {
-      try {
-        process.kill(apiProcess.pid);
-      } catch (error) {
-        console.error('Erro ao encerrar o subprocesso:', error);
-      }
-    }
-  });
 
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send('window-maximized');
