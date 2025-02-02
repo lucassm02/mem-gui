@@ -1,9 +1,13 @@
 {
-  "name": "MemGUI",
+  "name": "mem-gui",
   "private": false,
   "version": "0.1.0",
+  "author": {
+    "name": "Lucas Santos"
+  },
   "main": "src/electron/main.cjs",
   "type": "module",
+  "license": "Non-Commercial Use Only",
   "scripts": {
     "clean": "rimraf dist && rimraf release",
     "prestart": "yarn clean && tsc && node scripts/fix-server-extension.js",
