@@ -4,6 +4,7 @@ import { body, param, validationResult } from 'express-validator';
 import memjs from 'memjs';
 import net from 'net';
 import path from 'path';
+import pLimit from 'p-limit';
 
 import { promisify } from 'util';
 
@@ -25,17 +26,26 @@ interface MemcachedConnection {
   timer: NodeJS.Timeout;
 }
 
+interface CacheResponse {
+  key: string;
+  value: string | null;
+  timeUntilExpiration: number;
+  size: number;
+}
+
+interface KeyInfo {
+  key: string;
+  expiration: number;
+  size: number;
+  slabId?: string;
+}
+
 interface MemcachedConnection {
   host: string;
   port: number;
   client: memjs.Client;
   lastActive: Date;
 }
-
-type CacheResponse = {
-  key: string;
-  value: string | null;
-};
 
 const app = express();
 app.use(cors());
@@ -77,6 +87,34 @@ const logger = {
       })
     ),
 };
+
+function extractKeysInfoFromDump(
+  dumpOutput: string,
+  slabId?: string
+): KeyInfo[] {
+  const regex = /ITEM\s+(\S+)\s+\[(\d+)\s*b;\s*(\d+)\s*s\]/g;
+  const results: KeyInfo[] = [];
+  for (const match of dumpOutput.matchAll(regex)) {
+    const key = match[1];
+    const size = parseInt(match[2], 10);
+    const expiration = parseInt(match[3], 10);
+    results.push({ key, size, expiration, slabId });
+  }
+  return results;
+}
+
+function extractUsedChunksFromSlabs(slabsOutput: string): Map<string, number> {
+  const slabMap = new Map<string, number>();
+  const regex = /STAT\s+(\d+):used_chunks\s+(\d+)/g;
+  for (const match of slabsOutput.matchAll(regex)) {
+    const slabId = match[1];
+    const usedChunks = parseInt(match[2], 10);
+    slabMap.set(slabId, usedChunks);
+  }
+  return slabMap;
+}
+
+const RESERVED_KEY = '__ALL_KEYS__';
 
 const validateRequest = (validations: any[]) => {
   return async (
@@ -266,56 +304,118 @@ const ConnectionController = {
 
 const CacheController = {
   listKeys: async (req: express.Request, res: express.Response) => {
-    const connection = req.currentConnection!;
+    const connection = req.currentConnection;
+    if (!connection) {
+      res.status(400).json({ error: 'Conexão não definida.' });
+      return;
+    }
 
     try {
-      const slabsOutput = await executeTelnetCommand(connection, 'stats items');
+      // 1. Obtém as informações dos slabs usando o comando "stats slabs"
+      const slabsOutput = await executeTelnetCommand(connection, 'stats slabs');
+      const slabUsedMap = extractUsedChunksFromSlabs(slabsOutput);
+      const slabIds = Array.from(slabUsedMap.keys());
 
-      const slabIds = [
-        ...new Set(
-          [...slabsOutput.matchAll(/items:(\d+):number/g)].map(([, id]) => id)
-        ),
-      ];
+      // 2. Para cada slab, obtém o dump e extrai as informações (chave, tamanho, expiração, slabId)
+      const keysInfoArrays = await Promise.all(
+        slabIds.map(async (slabId) => {
+          try {
+            const dumpOutput = await executeTelnetCommand(
+              connection,
+              `stats cachedump ${slabId} 1000`
+            );
+            return extractKeysInfoFromDump(dumpOutput, slabId);
+          } catch (error) {
+            logger.error(`Erro ao processar slab ${slabId}`, error as Error);
+            return [];
+          }
+        })
+      );
 
-      const keys = (
-        await Promise.all(
-          slabIds.map(async (slabId) => {
-            try {
-              const dump = await executeTelnetCommand(
-                connection,
-                `stats cachedump ${slabId} 1000`
-              );
-              return [...dump.matchAll(/ITEM (\S+)/g)].map(([, key]) => key);
-            } catch (error) {
-              logger.error(`Erro no slab ${slabId}`, error as Error);
-              return [];
-            }
-          })
-        )
-      ).flat();
+      // Junta todas as informações extraídas
+      const keysInfo = keysInfoArrays.flat();
 
-      const results: CacheResponse[] = [];
-      for (let i = 0; i < keys.length; i += MAX_CONCURRENT_REQUESTS) {
-        const chunk = keys.slice(i, i + MAX_CONCURRENT_REQUESTS);
-        const chunkResults = await Promise.all(
-          chunk.map(async (key) => {
+      // 3. Verifica, para cada slab, se a quantidade de itens retornada pelo cachedump
+      // bate com o valor indicado em stats slabs
+      let discrepancyFound = false;
+      for (const slabId of slabIds) {
+        const expectedCount = slabUsedMap.get(slabId) || 0;
+        const actualCount = keysInfo.filter(
+          (info) => info.slabId === slabId
+        ).length;
+        if (actualCount !== expectedCount) {
+          discrepancyFound = true;
+          break;
+        }
+      }
+
+      // 4. Se houver discrepância, busca as chaves armazenadas na chave reservada
+      let unionKeys: string[];
+      if (discrepancyFound) {
+        let storedKeys: string[] = [];
+        try {
+          const reservedData = await connection.client.get(RESERVED_KEY);
+          if (reservedData) {
+            storedKeys = JSON.parse(reservedData.toString());
+          }
+        } catch (err) {
+          logger.error('Erro ao obter chave reservada', err as Error);
+        }
+        // Junta as chaves obtidas via cachedump com as armazenadas anteriormente
+        unionKeys = Array.from(
+          new Set([...keysInfo.map((info) => info.key), ...storedKeys])
+        );
+      } else {
+        // Se não houver discrepância, utiliza somente as chaves obtidas via cachedump
+        unionKeys = Array.from(new Set(keysInfo.map((info) => info.key)));
+      }
+
+      // 5. Para cada chave do conjunto final, obtém seu valor e monta a resposta.
+      const limit = pLimit(MAX_CONCURRENT_REQUESTS);
+      const results: CacheResponse[] = await Promise.all(
+        unionKeys.map((key) =>
+          limit(async () => {
             try {
               const { value } = await connection!.client.get(key);
+              // Tenta recuperar as informações (expiração e tamanho) para a chave,
+              // se disponível; caso contrário, assume 0.
+              const info = keysInfo.find((info) => info.key === key);
+              const expiration = info ? info.expiration : 0;
+              const size = info ? info.size : 0;
+              const currentUnixTime = Math.floor(Date.now() / 1000);
+              const timeUntilExpiration =
+                expiration > 0 ? expiration - currentUnixTime : 0;
 
               return {
                 key,
                 value: value?.toString() || null,
+                timeUntilExpiration,
+                size,
               };
             } catch (error) {
-              logger.error(`Erro ao obter chave ${key}`, error as Error);
-              return { key, value: null };
+              logger.error(`Erro ao obter a chave ${key}`, error as Error);
+              return { key, value: null, timeUntilExpiration: 0, size: 0 };
             }
           })
-        );
-        results.push(...chunkResults);
-      }
+        )
+      );
 
-      res.json(results);
+      const ONE_DAY_IN_SECONDS = 86400;
+
+      // 6. Atualiza a chave reservada com a união atual de chaves (de forma assíncrona)
+      connection.client
+        .set(RESERVED_KEY, JSON.stringify(unionKeys), {
+          expires: ONE_DAY_IN_SECONDS,
+        })
+        .catch((err: Error) =>
+          logger.error('Erro ao atualizar chave reservada', err)
+        );
+
+      const resultWithoutReservedKey = results.filter(
+        (item) => item.key !== RESERVED_KEY
+      );
+
+      res.json(resultWithoutReservedKey);
     } catch (error) {
       logger.error('Erro ao listar chaves', error as Error);
       res.status(500).json({ error: 'Falha ao recuperar chaves' });
@@ -331,39 +431,6 @@ const CacheController = {
     } catch (error) {
       logger.error(`Erro ao obter chave ${req.params.key}`, error);
       res.status(500).json({ error: 'Erro ao obter valor da chave' });
-    }
-  },
-
-  createKey: async (req: express.Request, res: express.Response) => {
-    try {
-      const connection = req.currentConnection;
-
-      const { key, value } = req.body;
-      await connection!.client.set(key, value);
-      res.sendStatus(204);
-    } catch (error) {
-      logger.error('Erro ao criar chave', error);
-      res.status(500).json({ error: 'Erro ao criar chave no Memcached' });
-    }
-  },
-
-  updateKey: async (req: express.Request, res: express.Response) => {
-    try {
-      const connection = req.currentConnection;
-
-      const { key } = req.params;
-      const { value } = req.body;
-
-      const existing = await connection!.client.get(key);
-      if (!existing.value) {
-        return res.status(404).json({ error: 'Chave não encontrada' });
-      }
-
-      await connection!.client.replace(key, value);
-      res.sendStatus(204);
-    } catch (error) {
-      logger.error(`Erro ao atualizar chave ${req.params.key}`, error);
-      res.status(500).json({ error: 'Erro ao atualizar chave' });
     }
   },
 
@@ -384,8 +451,8 @@ const CacheController = {
     try {
       const connection = req.currentConnection!;
 
-      const { key, value, ttl } = req.body;
-      const options = ttl ? { expires: ttl } : undefined;
+      const { key, value, expires } = req.body;
+      const options = expires ? { expires: expires } : undefined;
 
       const success = await connection.client.set(key, value, options);
 

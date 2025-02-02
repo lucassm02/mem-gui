@@ -12,6 +12,8 @@ interface Connection {
 interface KeyData {
   key: string;
   value: string;
+  timeUntilExpiration: number;
+  size: number;
 }
 
 interface ConnectionsContextType {

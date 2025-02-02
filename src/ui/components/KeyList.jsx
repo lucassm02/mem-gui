@@ -62,6 +62,8 @@ const KeyList = () => {
             <tr>
               <th scope="col" className="px-6 py-3">Chave</th>
               <th scope="col" className="px-6 py-3">Valor</th>
+              <th scope="col" className="px-6 py-3">Expiração</th>
+              <th scope="col" className="px-6 py-3">Tamanho (Bytes)</th>
               <th scope="col" className="px-6 py-3 text-right">Ações</th>
             </tr>
           </thead>
@@ -74,6 +76,8 @@ const KeyList = () => {
                     {item.key}
                   </td>
                   <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.value}</td>
+                  <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.timeUntilExpiration}</td>
+                  <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.size}</td>
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => {

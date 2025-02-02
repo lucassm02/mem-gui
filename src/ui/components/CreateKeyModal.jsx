@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-import {useModal} from '../hooks/useModal'
-import {useDarkMode} from '../hooks/useDarkMode'
+import { useModal } from '../hooks/useModal';
+import { useDarkMode } from '../hooks/useDarkMode';
 
 const CreateKeyModal = ({ onClose, onSave }) => {
-  const [formData, setFormData] = useState({ key: '', value: '' });
+  const [formData, setFormData] = useState({ key: '', value: '', expires: undefined });
 
-  const { createModalIsOpen , closeCreateModal} = useModal()
-  const  {darkMode} = useDarkMode()
+  const { createModalIsOpen, closeCreateModal } = useModal();
+  const { darkMode } = useDarkMode();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.key && formData.value) {
       onSave(formData);
-      closeCreateModal()
-      setFormData({})
+      closeCreateModal();
+      setFormData({ key: '', value: '', expires: undefined });
     }
   };
 
@@ -27,7 +27,7 @@ const CreateKeyModal = ({ onClose, onSave }) => {
           : 'bg-white border-gray-200 text-gray-900'
       }`}>
         <button
-          onClick={()=> {
+          onClick={() => {
             closeCreateModal();
             onClose?.();
           }}
@@ -70,13 +70,33 @@ const CreateKeyModal = ({ onClose, onSave }) => {
               onChange={(e) => setFormData({ ...formData, value: e.target.value })}
             />
           </div>
+          
+          <div>
+            <label className="block text-sm mb-2">Expiração (segundos)</label>
+            <input
+              type="number"
+              className={`w-full p-2 rounded-xl border-2 ${
+                darkMode
+                  ? 'bg-gray-700 border-gray-600 focus:border-blue-400'
+                  : 'border-gray-200 focus:border-blue-500'
+              }`}
+              value={formData.expires ?? ''}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  expires: e.target.value ? Number(e.target.value) : undefined,
+                })
+              }
+              placeholder="Opcional"
+            />
+          </div>
 
           <div className="flex gap-3 justify-end">
             <button
               type="button"
-              onClick={()=> {
+              onClick={() => {
                 closeCreateModal();
-                onClose?.()
+                onClose?.();
               }}
               className={`px-4 py-2 rounded-xl ${
                 darkMode 

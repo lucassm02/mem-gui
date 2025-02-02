@@ -4,23 +4,28 @@ import { useDarkMode } from '../hooks/useDarkMode';
 import { useModal } from '../hooks/useModal';
 
 const EditKeyModal = ({ onClose, keyData, onSave }) => {
-
   const [value, setValue] = useState(keyData?.value || '');
+  const [expires, setExpires] = useState(keyData?.expires !== undefined ? keyData.expires : '');
 
-    const { editModalIsOpen , closeEditModal} = useModal()
-    const  {darkMode} = useDarkMode()
+  const { editModalIsOpen, closeEditModal } = useModal();
+  const { darkMode } = useDarkMode();
 
   useEffect(() => {
     if (keyData) {
       setValue(keyData.value || '');
+      setExpires(keyData.expires !== undefined ? keyData.expires : '');
     }
   }, [keyData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (value.trim()) {
-      onSave({ ...keyData, value });
-      closeEditModal()
+      onSave({ 
+        ...keyData, 
+        value, 
+        expires: expires ? Number(expires) : undefined 
+      });
+      closeEditModal();
       onClose?.();
     }
   };
@@ -34,9 +39,9 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
       }`}>
 
         <button
-          onClick={()=> {
-            closeEditModal()
-            onClose?.()
+          onClick={() => {
+            closeEditModal();
+            onClose?.();
           }}
           className={`absolute top-4 right-4 p-1 rounded-full ${
             darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
@@ -73,12 +78,25 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
             />
           </div>
 
+          <div>
+            <label className="block text-sm mb-1">Expiração (segundos)</label>
+            <input
+              type="number"
+              className={`w-full p-2 rounded-lg border-2 ${
+                darkMode ? 'bg-gray-700 border-gray-600 focus:border-blue-400' : 'border-gray-300 focus:border-blue-500'
+              }`}
+              value={expires}
+              onChange={(e) => setExpires(e.target.value)}
+              placeholder="Opcional"
+            />
+          </div>
+
           <div className="flex gap-3 justify-end">
             <button
               type="button"
-              onClick={()=> {
-                closeEditModal()
-                onClose?.()
+              onClick={() => {
+                closeEditModal();
+                onClose?.();
               }}
               className={`px-4 py-2 rounded-lg ${
                 darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
