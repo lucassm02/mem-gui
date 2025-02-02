@@ -105,7 +105,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const loadKeys = async () => {
     try {
       const response = await api.get('/keys');
-      setKeys([...response.data]); // Garante que React detecte a mudança
+      setKeys([...response.data]);
     } catch (err) {
       setError('Erro ao carregar chaves.');
     }

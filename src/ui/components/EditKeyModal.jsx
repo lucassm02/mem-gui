@@ -9,8 +9,6 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
 
     const { editModalIsOpen , closeEditModal} = useModal()
     const  {darkMode} = useDarkMode()
-  
-
 
   useEffect(() => {
     if (keyData) {
@@ -34,7 +32,7 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
       <div className={`relative rounded-xl p-6 w-full max-w-md border-2 ${
         darkMode ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-200 text-gray-900'
       }`}>
-        {/* Botão de fechar */}
+
         <button
           onClick={()=> {
             closeEditModal()
@@ -50,7 +48,6 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
         <h3 className="text-lg font-medium mb-4">✏️ Editar Chave</h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Campo de Chave (Somente leitura) */}
           <div>
             <label className="block text-sm mb-1">Chave</label>
             <input
@@ -63,7 +60,6 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
             />
           </div>
           
-          {/* Campo de Valor */}
           <div>
             <label className="block text-sm mb-1">Novo Valor</label>
             <textarea
@@ -77,7 +73,6 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
             />
           </div>
 
-          {/* Botões de Ação */}
           <div className="flex gap-3 justify-end">
             <button
               type="button"

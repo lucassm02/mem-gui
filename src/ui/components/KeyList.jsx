@@ -30,7 +30,6 @@ const KeyList = () => {
 
   return (
     <div className="w-full px-6 max-w-7xl mx-auto mt-10">
-      {/* Cabeçalho da tabela */}
       <div className="flex items-center justify-between pb-4">
         <h2 className={`text-lg font-semibold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
           Chaves Armazenadas ({keys.length})
@@ -57,7 +56,6 @@ const KeyList = () => {
         </div>
       </div>
 
-      {/* Garantindo que a tabela aparece mesmo sem dados */}
       <div className={`overflow-x-auto shadow-md rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <table className="w-full text-sm text-left">
           <thead className={`text-xs uppercase ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>

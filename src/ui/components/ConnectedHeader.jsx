@@ -6,8 +6,7 @@ const ConnectedHeader = ({ connection, onDisconnect, onToggleMenu }) => {
 
   return (
     <header className={`p-4 border-b flex items-center justify-between ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
-      
-      {/* ✅ Botão de Menu Hamburguer */}
+    
       <button 
         onClick={onToggleMenu} 
         className={`p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
