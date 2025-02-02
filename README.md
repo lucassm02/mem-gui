@@ -52,4 +52,4 @@
 
 ## 📜 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Non-Commercial Use Only License**. You are granted a limited, non-exclusive, and non-transferable license to use this software for personal, educational, or non-commercial research purposes only. Commercial use—including selling, offering paid services, or integrating this software into commercial products—is strictly prohibited. For the full details, please see the [LICENSE](LICENSE) file.

@@ -1,8 +1,8 @@
 # **LICENSE - Non-Commercial Use Only**
 
-**Copyright © [2024] [Lucas S. M.]**
+**Copyright © [2025] [Lucas S. M.]**
 
-This software, **mem-gui**, is licensed under the following terms:
+This software, **MemGui**, is licensed under the following terms:
 
 ## **1. Permissions**  
 
@@ -25,4 +25,4 @@ THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Any violation of these terms will result in the immediate termination of this license. The author reserves the right to revoke or modify this license at any time.
 
-For inquiries regarding alternative licensing options, please contact **[your email or GitHub profile]**.
+For inquiries regarding alternative licensing options, please contact **[lucassm02](https://github.com/lucassm02)**.
