@@ -101,7 +101,7 @@ const KeyList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="3" className={`px-6 py-4 text-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <td colSpan="5" className={`px-6 py-4 text-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   Nenhuma chave armazenada
                 </td>
               </tr>

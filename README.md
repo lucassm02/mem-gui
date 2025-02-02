@@ -1,8 +1,52 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# MemGUI
 
-Currently, two official plugins are available:
+**MemGUI** is a graphical user interface (GUI) for managing **Memcached** databases and cache. It provides an intuitive experience for listing, creating, editing, and deleting keys, overcoming some of Memcached's limitations. It also allows users to view key details such as **content size and TTL** and supports multiple simultaneous connections to different servers.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📌 Features
+
+- **Complete Key Management**
+  - Create new keys.
+  - Edit existing keys (value and expiration time).
+  - Delete keys from the cache.
+  - View stored keys with details:
+    - Key name.
+    - Stored value.
+    - Expiration time (TTL).
+    - Content size.
+
+- **Multi-Server Support**
+  - Connect to multiple Memcached instances.
+  - Seamlessly switch between active connections without closing them.
+
+- **User-Friendly Interface**
+  - Light and dark mode for an enhanced user experience.
+  - Simplified navigation for efficient key and server management.
+
+## 🖼 Screenshots
+
+### Connection Screen
+
+![Connection Screen](./screenshots/screnshot-00.png)
+
+### Key List
+
+![Key List](./screenshots/screnshot-01.png)
+![Key List](./screenshots/screnshot-02.png)
+![Key List](./screenshots/screnshot-05.png)
+
+### Key Creating
+
+![Key List](./screenshots/screnshot-04.png)
+
+### Key Editing
+
+![Key Editing](./screenshots/screnshot-03.png)
+
+### Switch Connection
+
+![Switch Connection](./screenshots/screnshot-06.png)
+
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
