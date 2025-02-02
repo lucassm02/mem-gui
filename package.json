@@ -7,7 +7,7 @@
   },
   "main": "src/electron/main.cjs",
   "type": "module",
-  "license": "Non-Commercial Use Only",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "clean": "rimraf dist && rimraf release",
     "prestart": "yarn clean && tsc && node scripts/fix-server-extension.js",
@@ -22,7 +22,6 @@
     "start": "electron ."
   },
   "build": {
-    "asar": false,
     "extraFiles": [
       {
         "from": "dist/",
