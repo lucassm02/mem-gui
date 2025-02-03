@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 const TELNET_TIMEOUT = 5000;
 const MAX_CONCURRENT_REQUESTS = 10;
 const CONNECTION_TIMEOUT = 300_000;
+const ONE_DAY_IN_SECONDS = 86400;
 
 const STATIC_FILES_PATH = path.join(__dirname, '..', 'ui');
 
@@ -267,6 +268,7 @@ const ConnectionController = {
     logger.info('Conexão Memcached encerrada', {
       connectionId: connection.id,
     });
+
     res.json({ status: 'disconnected', connectionId: connection!.id });
   },
 
@@ -310,12 +312,23 @@ const CacheController = {
     }
 
     try {
-      // 1. Obtém as informações dos slabs usando o comando "stats slabs"
+      // 1. Busca as chaves armazenadas na chave reservada
+      let storedKeys: string[] = [];
+      try {
+        const reservedData = await connection.client.get(RESERVED_KEY);
+        if (reservedData) {
+          storedKeys = JSON.parse(reservedData?.value!.toString());
+        }
+      } catch (err) {
+        logger.error('Erro ao obter chave reservada', err as Error);
+      }
+
+      // 2. Obtém as informações dos slabs usando "stats slabs"
       const slabsOutput = await executeTelnetCommand(connection, 'stats slabs');
       const slabUsedMap = extractUsedChunksFromSlabs(slabsOutput);
       const slabIds = Array.from(slabUsedMap.keys());
 
-      // 2. Para cada slab, obtém o dump e extrai as informações (chave, tamanho, expiração, slabId)
+      // 3. Para cada slab, busca o cachedump e extrai as chaves
       const keysInfoArrays = await Promise.all(
         slabIds.map(async (slabId) => {
           try {
@@ -331,63 +344,50 @@ const CacheController = {
         })
       );
 
-      // Junta todas as informações extraídas
-      const keysInfo = keysInfoArrays.flat();
+      // 4. Junta todas as chaves encontradas, eliminando duplicatas e ordenando
+      const keysInfo = keysInfoArrays.flat(); // Mantemos a estrutura completa com expiração e tamanho
+      const slabKeys = keysInfo.map((info) => info.key);
+      const allKeys = Array.from(new Set([...slabKeys, ...storedKeys])).sort();
 
-      // 3. Verifica, para cada slab, se a quantidade de itens retornada pelo cachedump
-      // bate com o valor indicado em stats slabs
-      let discrepancyFound = false;
-      for (const slabId of slabIds) {
-        const expectedCount = slabUsedMap.get(slabId) || 0;
-        const actualCount = keysInfo.filter(
-          (info) => info.slabId === slabId
-        ).length;
-        if (actualCount !== expectedCount) {
-          discrepancyFound = true;
-          break;
-        }
+      if (allKeys.length === 0) {
+        res.json([]);
+        return;
       }
 
-      // 4. Se houver discrepância, busca as chaves armazenadas na chave reservada
-      let unionKeys: string[];
-      if (discrepancyFound) {
-        let storedKeys: string[] = [];
-        try {
-          const reservedData = await connection.client.get(RESERVED_KEY);
-          if (reservedData) {
-            storedKeys = JSON.parse(reservedData.toString());
-          }
-        } catch (err) {
-          logger.error('Erro ao obter chave reservada', err as Error);
-        }
-        // Junta as chaves obtidas via cachedump com as armazenadas anteriormente
-        unionKeys = Array.from(
-          new Set([...keysInfo.map((info) => info.key), ...storedKeys])
-        );
-      } else {
-        // Se não houver discrepância, utiliza somente as chaves obtidas via cachedump
-        unionKeys = Array.from(new Set(keysInfo.map((info) => info.key)));
-      }
-
-      // 5. Para cada chave do conjunto final, obtém seu valor e monta a resposta.
+      // 5. Para cada chave, obtém o valor e restaura expiração e tamanho
       const limit = pLimit(MAX_CONCURRENT_REQUESTS);
-      const results: CacheResponse[] = await Promise.all(
-        unionKeys.map((key) =>
+
+      const keysToDelete: string[] = [];
+
+      const results = await Promise.all(
+        allKeys.map((key) =>
           limit(async () => {
             try {
-              const { value } = await connection!.client.get(key);
-              // Tenta recuperar as informações (expiração e tamanho) para a chave,
-              // se disponível; caso contrário, assume 0.
+              const { value } = await connection.client.get(key);
+
+              if (!value) {
+                keysToDelete.push(key);
+                return null;
+              }
+
+              // Recupera expiração e tamanho da chave, se disponível
               const info = keysInfo.find((info) => info.key === key);
+
               const expiration = info ? info.expiration : 0;
-              const size = info ? info.size : 0;
               const currentUnixTime = Math.floor(Date.now() / 1000);
+
               const timeUntilExpiration =
                 expiration > 0 ? expiration - currentUnixTime : 0;
 
+              const valueToString = value.toString();
+
+              const size = info
+                ? info.size
+                : Buffer.from(valueToString, 'utf8').length;
+
               return {
                 key,
-                value: value?.toString() || null,
+                value: valueToString,
                 timeUntilExpiration,
                 size,
               };
@@ -399,21 +399,21 @@ const CacheController = {
         )
       );
 
-      const ONE_DAY_IN_SECONDS = 86400;
+      const filteredAllKeys = allKeys.filter((k) => !keysToDelete.includes(k));
 
-      // 6. Atualiza a chave reservada com a união atual de chaves (de forma assíncrona)
+      // 6. Atualiza a chave reservada com a lista ordenada de chaves
       connection.client
-        .set(RESERVED_KEY, JSON.stringify(unionKeys), {
+        .set(RESERVED_KEY, JSON.stringify(filteredAllKeys), {
           expires: ONE_DAY_IN_SECONDS,
         })
         .catch((err: Error) =>
           logger.error('Erro ao atualizar chave reservada', err)
         );
 
+      // 7. Retorna os resultados sem incluir a chave reservada
       const resultWithoutReservedKey = results.filter(
-        (item) => item.key !== RESERVED_KEY
+        (item) => item && item.key !== RESERVED_KEY
       );
-
       res.json(resultWithoutReservedKey);
     } catch (error) {
       logger.error('Erro ao listar chaves', error as Error);
@@ -463,6 +463,25 @@ const CacheController = {
         key,
         status: 'created',
         ttl: options?.expires,
+      });
+
+      connection.client.get(RESERVED_KEY).then((response) => {
+        if (!response) return;
+
+        try {
+          const storedKeys = JSON.parse(response?.value!.toString());
+          const allKeys = Array.from(new Set([...storedKeys, key])).sort();
+
+          connection.client
+            .set(RESERVED_KEY, JSON.stringify(allKeys), {
+              expires: ONE_DAY_IN_SECONDS,
+            })
+            .catch((err: Error) =>
+              logger.error('Erro ao atualizar chave reservada', err)
+            );
+        } catch (error) {
+          console.error(error);
+        }
       });
     } catch (error) {
       logger.error('Erro ao definir chave', error as Error);
