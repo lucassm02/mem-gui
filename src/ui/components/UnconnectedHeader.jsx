@@ -10,7 +10,7 @@ const UnconnectedHeader = ({ onToggleMenu }) => {
       
       <button 
         onClick={onToggleMenu} 
-        className={`p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
+        className={`cursor-pointer p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
       >
         <Bars3Icon className="w-6 h-6" />
       </button>
@@ -21,7 +21,7 @@ const UnconnectedHeader = ({ onToggleMenu }) => {
 
       <button
         onClick={toggleDarkMode}
-        className={`p-2 rounded-lg ${darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'}`}
+        className={`cursor-pointer p-2 rounded-lg ${darkMode ? 'text-blue-400 hover:bg-gray-700' : 'text-blue-600 hover:bg-gray-100'}`}
       >
         {darkMode ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
       </button>

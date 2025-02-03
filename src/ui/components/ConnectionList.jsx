@@ -20,7 +20,7 @@ const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onC
             <h3 className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               Conexões Salvas
             </h3>
-            <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-700/50">
+            <button onClick={onClose} className="cursor-pointer p-1 rounded-md hover:bg-gray-700/50">
               <XMarkIcon className={`w-6 h-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`} />
             </button>
           </div>
@@ -60,7 +60,7 @@ const ConnectionList = ({ connections, darkMode, onSelect, onDelete, isOpen, onC
                   e.stopPropagation();
                   onDelete(conn);
                 }}
-                className={`p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity
+                className={`cursor-pointer p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity
                   ${darkMode ? 'text-red-400 hover:bg-gray-600' : 'text-red-600 hover:bg-gray-200'}
                 `}
               >

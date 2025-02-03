@@ -9,7 +9,7 @@ const ConnectedHeader = ({ connection, onDisconnect, onToggleMenu }) => {
     
       <button 
         onClick={onToggleMenu} 
-        className={`p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
+        className={`cursor-pointer p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-200'}`}
       >
         <Bars3Icon className="w-6 h-6" />
       </button>
@@ -34,7 +34,7 @@ const ConnectedHeader = ({ connection, onDisconnect, onToggleMenu }) => {
       <div className="flex items-center gap-3">
         <button
           onClick={onDisconnect}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${darkMode ? 'text-red-400 hover:bg-gray-700/40' : 'text-red-600 hover:bg-gray-100'}`}
+          className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${darkMode ? 'text-red-400 hover:bg-gray-700/40' : 'text-red-600 hover:bg-gray-100'}`}
         >
           <LinkSlashIcon className="w-5 h-5" />
           <span className="text-sm">Desconectar</span>
@@ -42,7 +42,7 @@ const ConnectedHeader = ({ connection, onDisconnect, onToggleMenu }) => {
 
         <button
           onClick={toggleDarkMode}
-          className={`p-2 rounded-xl border ${darkMode ? 'border-gray-600 text-blue-400 hover:bg-gray-700/40' : 'border-gray-200 text-blue-600 hover:bg-gray-100'}`}
+          className={`cursor-pointer p-2 rounded-xl border ${darkMode ? 'border-gray-600 text-blue-400 hover:bg-gray-700/40' : 'border-gray-200 text-blue-600 hover:bg-gray-100'}`}
         >
           {darkMode ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
         </button>

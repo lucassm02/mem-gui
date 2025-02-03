@@ -31,7 +31,7 @@ const CreateKeyModal = ({ onClose, onSave }) => {
             closeCreateModal();
             onClose?.();
           }}
-          className={`absolute top-4 right-4 p-1 rounded-xl ${
+          className={`cursor-pointer absolute top-4 right-4 p-1 rounded-xl ${
             darkMode ? 'hover:bg-gray-700/40' : 'hover:bg-gray-100'
           }`}
         >
@@ -98,7 +98,7 @@ const CreateKeyModal = ({ onClose, onSave }) => {
                 closeCreateModal();
                 onClose?.();
               }}
-              className={`px-4 py-2 rounded-xl ${
+              className={`cursor-pointer px-4 py-2 rounded-xl ${
                 darkMode 
                   ? 'text-gray-300 hover:bg-gray-700/40' 
                   : 'text-gray-600 hover:bg-gray-100'
@@ -108,7 +108,7 @@ const CreateKeyModal = ({ onClose, onSave }) => {
             </button>
             <button
               type="submit"
-              className={`px-4 py-2 rounded-xl ${
+              className={`cursor-pointer px-4 py-2 rounded-xl ${
                 darkMode 
                   ? 'bg-blue-700 hover:bg-blue-600 text-white' 
                   : 'bg-blue-600 hover:bg-blue-700 text-white'

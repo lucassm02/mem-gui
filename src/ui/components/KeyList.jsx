@@ -1,7 +1,7 @@
 import {
   ArrowPathIcon,
   KeyIcon,
-  PencilIcon,
+  PencilSquareIcon,
   PlusIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
@@ -16,7 +16,7 @@ const KeyList = () => {
   const { darkMode } = useDarkMode();
   const { 
     keys, 
-    loadKeys, 
+    handleLoadKeys,
     handleDeleteKey, 
     handleCreateKey,
     handleEditKey
@@ -39,14 +39,14 @@ const KeyList = () => {
             onClick={() => {
               openCreateModal()
             }}
-            className="px-4 py-2 rounded-lg flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white transition-all"
+            className="cursor-pointer px-4 py-2 rounded-lg flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white transition-all"
           >
             <PlusIcon className="w-5 h-5" />
             Criar
           </button>
           <button
-            onClick={loadKeys}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
+            onClick={handleLoadKeys}
+            className={`cursor-pointer px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
               darkMode ? 'text-gray-300 hover:bg-gray-700/50' : 'text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -73,25 +73,25 @@ const KeyList = () => {
                 <tr key={item.key} className={`border-b ${darkMode ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-all`}>
                   <td className={`px-6 py-4 font-medium flex items-center gap-2 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                     <KeyIcon className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                    {item.key}
+                    <p className='truncate max-w-[600px]' >{item.key}</p>
                   </td>
                   <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.value}</td>
-                  <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.timeUntilExpiration}</td>
-                  <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.size}</td>
+                  <td className={`px-6 py-4 truncate max-w-[100px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.timeUntilExpiration}</td>
+                  <td className={`px-6 py-4 truncate max-w-[100px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.size}</td>
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => {
                         setEditingKey(item)
                         openEditModal(item)
                       }}
-                      className={`transition-all mx-2 ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+                      className={`cursor-pointer transition-all mx-2 ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
                       aria-label={`Editar chave ${item.key}`}
                     >
-                      <PencilIcon className="w-5 h-5" />
+                      <PencilSquareIcon className="w-5 h-5" />
                     </button>
                     <button 
                       onClick={() => handleDeleteKey(item.key)}
-                      className={`transition-all mx-2 ${darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'}`}
+                      className={`cursor-pointer transition-all mx-2 ${darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'}`}
                       aria-label={`Excluir chave ${item.key}`}
                     >
                       <TrashIcon className="w-5 h-5" />

@@ -25,7 +25,7 @@ interface ConnectionsContextType {
   handleConnect: (connection: Omit<Connection, 'id'>) => Promise<void>;
   choseConnection: (connection: Omit<Connection, 'id'>) => Promise<void>;
   handleDisconnect: () => void;
-  loadKeys: () => Promise<void>;
+  handleLoadKeys: () => Promise<void>;
   handleCreateKey: (newKey: KeyData) => Promise<void>;
   handleEditKey: (updatedKey: KeyData) => Promise<void>;
   handleDeleteKey: (key: string) => Promise<void>;
@@ -162,7 +162,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       handleConnect,
       choseConnection,
       handleDisconnect,
-      loadKeys: handleLoadKeys,
+      handleLoadKeys,
       handleCreateKey,
       handleEditKey,
       handleDeleteKey,

@@ -92,7 +92,7 @@ const ConnectionForm = ({ initialConnection, error, onSubmit }) => {
 
           <button
             type="submit"
-            className={`w-full p-3 rounded-lg flex items-center justify-center gap-2 transition-all ${darkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+            className={`cursor-pointer w-full p-3 rounded-lg flex items-center justify-center gap-2 transition-all ${darkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
           >
             Conectar ao Servidor
