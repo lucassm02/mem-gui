@@ -2,7 +2,7 @@
   "name": "MemGUI",
   "description": "GUI for managing Memcached",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.1.2",
   "author": {
     "name": "Lucas Santos"
   },

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import api, { clearConnectionId, setConnectionId } from '../api';
 import React from 'react';
+import { useModal } from '../hooks/useModal';
 
 interface Connection {
   name: string;
@@ -51,8 +52,12 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [keys, setKeys] = useState<KeyData[]>([]);
   const [error, setError] = useState('');
 
+  const { showError, showLoading, dismissLoading } = useModal()
+
+
   const handleConnect = async ({ host, port, name }: Omit<Connection, 'id'>) => {
     try {
+      showLoading();
       const response = await api.post('/connections', { host, port });
       const { connectionId } = response.data;
       setConnectionId(connectionId);
@@ -68,13 +73,16 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
       setCurrentConnection(newConnection);
       await handleLoadKeys();
+      dismissLoading()
     } catch (err) {
-      setError('Falha na conexão. Verifique os dados e tente novamente.');
+      dismissLoading()
+      showError('Falha na conexão. Verifique os dados e tente novamente.');
     }
   };
 
   const choseConnection = async ({ name, host, port }: Omit<Connection, 'id'>) => {
     try {
+      showLoading();
       const connection = savedConnections.find((c) => c.host === host && c.port === port);
 
       if (!connection) {
@@ -88,12 +96,14 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       setIsConnected(true);
       setCurrentConnection(connection);
       await handleLoadKeys();
+      dismissLoading()
     } catch (err) {
+      dismissLoading()
       if (err.status === 404) {
         await handleConnect({ name, host, port });
         return;
       }
-      setError('Erro ao escolher conexão.');
+      showError('Erro ao escolher conexão.');
     }
   };
 
@@ -106,11 +116,14 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
   const handleLoadKeys = async () => {
     try {
+      showLoading()
       const response = await api.get('/keys');
       const sortedKeys = [...response.data].sort((a, b) => a.key.localeCompare(b.key));
       setKeys(sortedKeys);
+      dismissLoading()
     } catch (err) {
-      setError('Erro ao carregar chaves.');
+      dismissLoading()
+      showError('Erro ao carregar chaves.');
     }
   };
 
@@ -120,18 +133,19 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       setKeys(newList);
       await api.post('/keys', { key: newKey.key, value: newKey.value, expires: newKey.timeUntilExpiration });
     } catch (error) {
-      setError('Erro ao criar chave.');
+      showError('Erro ao criar chave.');
     }
   };
 
   const handleEditKey = async (updatedKey: KeyData) => {
     try {
+      showLoading();
       setKeys((prevKeys) =>
         prevKeys.map((k) => (k.key === updatedKey.key ? { ...updatedKey, size: new Blob([updatedKey.value]).size, timeUntilExpiration: updatedKey.timeUntilExpiration ?? 0 } : k))
       );
       await api.post('/keys', { key: updatedKey.key, value: updatedKey.value, expires: updatedKey.timeUntilExpiration });
     } catch (error) {
-      setError('Erro ao editar chave.');
+      showError('Erro ao editar chave.');
     }
   };
 
@@ -140,7 +154,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       await api.delete(`/keys/${key}`);
       setKeys((prevKeys) => prevKeys.filter((k) => k.key !== key));
     } catch (error) {
-      setError('Erro ao excluir chave.');
+      showError('Erro ao excluir chave.');
     }
   };
 

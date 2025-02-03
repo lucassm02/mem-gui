@@ -1,3 +1,5 @@
+import LoadingModal from './components/LoadingModal';
+import ErrorModal from './components/ErrorModal';
 import Main from './components/Main';
 import TitleBar from './components/TitleBar';
 import { ConnectionsProvider } from './context/ConnectionsContext';
@@ -11,6 +13,8 @@ const App = () => (
       <ConnectionsProvider>
         <div className="h-screen flex flex-col">
             <TitleBar />
+            <LoadingModal/>
+            <ErrorModal/>
             <Main />
           </div>
       </ConnectionsProvider>

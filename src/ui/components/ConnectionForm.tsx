@@ -42,10 +42,10 @@ const ConnectionForm = ({ initialConnection, error, onSubmit }) => {
             <input
               type="text"
               name="name"
-              placeholder="Ex: Produção"
+              placeholder="Produção"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full p-3 rounded-lg focus:ring-2 transition-all ${darkMode
+              className={`w-full mt-1 p-3 rounded-lg focus:ring-2 transition-all ${darkMode
                 ? 'bg-gray-700 border-gray-600 text-gray-100 focus:ring-blue-400'
                 : 'bg-gray-100 border-gray-300 text-gray-900 focus:ring-blue-500'
                 }`}
@@ -61,7 +61,7 @@ const ConnectionForm = ({ initialConnection, error, onSubmit }) => {
               <input
                 type="text"
                 name="host"
-                placeholder="ex: 60.68.77.198"
+                placeholder="60.68.77.198"
                 value={formData.host}
                 onChange={handleChange}
                 className={`flex-1 p-3 rounded-lg focus:ring-2 transition-all ${darkMode
