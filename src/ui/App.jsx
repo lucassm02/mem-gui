@@ -1,5 +1,5 @@
-import LoadingModal from './components/LoadingModal';
 import ErrorModal from './components/ErrorModal';
+import LoadingModal from './components/LoadingModal';
 import Main from './components/Main';
 import TitleBar from './components/TitleBar';
 import { ConnectionsProvider } from './context/ConnectionsContext';

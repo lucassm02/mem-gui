@@ -2,7 +2,7 @@
   "name": "MemGUI",
   "description": "GUI for managing Memcached",
   "private": false,
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": {
     "name": "Lucas Santos"
   },
@@ -54,8 +54,13 @@
     }
   },
   "dependencies": {
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-xml": "^6.1.0",
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.0.1",
+    "@uiw/react-codemirror": "^4.23.7",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "express": "^4.21.2",

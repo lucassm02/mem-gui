@@ -3,35 +3,35 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useModal } from '../hooks/useModal';
 
-const EditKeyModal = ({ onClose, keyData, onSave }) => {
-  const [value, setValue] = useState(keyData?.value || '');
-  const [timeUntilExpiration, setTimeUntilExpiration] = useState(keyData?.timeUntilExpiration !== undefined ? keyData.timeUntilExpiration : '');
+const EditKeyModal = ({ onSave }) => {
+  const { editModalIsOpen, closeEditModal, itemToEdit } = useModal();
 
-  const { editModalIsOpen, closeEditModal } = useModal();
+  const [value, setValue] = useState(itemToEdit?.value || '');
+  const [timeUntilExpiration, setTimeUntilExpiration] = useState(itemToEdit?.timeUntilExpiration !== undefined ? itemToEdit.timeUntilExpiration : '');
+
   const { darkMode } = useDarkMode();
 
   useEffect(() => {
-    if (keyData) {
+    if (itemToEdit) {
       
-      setValue(keyData.value || '');
-      setTimeUntilExpiration(keyData.timeUntilExpiration !== undefined ? keyData.timeUntilExpiration : '');
+      setValue(itemToEdit.value || '');
+      setTimeUntilExpiration(itemToEdit.timeUntilExpiration !== undefined ? itemToEdit.timeUntilExpiration : '');
     }
-  }, [keyData]);
+  }, [itemToEdit]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (value.trim()) {
       onSave({ 
-        ...keyData, 
+        ...itemToEdit, 
         value, 
         timeUntilExpiration: timeUntilExpiration ? Number(timeUntilExpiration) : undefined 
       });
       closeEditModal();
-      onClose?.();
     }
   };
 
-  if (!editModalIsOpen || !keyData) return null; 
+  if (!editModalIsOpen || !itemToEdit) return null; 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -42,7 +42,6 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
         <button
           onClick={() => {
             closeEditModal();
-            onClose?.();
           }}
           className={`cursor-pointer absolute top-4 right-4 p-1 rounded-xl ${
             darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
@@ -61,7 +60,7 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
               className={`w-full p-2 rounded-lg cursor-not-allowed ${
                 darkMode ? 'bg-gray-700 border-gray-600 opacity-75' : 'border-gray-300 bg-gray-50'
               }`}
-              value={keyData.key}
+              value={itemToEdit.key}
               readOnly
             />
           </div>
@@ -97,7 +96,6 @@ const EditKeyModal = ({ onClose, keyData, onSave }) => {
               type="button"
               onClick={() => {
                 closeEditModal();
-                onClose?.();
               }}
               className={`cursor-pointer px-4 py-2 rounded-lg ${
                 darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'

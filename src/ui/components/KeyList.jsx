@@ -3,7 +3,8 @@ import {
   KeyIcon,
   PencilSquareIcon,
   PlusIcon,
-  TrashIcon
+  TrashIcon,
+  DocumentMagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { useConnections } from '../hooks/useConnections';
 import { useDarkMode } from '../hooks/useDarkMode';
@@ -11,6 +12,7 @@ import { useModal } from '../hooks/useModal';
 import CreateKeyModal from './CreateKeyModal';
 import EditKeyModal from './EditKeyModal';
 import { useState } from 'react';
+import ViewDataModal from './ViewDataModal';
 
 const KeyList = () => {
   const { darkMode } = useDarkMode();
@@ -19,14 +21,11 @@ const KeyList = () => {
     handleLoadKeys,
     handleDeleteKey, 
     handleCreateKey,
-    handleEditKey
+    handleEditKey,
   } = useConnections();
 
 
-  const {openCreateModal, openEditModal} = useModal()
-
-
-  const [editingKey, setEditingKey] = useState({})
+  const {openCreateModal, openEditModal, openViewDataModal} = useModal()
 
   return (
     <div className="w-full px-6 max-w-7xl mx-auto mt-10">
@@ -73,15 +72,23 @@ const KeyList = () => {
                 <tr key={item.key} className={`border-b ${darkMode ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-all`}>
                   <td className={`px-6 py-4 font-medium flex items-center gap-2 ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                     <KeyIcon className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                    <p className='truncate max-w-[600px]' >{item.key}</p>
+                    <p className='truncate max-w-[300px]' >{item.key}</p>
                   </td>
                   <td className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.value}</td>
                   <td className={`px-6 py-4 truncate max-w-[100px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.timeUntilExpiration}</td>
                   <td className={`px-6 py-4 truncate max-w-[100px] ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{item.size}</td>
                   <td className="px-6 py-4 text-right">
+                  <button 
+                      onClick={() => {
+                        openViewDataModal(item)
+                      }}
+                      className={`cursor-pointer transition-all mx-2 ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+                      aria-label={`Editar chave ${item.key}`}
+                    >
+                      <DocumentMagnifyingGlassIcon className="w-5 h-5" />
+                    </button>
                     <button 
                       onClick={() => {
-                        setEditingKey(item)
                         openEditModal(item)
                       }}
                       className={`cursor-pointer transition-all mx-2 ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
@@ -115,10 +122,10 @@ const KeyList = () => {
         />
     
         <EditKeyModal
-          keyData={editingKey}
           onSave={handleEditKey}
-          onClose={()=>setEditingKey({})}
         />
+
+        <ViewDataModal />
       
     </div>
 

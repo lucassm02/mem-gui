@@ -3,10 +3,12 @@ import React, { createContext } from 'react';
 
 
 interface ModalContextType {
-  openEditModal: () => void;
+  openEditModal: (itemToEdit: any) => void;
   closeEditModal: () => void;
   openCreateModal: () => void;
   closeCreateModal: () => void;
+  openViewDataModal: (dataToShow: any) => void;
+  closeViewDataModal: () => void;
   showLoading: () => void;
   dismissLoading: () => void;
   showError: (error: string) => void;
@@ -16,6 +18,9 @@ interface ModalContextType {
   errorModalIsOpen: boolean;
   errorModalMessage: string;
   loadingModalIsOpen: boolean;
+  viewDataModalIsOpen: boolean;
+  itemToView: {};
+  itemToEdit: {}
 }
 
 export const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -23,16 +28,21 @@ export const ModalContext = createContext<ModalContextType | undefined>(undefine
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
   const [editModalIsOpen, setEditModalIsOpen] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState({});
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
   const [errorModalMessage, setErrorModalMessage] = useState('');
   const [loadingModalIsOpen, setLoadingModalIsOpen] = useState(false);
+  const [viewDataModalIsOpen, setViewDataModalIsOpen] = useState(false);
+  const [itemToView, setItemToView] = useState({});
 
-  const openEditModal = () => {
+  const openEditModal = (itemToEdit: any) => {
     setEditModalIsOpen(true)
+    setItemToEdit(itemToEdit)
   };
 
   const closeEditModal = () => {
     setEditModalIsOpen(false)
+    setItemToEdit({})
   };
 
   const openCreateModal = () => {
@@ -61,8 +71,18 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     setLoadingModalIsOpen(false)
   };
 
+  const openViewDataModal = (dataToShow: any) => {
+    setViewDataModalIsOpen(true)
+    setItemToView(dataToShow)
+  };
+
+  const closeViewDataModal = () => {
+    setViewDataModalIsOpen(false);
+    setItemToView({})
+  }
+
   return (
-    <ModalContext.Provider value={{ openCreateModal, closeCreateModal, closeEditModal, openEditModal, createModalIsOpen, editModalIsOpen, showError, dismissError, errorModalIsOpen, errorModalMessage, dismissLoading, loadingModalIsOpen, showLoading }}>
+    <ModalContext.Provider value={{ openCreateModal, closeCreateModal, closeEditModal, openEditModal, itemToEdit, createModalIsOpen, editModalIsOpen, showError, dismissError, errorModalIsOpen, errorModalMessage, dismissLoading, loadingModalIsOpen, showLoading, closeViewDataModal, openViewDataModal, viewDataModalIsOpen, itemToView: itemToView }}>
       {children}
     </ModalContext.Provider>
   );
