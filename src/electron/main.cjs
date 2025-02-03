@@ -1,6 +1,7 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, dialog } = require('electron');
 const path = require('path');
 const net = require('net');
+const { response } = require('express');
 
 const DEFAULT_SERVER_PORT = 33080;
 
@@ -35,16 +36,17 @@ async function isPortInUse(port) {
 }
 
 app.whenReady().then(async () => {
+  const isUsed = await isPortInUse(DEFAULT_SERVER_PORT);
+
   try {
     const { server } = require(serverPath);
-
-    const isUsed = await isPortInUse(DEFAULT_SERVER_PORT);
 
     if (!isUsed) {
       await server.listen(DEFAULT_SERVER_PORT);
     }
   } catch (error) {
     console.error('Unable to create a new http sever', error);
+    app.quit();
   }
 
   const primaryDisplay = screen.getPrimaryDisplay();
@@ -68,6 +70,19 @@ app.whenReady().then(async () => {
   });
 
   mainWindow.loadURL(startURL);
+
+  mainWindow.webContents.once('did-finish-load', async () => {
+    if (isUsed) {
+      await dialog.showMessageBox(mainWindow, {
+        type: 'warning',
+        title: 'Alerta',
+        message: 'Já existe uma instância do MemGUI em execução!',
+        buttons: ['OK'],
+      });
+
+      app.quit();
+    }
+  });
 
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send('window-maximized');
