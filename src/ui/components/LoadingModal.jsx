@@ -1,20 +1,31 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useModal } from "../hooks/useModal";
+import { useDarkMode } from "../hooks/useDarkMode"; // Importa o tema
 
 const LoadingModal = () => {
-
-  const {loadingModalIsOpen} = useModal()
+  const { loadingModalIsOpen } = useModal();
+  const { darkMode } = useDarkMode(); // Obtém o tema atual
 
   if (!loadingModalIsOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-99">
-      <div className="bg-[#1E293B]/80 text-white p-8 rounded-lg shadow-xl w-40 border border-gray-700 animate-fadeIn flex flex-col items-center">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-50">
+      <div className={`p-8 rounded-lg shadow-xl w-40 flex flex-col items-center animate-fadeIn transition-all
+        ${darkMode ? "bg-gray-800/80 text-white border-gray-700" : "bg-white/80 text-gray-900 border-gray-300"}`}>
+
+        
         <div className="relative flex justify-center">
-          <ArrowPathIcon className="w-14 h-14 text-blue-400 animate-spin" />
-          <div className="absolute w-14 h-14 bg-blue-400 opacity-20 rounded-full blur-xl"></div>
+          <ArrowPathIcon className={`w-14 h-14 animate-spin 
+            ${darkMode ? "text-blue-400" : "text-blue-600"}`} />
+          <div className={`absolute w-14 h-14 opacity-20 rounded-full blur-xl transition
+            ${darkMode ? "bg-blue-400" : "bg-blue-600"}`}></div>
         </div>
-        <p className="mt-5 text-sm text-gray-300 font-medium">Carregando...</p>
+
+        
+        <p className={`mt-5 text-sm font-medium transition 
+          ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+          Carregando...
+        </p>
       </div>
     </div>
   );
