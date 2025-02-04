@@ -7,10 +7,17 @@ import {
 } from "@heroicons/react/24/outline";
 
 const TitleBar = () => {
-  const { ipcRenderer } = window.require("electron");
+
+let ipcRenderer = null
+
+  if(window.require){
+    ipcRenderer  = window.require("electron").ipcRenderer;
+  }
+
   const [isMaximized, setIsMaximized] = useState(false);
 
   useEffect(() => {
+    if(!ipcRenderer) return;
     ipcRenderer.on("window-maximized", () => setIsMaximized(true));
     ipcRenderer.on("window-unmaximized", () => setIsMaximized(false));
 
@@ -19,6 +26,8 @@ const TitleBar = () => {
       ipcRenderer.removeAllListeners("window-unmaximized");
     };
   }, []);
+
+  if(!ipcRenderer) return null
 
   return (
     <div className="w-full h-10 bg-[#121212] flex items-center justify-between px-4 text-white"
