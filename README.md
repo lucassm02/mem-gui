@@ -9,6 +9,7 @@
 ## 📌 Features
 
 - **Complete Key Management**
+
   - Create new keys.
   - Edit existing keys (value and expiration time).
   - Delete keys from the cache.
@@ -19,6 +20,7 @@
     - Content size.
 
 - **Multi-Server Support**
+
   - Connect to multiple Memcached instances.
   - Seamlessly switch between active connections without closing them.
 

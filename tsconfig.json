@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react-jsx",
     "target": "ESNext",
     "module": "CommonJS",
     "outDir": "dist",
@@ -8,6 +9,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "useUnknownInCatchVariables": false,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
     "src"
