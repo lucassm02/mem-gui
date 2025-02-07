@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import {
   ArrowDownTrayIcon,
   ArrowUpTrayIcon,
@@ -10,7 +11,7 @@ import {
   ServerIcon,
   SignalIcon
 } from "@heroicons/react/24/outline";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import ConnectedHeader from "@/components/ConnectedHeader";
 import ConnectionList from "@/components/ConnectionList";
 import { useConnections, useDarkMode } from "@/hooks";
@@ -18,7 +19,17 @@ import { useConnections, useDarkMode } from "@/hooks";
 export function Dashboard() {
   const { darkMode } = useDarkMode();
 
-  const { serverData } = useConnections();
+  const { serverData, handleLoadServerData } = useConnections();
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    interval = setInterval(() => {
+      handleLoadServerData(false);
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [handleLoadServerData]);
 
   if (!serverData) return null;
 

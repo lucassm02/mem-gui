@@ -79,7 +79,7 @@ interface ConnectionsContextType {
   handleEditKey: (updatedKey: KeyData) => Promise<boolean>;
   handleDeleteKey: (key: string) => Promise<boolean>;
   handleDeleteConnection: (connection: Connection) => void;
-  handleLoadServerData: () => Promise<boolean>;
+  handleLoadServerData: (showLoadingModal?: boolean) => Promise<boolean>;
 }
 
 export const ConnectionsContext = createContext<
@@ -182,16 +182,16 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const handleLoadServerData = async () => {
+  const handleLoadServerData = async (showLoadingModal = true) => {
     try {
-      showLoading();
+      if (showLoadingModal) showLoading();
       const response = await api.get("/connections");
 
       setServerData({ ...response.data });
-      dismissLoading();
+      if (showLoadingModal) dismissLoading();
       return true;
     } catch (_error) {
-      dismissLoading();
+      if (showLoadingModal) dismissLoading();
       showError("Não foi possível carregar estatistias do servidor.");
       return false;
     }

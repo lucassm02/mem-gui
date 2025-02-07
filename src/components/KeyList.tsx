@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import {
   ArrowPathIcon,
   PlusIcon,
@@ -5,7 +6,7 @@ import {
   TrashIcon,
   DocumentMagnifyingGlassIcon
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useConnections } from "../hooks/useConnections";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "../hooks/useModal";
@@ -27,6 +28,19 @@ const KeyList = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [maxItems, setMaxItems] = useState(10);
+  const [autoUpdate, setAutoUpdate] = useState(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (autoUpdate) {
+      interval = setInterval(() => {
+        handleLoadKeys();
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [autoUpdate, handleLoadKeys]);
 
   const filteredKeys = keys.filter((item) => {
     try {
@@ -38,7 +52,9 @@ const KeyList = () => {
 
   return (
     <div
-      className={`w-full px-6 max-w-7xl mx-auto mt-10 transition-all ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"}`}
+      className={`w-full px-6 max-w-7xl mx-auto mt-10 transition-all ${
+        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Chaves Armazenadas</h2>
@@ -54,32 +70,61 @@ const KeyList = () => {
 
           <button
             onClick={handleLoadKeys}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm
-              ${darkMode ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-800"} cursor-pointer`}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm ${
+              darkMode
+                ? "bg-gray-700 hover:bg-gray-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+            } cursor-pointer`}
           >
             <ArrowPathIcon className="w-5 h-5" />
             Atualizar
+          </button>
+
+          <button
+            onClick={() => setAutoUpdate((prev) => !prev)}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm cursor-pointer ${
+              autoUpdate
+                ? darkMode
+                  ? "bg-blue-700 hover:bg-blue-600 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                : darkMode
+                  ? "bg-gray-700 hover:bg-gray-600 text-white"
+                  : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+            }`}
+          >
+            <ArrowPathIcon
+              className={`w-5 h-5 ${autoUpdate ? "animate-spin" : ""}`}
+            />
+            Auto Atualizar
           </button>
         </div>
       </div>
 
       <div
-        className={`p-3 rounded-lg mb-4 flex items-center justify-between ${darkMode ? "bg-gray-800" : "bg-gray-200"} shadow-md`}
+        className={`p-3 rounded-lg mb-4 flex items-center justify-between ${
+          darkMode ? "bg-gray-800" : "bg-gray-200"
+        } shadow-md`}
       >
         <input
           type="text"
           placeholder="🔍 Buscar chave (regex)..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm
-            ${darkMode ? "bg-gray-900 text-gray-100 placeholder-gray-400" : "bg-white text-gray-700 placeholder-gray-500 border border-gray-300"}`}
+          className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm ${
+            darkMode
+              ? "bg-gray-900 text-gray-100 placeholder-gray-400"
+              : "bg-white text-gray-700 placeholder-gray-500 border border-gray-300"
+          }`}
         />
 
         <select
           value={maxItems}
           onChange={(e) => setMaxItems(Number(e.target.value))}
-          className={`ml-4 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all
-            ${darkMode ? "bg-gray-900 text-gray-100 border-gray-700" : "bg-white text-gray-700 border border-gray-300"} cursor-pointer`}
+          className={`ml-4 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+            darkMode
+              ? "bg-gray-900 text-gray-100 border-gray-700"
+              : "bg-white text-gray-700 border border-gray-300"
+          } cursor-pointer`}
         >
           {[5, 10, 15, 20, 50, 100].map((num) => (
             <option key={num} value={num}>
@@ -90,11 +135,17 @@ const KeyList = () => {
       </div>
 
       <div
-        className={`overflow-hidden mb-10 rounded-lg shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+        className={`overflow-hidden mb-10 rounded-lg shadow ${
+          darkMode ? "bg-gray-800" : "bg-white"
+        }`}
       >
         <table className="w-full text-sm text-left">
           <thead
-            className={`text-xs uppercase ${darkMode ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-700"}`}
+            className={`text-xs uppercase ${
+              darkMode
+                ? "bg-gray-700 text-gray-300"
+                : "bg-gray-200 text-gray-700"
+            }`}
           >
             <tr>
               <th className="px-6 py-3">Chave</th>
@@ -109,25 +160,37 @@ const KeyList = () => {
               filteredKeys.slice(0, maxItems).map((item) => (
                 <tr
                   key={item.key}
-                  className={`border-b transition-all ${darkMode ? "border-gray-700 hover:bg-gray-700" : "border-gray-300 hover:bg-gray-100"}`}
+                  className={`border-b transition-all ${
+                    darkMode
+                      ? "border-gray-700 hover:bg-gray-700"
+                      : "border-gray-300 hover:bg-gray-100"
+                  }`}
                 >
                   <td
-                    className={`px-6 py-4 truncate max-w-[300px]  ${darkMode ? "text-gray-100" : "text-gray-800"}`}
+                    className={`px-6 py-4 truncate max-w-[300px] ${
+                      darkMode ? "text-gray-100" : "text-gray-800"
+                    }`}
                   >
                     {item.key}
                   </td>
                   <td
-                    className={`px-6 py-4 truncate max-w-[250px] ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                    className={`px-6 py-4 truncate max-w-[250px] ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                   >
                     {item.value}
                   </td>
                   <td
-                    className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                    className={`px-6 py-4 truncate max-w-[300px] ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                   >
                     {item.timeUntilExpiration}
                   </td>
                   <td
-                    className={`px-6 py-4 truncate max-w-[300px] ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                    className={`px-6 py-4 truncate max-w-[300px] ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                   >
                     {item.size}
                   </td>

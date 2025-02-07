@@ -1,25 +1,21 @@
 import {
+  ArrowUturnLeftIcon,
   Bars3Icon,
   ChartBarIcon,
   LinkIcon,
   LinkSlashIcon,
   MoonIcon,
   ServerIcon,
-  SunIcon,
-  ArrowUturnLeftIcon
+  SunIcon
 } from "@heroicons/react/24/outline";
-import { useNavigate, useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { useConnections, useDarkMode, useMenu } from "@/hooks";
 
 const ConnectedHeader = () => {
   const { darkMode, toggleDarkMode } = useDarkMode();
-  const {
-    currentConnection,
-    handleDisconnect,
-    handleLoadServerData,
-    handleLoadKeys
-  } = useConnections();
+  const { currentConnection, handleDisconnect, handleLoadServerData } =
+    useConnections();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,11 +34,7 @@ const ConnectedHeader = () => {
   }
 
   async function goBack() {
-    const redirect = await handleLoadKeys();
-
-    if (redirect) {
-      navigate("/panel");
-    }
+    navigate("/panel");
   }
 
   const { openMenu } = useMenu();

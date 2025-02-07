@@ -15,26 +15,26 @@ button {
 }
 
 /* Custom Scroll*/
-::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 8px;
   opacity: 0;
 }
 
-::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   background: transparent;
   border-radius: 4px;
   transition: background 0.3s ease-in-out;
 }
 
-:hover::-webkit-scrollbar-thumb {
+*:hover::-webkit-scrollbar-thumb {
   background: #5a5f6a;
 }
 
-:active::-webkit-scrollbar-thumb {
+*:active::-webkit-scrollbar-thumb {
   background: #737884;
 }
 
@@ -43,6 +43,6 @@ button {
   scrollbar-color: transparent transparent;
 }
 
-:hover {
+*:hover {
   scrollbar-color: #5a5f6a transparent;
 }
