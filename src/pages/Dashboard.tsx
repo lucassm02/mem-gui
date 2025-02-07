@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { ReactNode } from "react";
 import ConnectedHeader from "@/components/ConnectedHeader";
+import ConnectionList from "@/components/ConnectionList";
 import { useConnections, useDarkMode } from "@/hooks";
 
 export function Dashboard() {
@@ -25,18 +26,17 @@ export function Dashboard() {
     <>
       <ConnectedHeader />
       <div
-        className={`flex-1 flex flex-col overflow-hidden transition-all ${
+        className={`overflow-hidden flex-1 flex flex-col transition-all ${
           darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
         }`}
       >
         <div
-          className={`w-full px-6 max-w-7xl mx-auto mt-10 transition-all ${darkMode ? "text-gray-100" : "text-gray-900"}`}
+          className={`w-full overflow-y-auto px-6 max-w-7xl mx-auto mt-10 transition-all ${darkMode ? "text-gray-100" : "text-gray-900"}`}
         >
           <h2 className="text-2xl font-semibold mb-6">
             Estatísticas do Servidor
           </h2>
 
-          {/* Cards Principais */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <InfoCard
               title="Host"
@@ -55,7 +55,6 @@ export function Dashboard() {
             />
           </div>
 
-          {/* Estatísticas Avançadas */}
           <h3 className="text-xl font-semibold mt-6 mb-4">
             Monitoramento Avançado
           </h3>
@@ -99,7 +98,6 @@ export function Dashboard() {
             />
           </div>
 
-          {/* Estatísticas de Leitura e Escrita */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <InfoCard
               title="Bytes Escritos"
@@ -120,7 +118,6 @@ export function Dashboard() {
             />
           </div>
 
-          {/* Estatísticas de Slabs */}
           <h3 className="text-xl font-semibold mt-6 mb-4">
             Estatísticas de Slabs
           </h3>
@@ -159,6 +156,7 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+      <ConnectionList />
     </>
   );
 }
@@ -171,12 +169,17 @@ const InfoCard = ({
   title: string;
   value: string;
   icon: ReactNode;
-}) => (
-  <div className="p-4 rounded-lg shadow-md flex items-center gap-4 bg-gray-800 text-white">
-    {icon}
-    <div>
-      <p className="text-sm text-gray-400">{title}</p>
-      <p className="text-lg font-medium">{value}</p>
+}) => {
+  const { darkMode } = useDarkMode();
+  return (
+    <div
+      className={`p-4 rounded-lg shadow-md flex items-center gap-4 ${darkMode ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
+    >
+      {icon}
+      <div>
+        <p className="text-sm text-gray-400">{title}</p>
+        <p className="text-lg font-medium">{value}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};

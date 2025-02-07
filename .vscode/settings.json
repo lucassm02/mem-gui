@@ -23,7 +23,8 @@
     "memgui",
     "memjs",
     "unmaximize",
-    "unmaximized"
+    "unmaximized",
+    "Uturn"
   ],
   "editor.tabSize": 2,
   "editor.insertSpaces": true,

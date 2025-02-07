@@ -14,10 +14,12 @@ export function Connection() {
 
   const { darkMode } = useDarkMode();
 
-  function submit(params: SubmitParams) {
-    handleConnect(params);
-    console.log("opa");
-    navigate("/panel");
+  async function submit(params: SubmitParams) {
+    const redirect = await handleConnect(params);
+
+    if (redirect) {
+      navigate("/panel");
+    }
   }
 
   return (

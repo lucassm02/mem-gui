@@ -35,7 +35,10 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
 
   return (
     <DarkModeContext.Provider
-      value={{ darkMode, toggleDarkMode: () => setDarkMode((prev) => !prev) }}
+      value={{
+        darkMode,
+        toggleDarkMode: () => setDarkMode((prev: boolean) => !prev)
+      }}
     >
       {children}
     </DarkModeContext.Provider>

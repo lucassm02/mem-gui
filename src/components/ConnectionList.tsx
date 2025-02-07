@@ -21,9 +21,12 @@ const ConnectionList = () => {
 
   const navigate = useNavigate();
 
-  function choseConnection(connection: Connection) {
-    handleChoseConnection(connection);
-    navigate("/panel");
+  async function choseConnection(connection: Connection) {
+    const redirect = await handleChoseConnection(connection);
+
+    if (redirect) {
+      navigate("/panel");
+    }
   }
 
   return (

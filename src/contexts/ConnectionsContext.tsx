@@ -68,15 +68,17 @@ interface ConnectionsContextType {
   keys: KeyData[];
   serverData: ServerData | null;
   error: string;
-  handleConnect: (connection: Omit<Connection, "id">) => Promise<void>;
-  handleChoseConnection: (connection: Omit<Connection, "id">) => Promise<void>;
+  handleConnect: (connection: Omit<Connection, "id">) => Promise<boolean>;
+  handleChoseConnection: (
+    connection: Omit<Connection, "id">
+  ) => Promise<boolean>;
   handleDisconnect: () => void;
-  handleLoadKeys: () => Promise<void>;
-  handleCreateKey: (newKey: KeyData) => Promise<void>;
-  handleEditKey: (updatedKey: KeyData) => Promise<void>;
-  handleDeleteKey: (key: string) => Promise<void>;
+  handleLoadKeys: () => Promise<boolean>;
+  handleCreateKey: (newKey: KeyData) => Promise<boolean>;
+  handleEditKey: (updatedKey: KeyData) => Promise<boolean>;
+  handleDeleteKey: (key: string) => Promise<boolean>;
   handleDeleteConnection: (connection: Connection) => void;
-  handleLoadServerData: () => Promise<void>;
+  handleLoadServerData: () => Promise<boolean>;
 }
 
 export const ConnectionsContext = createContext<
@@ -125,11 +127,12 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
       setCurrentConnection(newConnection);
 
-      await handleLoadKeys();
       dismissLoading();
+      return true;
     } catch (err) {
       dismissLoading();
       showError("Falha na conexão. Verifique os dados e tente novamente.");
+      return false;
     }
   };
 
@@ -145,8 +148,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       );
 
       if (!connection) {
-        await handleConnect({ name, host, port });
-        return;
+        return await handleConnect({ name, host, port });
       }
 
       setConnectionId(connection.id);
@@ -154,16 +156,16 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
       setIsConnected(true);
       setCurrentConnection(connection);
-      await handleLoadKeys();
       dismissLoading();
+      return true;
     } catch (err) {
       dismissLoading();
       if (err.status === 404) {
-        await handleConnect({ name, host, port });
-        return;
+        return await handleConnect({ name, host, port });
       }
 
       showError("Erro ao escolher conexão.");
+      return false;
     }
   };
 
@@ -171,11 +173,15 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     try {
       showLoading();
       const response = await api.get("/connections");
+
+      console.log(response.data);
       setServerData({ ...response.data });
       dismissLoading();
+      return true;
     } catch (_error) {
       dismissLoading();
       showError("Não foi possível carregar estatistias do servidor.");
+      return false;
     }
   };
 
@@ -195,9 +201,11 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       );
       setKeys(sortedKeys);
       dismissLoading();
+      return true;
     } catch (_error) {
       dismissLoading();
       showError("Erro ao carregar chaves.");
+      return false;
     }
   };
 
@@ -218,9 +226,11 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
         expires: newKey.timeUntilExpiration
       });
       dismissLoading();
+      return true;
     } catch (_error) {
       dismissLoading();
       showError("Erro ao criar chave.");
+      return false;
     }
   };
 
@@ -244,9 +254,11 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
         expires: updatedKey.timeUntilExpiration
       });
       dismissLoading();
+      return true;
     } catch (_error) {
       dismissLoading();
       showError("Erro ao editar chave.");
+      return false;
     }
   };
 
@@ -254,8 +266,10 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     try {
       await api.delete(`/keys/${key}`);
       setKeys((prevKeys) => prevKeys.filter((k) => k.key !== key));
+      return true;
     } catch (_error) {
       showError("Erro ao excluir chave.");
+      return false;
     }
   };
 

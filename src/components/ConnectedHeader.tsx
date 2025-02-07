@@ -5,18 +5,24 @@ import {
   LinkSlashIcon,
   MoonIcon,
   ServerIcon,
-  SunIcon
+  SunIcon,
+  ArrowUturnLeftIcon
 } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 import { useConnections, useDarkMode, useMenu } from "@/hooks";
 
 const ConnectedHeader = () => {
   const { darkMode, toggleDarkMode } = useDarkMode();
-  const { currentConnection, handleDisconnect, handleLoadServerData } =
-    useConnections();
+  const {
+    currentConnection,
+    handleDisconnect,
+    handleLoadServerData,
+    handleLoadKeys
+  } = useConnections();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   function disconnect() {
     handleDisconnect();
@@ -24,8 +30,21 @@ const ConnectedHeader = () => {
   }
 
   async function goToDashboard() {
-    await handleLoadServerData();
-    navigate("/dashboard");
+    const redirect = await handleLoadServerData();
+
+    console.log();
+
+    if (redirect) {
+      navigate("/dashboard");
+    }
+  }
+
+  async function goBack() {
+    const redirect = await handleLoadKeys();
+
+    if (redirect) {
+      navigate("/panel");
+    }
   }
 
   const { openMenu } = useMenu();
@@ -84,17 +103,31 @@ const ConnectedHeader = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={goToDashboard}
-            className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
-              darkMode
-                ? "text-yellow-400 hover:bg-gray-700/40"
-                : "text-yellow-600 hover:bg-gray-100"
-            }`}
-          >
-            <ChartBarIcon className="w-5 h-5" />
-            <span className="text-sm">Dashboard</span>
-          </button>
+          {location.pathname === "/dashboard" ? (
+            <button
+              onClick={goBack}
+              className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+                darkMode
+                  ? "text-yellow-400 hover:bg-gray-700/40"
+                  : "text-yellow-600 hover:bg-gray-100"
+              }`}
+            >
+              <ArrowUturnLeftIcon className="w-5 h-5" />
+              <span className="text-sm">Voltar</span>
+            </button>
+          ) : (
+            <button
+              onClick={goToDashboard}
+              className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+                darkMode
+                  ? "text-yellow-400 hover:bg-gray-700/40"
+                  : "text-yellow-600 hover:bg-gray-100"
+              }`}
+            >
+              <ChartBarIcon className="w-5 h-5" />
+              <span className="text-sm">Dashboard</span>
+            </button>
+          )}
 
           <button
             onClick={disconnect}

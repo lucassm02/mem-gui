@@ -90,7 +90,7 @@ const KeyList = () => {
       </div>
 
       <div
-        className={`overflow-hidden rounded-lg shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
+        className={`overflow-hidden mb-10 rounded-lg shadow ${darkMode ? "bg-gray-800" : "bg-white"}`}
       >
         <table className="w-full text-sm text-left">
           <thead

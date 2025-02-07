@@ -14,21 +14,35 @@ button {
   transition: background-color 0.2s ease;
 }
 
-/* Scrollbar personalizada */
+/* Custom Scroll*/
 ::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
+  opacity: 0;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: transparent;
   border-radius: 4px;
+  transition: background 0.3s ease-in-out;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+:hover::-webkit-scrollbar-thumb {
+  background: #5a5f6a;
+}
+
+:active::-webkit-scrollbar-thumb {
+  background: #737884;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+:hover {
+  scrollbar-color: #5a5f6a transparent;
 }
