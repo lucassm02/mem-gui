@@ -1,10 +1,10 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
-import { useDarkMode } from "../hooks/useDarkMode"; // Importa o tema
+import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "../hooks/useModal";
 
 const LoadingModal = () => {
   const { loadingModalIsOpen } = useModal();
-  const { darkMode } = useDarkMode(); // Obtém o tema atual
+  const { darkMode } = useDarkMode();
 
   if (!loadingModalIsOpen) return null;
 
@@ -16,7 +16,7 @@ const LoadingModal = () => {
       >
         <div className="relative flex justify-center">
           <ArrowPathIcon
-            className={`w-14 h-14 animate-spin 
+            className={`w-14 h-14 animate-spin
             ${darkMode ? "text-blue-400" : "text-blue-600"}`}
           />
           <div
@@ -26,7 +26,7 @@ const LoadingModal = () => {
         </div>
 
         <p
-          className={`mt-5 text-sm font-medium transition 
+          className={`mt-5 text-sm font-medium transition
           ${darkMode ? "text-gray-300" : "text-gray-700"}`}
         >
           Carregando...

@@ -18,6 +18,9 @@ export default defineConfig({
     historyApiFallback: true
   },
   build: {
-    outDir: "dist"
+    outDir: "dist/public",
+    rollupOptions: {
+      external: ["src/api", "src/server.ts", "src/utils/backend"]
+    }
   }
 });

@@ -10,20 +10,16 @@
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
-    "clean": "rimraf dist && rimraf release",
-    "prestart": "yarn clean && tsc && node scripts/build-server.js",
-    "predev": "yarn clean && tsc && node scripts/build-server.js",
-    "dev": "concurrently \"npm run ui\" \"wait-on http://localhost:5173 && npm run electron\"",
-    "ui": "vite",
-    "server": "tsx src/server/index.ts",
-    "electron": "electron .",
-    "build:server": "tsc",
-    "build:ui": "vite build",
-    "build:all": "yarn clean && yarn build:ui && yarn build:server && node scripts/build-server.js && electron-builder",
-    "start": "electron .",
     "lint": "eslint ./src",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "clean": "rimraf dist && rimraf release",
+    "dev": "concurrently \"yarn dev:server\" \"wait-on http://localhost:5173 && yarn electron\"",
+    "dev:server": "yarn tsx src/server.ts --start --dev --port 5173",
+    "electron": "electron .",
+    "build:server": "node scripts/build-server.cjs",
+    "build:ui": "vite build",
+    "build:all": "yarn clean && yarn build:ui && yarn build:server && electron-builder"
   },
   "build": {
     "asar": false,
@@ -45,10 +41,10 @@
       "package.json"
     ],
     "win": {
-      "icon": "assets/mem-gui.ico"
+      "icon": "assets/images/logo.ico"
     },
     "linux": {
-      "icon": "assets/mem-gui.png",
+      "icon": "assets/images/logo.png",
       "target": [
         "AppImage",
         "deb",
@@ -67,13 +63,13 @@
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "express-validator": "^7.2.1",
     "memjs": "^1.3.2",
     "p-limit": "3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.5",
     "uuid": "^11.0.5",
+    "yargs": "^13.2",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -84,10 +80,12 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@types/uuid": "^10.0.0",
+    "@types/yargs": "^17.0.33",
     "@typescript-eslint/eslint-plugin": "^8.23.0",
     "@typescript-eslint/parser": "^8.23.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "chokidar": "^4.0.3",
     "concurrently": "^9.1.2",
     "electron": "^34.0.2",
     "electron-builder": "^25.1.8",

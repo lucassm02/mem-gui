@@ -26,7 +26,6 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
       : window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
-  // Atualiza o tema quando o estado muda
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
     if (typeof window !== "undefined") {

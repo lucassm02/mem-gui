@@ -11,15 +11,9 @@
     "useUnknownInCatchVariables": false,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "./src/ui"
-  ]
+  "include": ["src"],
+  "exclude": ["./src/ui"]
 }

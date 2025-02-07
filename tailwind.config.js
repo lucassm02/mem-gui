@@ -3,9 +3,7 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors: {
-        // Adicione cores personalizadas se necessário
-      },
+      colors: {},
       animation: {
         fadeIn: "fadeIn 0.3s ease-in-out"
       },
