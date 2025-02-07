@@ -10,7 +10,7 @@ import { useModal } from "../hooks/useModal";
 
 const ViewDataModal = () => {
   const [format, setFormat] = useState("TEXT");
-  const [copiedField, setCopiedField] = useState(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const { darkMode } = useDarkMode();
   const { itemToView, viewDataModalIsOpen, closeViewDataModal } = useModal();
 
@@ -37,10 +37,10 @@ const ViewDataModal = () => {
 
   if (!viewDataModalIsOpen) return null;
 
-  const copyToClipboard = (text, field) => {
+  const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 2000); // Remove a indicação após 2 segundos
+      setTimeout(() => setCopiedField(null), 2000);
     });
   };
 
@@ -83,7 +83,7 @@ const ViewDataModal = () => {
               className={`font-mono p-2 rounded-md text-sm break-words border cursor-pointer transition
                 ${darkMode ? "bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600" : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"}
                 ${copiedField === field ? "bg-green-500 text-white" : ""}`}
-              onClick={() => copyToClipboard(value, field)}
+              onClick={() => copyToClipboard(value as string, field)}
               title={copiedField === field ? "Copiado!" : "Clique para copiar"}
             >
               {value}

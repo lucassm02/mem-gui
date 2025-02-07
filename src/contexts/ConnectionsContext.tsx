@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { createContext, ReactNode, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/useModal";
 import api, { clearConnectionId, setConnectionId } from "@/services/api";
 
@@ -14,8 +15,8 @@ interface Connection {
 interface KeyData {
   key: string;
   value: string;
+  size: number;
   timeUntilExpiration?: number;
-  size?: number;
 }
 
 export interface ServerData {
@@ -91,6 +92,8 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     return connections ? JSON.parse(connections) : [];
   });
 
+  const navigate = useNavigate();
+
   const [currentConnection, setCurrentConnection] = useState<Connection>({
     host: "",
     port: 11211,
@@ -104,6 +107,16 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [error] = useState("");
 
   const { showError, showLoading, dismissLoading } = useModal();
+
+  api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response && error.response.status === 401) {
+        navigate("/");
+      }
+      return Promise.reject(error);
+    }
+  );
 
   const handleConnect = async ({
     host,
@@ -160,7 +173,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (err) {
       dismissLoading();
-      if (err.status === 404) {
+      if (err.status === 401) {
         return await handleConnect({ name, host, port });
       }
 
@@ -174,7 +187,6 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       showLoading();
       const response = await api.get("/connections");
 
-      console.log(response.data);
       setServerData({ ...response.data });
       dismissLoading();
       return true;

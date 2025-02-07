@@ -19,11 +19,6 @@ class KeyController {
     const connectionId = <string>request.headers["x-connection-id"];
     const connection = connections.get(connectionId)!;
 
-    if (!connection) {
-      response.status(400).json({ error: "Conexão não definida." });
-      return;
-    }
-
     try {
       // 1. Busca as chaves armazenadas na chave reservada
       let storedKeys: string[] = [];
@@ -190,11 +185,13 @@ class KeyController {
     try {
       const connections = connectionManager();
       const connectionId = <string>request.headers["x-connection-id"];
+
       const connection = connections.get(connectionId)!;
-      await connection.client.delete(<string>request.query.key);
+
+      await connection.client.delete(<string>request.params.key);
       response.status(204).send("");
     } catch (error) {
-      const message = `Erro ao deletar chave ${request.query.key}`;
+      const message = `Erro ao deletar chave ${request.params.key}`;
       logger.error(message, error);
       response.status(500).json({
         error: message
@@ -208,12 +205,12 @@ class KeyController {
       const connectionId = <string>request.headers["x-connection-id"];
       const connection = connections.get(connectionId)!;
 
-      const key = <string>request.query.key;
+      const key = <string>request.params.key;
 
       const { value } = await connection!.client.get(key);
       response.json({ key, value: value?.toString() || null });
     } catch (error) {
-      const message = `Erro ao obter chave ${request.query.key}`;
+      const message = `Erro ao obter chave ${request.params.key}`;
       logger.error(message, error);
       response.status(500).json({
         error: message

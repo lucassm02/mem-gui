@@ -32,8 +32,6 @@ const ConnectedHeader = () => {
   async function goToDashboard() {
     const redirect = await handleLoadServerData();
 
-    console.log();
-
     if (redirect) {
       navigate("/dashboard");
     }

@@ -1,7 +1,12 @@
 import { ReactNode, useState } from "react";
 import React, { createContext } from "react";
 
-type Key = { key: string; value: string; timeUntilExpiration?: number };
+type Key = {
+  key: string;
+  value: string;
+  size: number;
+  timeUntilExpiration?: number;
+};
 interface ModalContextType {
   openEditModal: (itemToEdit: Key) => void;
   closeEditModal: () => void;
@@ -30,12 +35,20 @@ export const ModalContext = createContext<ModalContextType | undefined>(
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
   const [editModalIsOpen, setEditModalIsOpen] = useState(false);
-  const [itemToEdit, setItemToEdit] = useState<Key>({ key: "", value: "" });
+  const [itemToEdit, setItemToEdit] = useState<Key>({
+    key: "",
+    value: "",
+    size: 0
+  });
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
   const [errorModalMessage, setErrorModalMessage] = useState("");
   const [loadingModalIsOpen, setLoadingModalIsOpen] = useState(false);
   const [viewDataModalIsOpen, setViewDataModalIsOpen] = useState(false);
-  const [itemToView, setItemToView] = useState<Key>({ key: "", value: "" });
+  const [itemToView, setItemToView] = useState<Key>({
+    key: "",
+    value: "",
+    size: 0
+  });
 
   const openEditModal = (itemToEdit: Key) => {
     setEditModalIsOpen(true);
@@ -44,7 +57,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   const closeEditModal = () => {
     setEditModalIsOpen(false);
-    setItemToEdit({ key: "", value: "" });
+    setItemToEdit({ key: "", value: "", size: 0 });
   };
 
   const openCreateModal = () => {
@@ -79,7 +92,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   const closeViewDataModal = () => {
     setViewDataModalIsOpen(false);
-    setItemToView({ key: "", value: "" });
+    setItemToView({ key: "", value: "", size: 0 });
   };
 
   return (
