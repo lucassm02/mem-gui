@@ -8,7 +8,7 @@ const connectionSchema = z.object({
 });
 
 const cacheKeySchema = z.object({
-  query: z.object({ key: z.string().min(1) })
+  params: z.object({ key: z.string().min(1) })
 });
 
 const cacheValueSchema = z.object({

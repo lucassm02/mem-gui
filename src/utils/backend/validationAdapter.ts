@@ -6,7 +6,8 @@ export const validationAdapter =
   (request: Request, response: Response, next: () => void) => {
     const result = schema.safeParse({
       body: request.body,
-      query: request.query
+      query: request.query,
+      params: request.params
     });
 
     if (!result.success) {
