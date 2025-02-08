@@ -1,5 +1,4 @@
-import { ReactNode, useState } from "react";
-import React, { createContext } from "react";
+import { createContext, ReactNode, useState } from "react";
 
 type Key = {
   key: string;
@@ -14,12 +13,18 @@ interface ModalContextType {
   closeCreateModal: () => void;
   openViewDataModal: (dataToShow: Key) => void;
   closeViewDataModal: () => void;
+  openConnectionModal: () => void;
+  openSetupGuideModal: () => void;
+  closeConnectionModal: () => void;
+  closeSetupGuideModal: () => void;
   showLoading: () => void;
   dismissLoading: () => void;
   showError: (error: string) => void;
   dismissError: () => void;
+  setupGuideModalIsOpen: boolean;
   createModalIsOpen: boolean;
   editModalIsOpen: boolean;
+  connectionModalIsOpen: boolean;
   errorModalIsOpen: boolean;
   errorModalMessage: string;
   loadingModalIsOpen: boolean;
@@ -44,6 +49,8 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [errorModalMessage, setErrorModalMessage] = useState("");
   const [loadingModalIsOpen, setLoadingModalIsOpen] = useState(false);
   const [viewDataModalIsOpen, setViewDataModalIsOpen] = useState(false);
+  const [connectionModalIsOpen, setConnectionModalIsOpen] = useState(false);
+  const [setupGuideModalIsOpen, setSetupGuideModalIsOpen] = useState(false);
   const [itemToView, setItemToView] = useState<Key>({
     key: "",
     value: "",
@@ -66,6 +73,22 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   const closeCreateModal = () => {
     setCreateModalIsOpen(false);
+  };
+
+  const openConnectionModal = () => {
+    setConnectionModalIsOpen(true);
+  };
+
+  const closeConnectionModal = () => {
+    setConnectionModalIsOpen(false);
+  };
+
+  const openSetupGuideModal = () => {
+    setSetupGuideModalIsOpen(true);
+  };
+
+  const closeSetupGuideModal = () => {
+    setSetupGuideModalIsOpen(false);
   };
 
   const showError = (error: string) => {
@@ -115,7 +138,13 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
         closeViewDataModal,
         openViewDataModal,
         viewDataModalIsOpen,
-        itemToView: itemToView
+        itemToView,
+        closeConnectionModal,
+        connectionModalIsOpen,
+        openConnectionModal,
+        closeSetupGuideModal,
+        openSetupGuideModal,
+        setupGuideModalIsOpen
       }}
     >
       {children}

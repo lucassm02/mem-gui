@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router";
-import ConnectionForm from "@/components/ConnectionForm";
+import ConnectionHome from "@/components/ConnectionHome";
 import ConnectionList from "@/components/ConnectionList";
+import ConnectionModal from "@/components/ConnectionModal";
+import SetupGuide from "@/components/SetupGuide";
 import UnconnectedHeader from "@/components/UnconnectedHeader";
 
 import { useConnections } from "@/hooks/useConnections";
@@ -14,7 +16,7 @@ export function Connection() {
 
   const { darkMode } = useDarkMode();
 
-  async function submit(params: SubmitParams) {
+  async function handleSubmit(params: SubmitParams) {
     const redirect = await handleConnect(params);
 
     if (redirect) {
@@ -30,9 +32,11 @@ export function Connection() {
         }`}
       >
         <UnconnectedHeader />
-        <main className="flex-1 overflow-auto">
-          <ConnectionForm onSubmit={submit} />
+        <main className="flex-1 overflow-hidden">
+          <ConnectionModal onSubmit={handleSubmit} />
+          <ConnectionHome />
           <ConnectionList />
+          <SetupGuide />
         </main>
       </div>
     </>

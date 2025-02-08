@@ -1,5 +1,5 @@
 export * from "./ConnectedHeader";
-export * from "./ConnectionForm";
+export * from "./ConnectionModal";
 export * from "./ConnectionList";
 export * from "./CreateKeyModal";
 export * from "./EditKeyModal";
@@ -9,3 +9,4 @@ export * from "./LoadingModal";
 export * from "./TitleBar";
 export * from "./UnconnectedHeader";
 export * from "./ViewDataModal";
+export * from "./ConnectionHome";
