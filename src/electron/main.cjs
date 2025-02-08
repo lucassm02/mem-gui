@@ -27,7 +27,7 @@ app.whenReady().then(async () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
 
-  const iconPath = path.join(__dirname, "..", "..", "assets", "mem-gui.ico");
+  const iconPath = path.join(__dirname, "..", "..", "asset", "mem-gui.ico");
 
   const mainWindow = new BrowserWindow({
     width: width - 100,

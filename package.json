@@ -33,7 +33,7 @@
     "productName": "MemGUI",
     "directories": {
       "output": "release",
-      "buildResources": "assets"
+      "buildResources": "asset"
     },
     "files": [
       "dist/**/*",
@@ -41,10 +41,10 @@
       "package.json"
     ],
     "win": {
-      "icon": "assets/images/logo.ico"
+      "icon": "asset/images/logo.ico"
     },
     "linux": {
-      "icon": "assets/images/logo.png",
+      "icon": "asset/images/logo.png",
       "target": [
         "AppImage",
         "deb",

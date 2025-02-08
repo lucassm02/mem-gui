@@ -1,7 +1,7 @@
 # MemGUI
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/assets/mem-gui.svg" alt="MemGUI Logo" width="160" />
+  <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/mem-gui.svg" alt="MemGUI Logo" width="160" />
 </p>
 
 **MemGUI** is a graphical user interface (GUI) for managing **Memcached** databases and cache. It provides an intuitive experience for listing, creating, editing, and deleting keys, overcoming some of Memcached's limitations. It also allows users to view key details such as **content size and TTL** and supports multiple simultaneous connections to different servers.
