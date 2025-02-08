@@ -74,7 +74,7 @@ interface ConnectionsContextType {
     connection: Omit<Connection, "id">
   ) => Promise<boolean>;
   handleDisconnect: () => void;
-  handleLoadKeys: () => Promise<boolean>;
+  handleLoadKeys: (showLoadingModal?: boolean) => Promise<boolean>;
   handleCreateKey: (newKey: KeyData) => Promise<boolean>;
   handleEditKey: (updatedKey: KeyData) => Promise<boolean>;
   handleDeleteKey: (key: string) => Promise<boolean>;
@@ -204,18 +204,18 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     setCurrentConnection({ host: "", port: 11211, name: "", id: "" });
   };
 
-  const handleLoadKeys = async () => {
+  const handleLoadKeys = async (showLoadingModal = true) => {
     try {
-      showLoading();
+      if (showLoadingModal) showLoading();
       const response = await api.get("/keys");
       const sortedKeys = [...response.data].sort((a, b) =>
         a.key.localeCompare(b.key)
       );
       setKeys(sortedKeys);
-      dismissLoading();
+      if (showLoadingModal) dismissLoading();
       return true;
     } catch (_error) {
-      dismissLoading();
+      if (showLoadingModal) dismissLoading();
       showError("Erro ao carregar chaves.");
       return false;
     }

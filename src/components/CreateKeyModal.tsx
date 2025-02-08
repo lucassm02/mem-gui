@@ -30,7 +30,6 @@ const CreateKeyModal = ({ onSave }: Params) => {
   const { createModalIsOpen, closeCreateModal } = useModal();
   const { darkMode } = useDarkMode();
 
-  // Define a extensão de linguagem com base no formato selecionado
   const languageExtension = useMemo(() => {
     switch (format) {
       case "HTML":
@@ -46,7 +45,6 @@ const CreateKeyModal = ({ onSave }: Params) => {
     }
   }, [format]);
 
-  // Foco no input da chave quando o modal é aberto
   useEffect(() => {
     if (createModalIsOpen) {
       document.getElementById("key-input")?.focus();

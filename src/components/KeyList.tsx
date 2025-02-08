@@ -34,7 +34,7 @@ const KeyList = () => {
     let interval: NodeJS.Timeout;
     if (autoUpdate) {
       interval = setInterval(() => {
-        handleLoadKeys();
+        handleLoadKeys(false);
       }, 5000);
     }
     return () => {
