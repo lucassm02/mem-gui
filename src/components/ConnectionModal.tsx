@@ -2,7 +2,7 @@ import {
   XMarkIcon,
   ServerIcon,
   ChevronRightIcon
-} from "@heroicons/react/24/solid";
+} from "@heroicons/react/24/outline";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "../hooks/useModal";

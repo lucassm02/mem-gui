@@ -1,4 +1,4 @@
-import { PlusCircleIcon, ServerIcon } from "@heroicons/react/24/solid";
+import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "@/hooks";
 
@@ -11,7 +11,11 @@ const ConnectionHome = () => {
       className={`min-h-screen flex flex-col justify-center items-center px-6 text-center ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-900"}`}
     >
       <div className="mb-6">
-        <ServerIcon className="w-24 h-24 text-blue-500" />
+        <img
+          src={darkMode ? `images/logo-white.svg` : `images/logo.svg`}
+          alt="MemGUI"
+          className={`w-32 h-32 ${darkMode ? "text-blue-400" : "text-blue-600"}`}
+        />
       </div>
 
       <h1 className="text-3xl font-bold mb-2">Bem-vindo ao MemGUI</h1>

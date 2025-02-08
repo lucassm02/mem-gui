@@ -16,14 +16,6 @@ const UnconnectedHeader = () => {
         <Bars3Icon className="w-6 h-6" />
       </button>
 
-      <div className="flex items-center gap-2">
-        <img
-          src="images/logo.svg"
-          alt="MemGUI"
-          className={`w-12 h-12 ${darkMode ? "text-blue-400" : "text-blue-600"}`}
-        />
-      </div>
-
       <button
         onClick={toggleDarkMode}
         className={`cursor-pointer p-2 rounded-lg ${darkMode ? "text-blue-400 hover:bg-gray-700" : "text-blue-600 hover:bg-gray-100"}`}
