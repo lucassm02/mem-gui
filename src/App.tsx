@@ -8,8 +8,8 @@ import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { MenuProvider } from "@/contexts/MenuContext";
 import { ModalProvider } from "@/contexts/ModalContext";
 import { Connection } from "@/pages/Connection";
-import { Dashboard } from "@/pages/Dashboard";
 import { Panel } from "@/pages/Panel";
+import { Dashboard } from "@/pages/Statistics";
 
 const App = () => (
   <DarkModeProvider>
@@ -23,7 +23,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Connection />} />
               <Route path="/panel" element={<Panel />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/statistics" element={<Dashboard />} />
             </Routes>
           </div>
         </MenuProvider>

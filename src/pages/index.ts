@@ -1,3 +1,3 @@
 export * from "./Connection";
-export * from "./Dashboard";
+export * from "./statistics";
 export * from "./Panel";

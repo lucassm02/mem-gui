@@ -25,11 +25,11 @@ const ConnectedHeader = () => {
     navigate("/");
   }
 
-  async function goToDashboard() {
+  async function goToStatistics() {
     const redirect = await handleLoadServerData();
 
     if (redirect) {
-      navigate("/dashboard");
+      navigate("/statistics");
     }
   }
 
@@ -93,7 +93,7 @@ const ConnectedHeader = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          {location.pathname === "/dashboard" ? (
+          {location.pathname === "/statistics" ? (
             <button
               onClick={goBack}
               className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
@@ -107,7 +107,7 @@ const ConnectedHeader = () => {
             </button>
           ) : (
             <button
-              onClick={goToDashboard}
+              onClick={goToStatistics}
               className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
                 darkMode
                   ? "text-yellow-400 hover:bg-gray-700/40"
@@ -115,7 +115,7 @@ const ConnectedHeader = () => {
               }`}
             >
               <ChartBarIcon className="w-5 h-5" />
-              <span className="text-sm">Dashboard</span>
+              <span className="text-sm">Estatísticas</span>
             </button>
           )}
 

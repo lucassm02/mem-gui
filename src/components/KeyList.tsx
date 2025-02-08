@@ -69,7 +69,7 @@ const KeyList = () => {
           </button>
 
           <button
-            onClick={handleLoadKeys}
+            onClick={() => handleLoadKeys()}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm ${
               darkMode
                 ? "bg-gray-700 hover:bg-gray-600 text-white"
@@ -107,7 +107,7 @@ const KeyList = () => {
       >
         <input
           type="text"
-          placeholder="🔍 Buscar chave (regex)..."
+          placeholder="🔍 Digite uma chave ou regex..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm ${
@@ -162,7 +162,7 @@ const KeyList = () => {
                   key={item.key}
                   className={`border-b transition-all ${
                     darkMode
-                      ? "border-gray-700 hover:bg-gray-700"
+                      ? "border-gray-700 hover:bg-gray-700 "
                       : "border-gray-300 hover:bg-gray-100"
                   }`}
                 >
