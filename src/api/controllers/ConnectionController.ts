@@ -2,10 +2,12 @@ import { randomUUID } from "crypto";
 import { promisify } from "node:util";
 import { Request, Response } from "express";
 import memjs from "memjs";
+import z from "zod";
+
 import { MemcachedConnection } from "@/types";
 import { connectionManager, logger, parseSlabs } from "@/utils/backend";
-import { CONNECTION_TIMEOUT } from "@/utils/backend";
-import { executeTelnetCommand } from "@/utils/backend/executeTelnetCommand";
+import { executeMemcachedStatsCommand } from "@/utils/backend/executeMemcachedStatsCommand";
+import { connectionSchema } from "@/utils/backend/validationSchema";
 
 class ConnectionController {
   constructor() {}
@@ -49,7 +51,7 @@ class ConnectionController {
       }
 
       const [slabsOutput, serverInfo] = await Promise.all([
-        executeTelnetCommand(connection, "stats slabs"),
+        executeMemcachedStatsCommand(connection, "stats slabs"),
         promisify(statsWrapper)()
       ]);
 
@@ -76,13 +78,19 @@ class ConnectionController {
     try {
       const connections = connectionManager();
 
-      const { host, port } = await request.body;
+      type Body = z.infer<typeof connectionSchema>["body"];
+
+      const { host, port, connectionTimeout, authentication } = <Body>(
+        request.body
+      );
 
       const connectionId = randomUUID();
 
       const client = memjs.Client.create(`${host}:${port}`, {
         retries: 1,
-        timeout: 5000
+        username: authentication?.username,
+        password: authentication?.password,
+        timeout: connectionTimeout
       });
 
       await new Promise<void>((resolve, reject) => {
@@ -95,11 +103,13 @@ class ConnectionController {
         port: Number(port),
         client,
         lastActive: new Date(),
+        authentication,
+        connectionTimeout,
         timer: setTimeout(() => {
           logger.info(`Conexão ${connectionId} expirada por inatividade`);
           client.close();
           connections.delete(connectionId);
-        }, CONNECTION_TIMEOUT)
+        }, connectionTimeout * 1000)
       };
 
       connections.set(connectionId, newConnection);

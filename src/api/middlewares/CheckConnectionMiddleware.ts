@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { CONNECTION_TIMEOUT, connectionManager, logger } from "@/utils/backend";
+import { connectionManager, logger } from "@/utils/backend";
 
 export function checkConnectionMiddleware(
   request: Request,
@@ -31,7 +31,7 @@ export function checkConnectionMiddleware(
       logger.info(`Conexão ${connectionId} expirada por inatividade`);
       connection.client.close();
       connections.delete(connectionId);
-    }, CONNECTION_TIMEOUT);
+    }, connection.connectionTimeout * 1000);
 
     next();
   } catch (error) {

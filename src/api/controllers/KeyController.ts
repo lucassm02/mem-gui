@@ -9,7 +9,7 @@ import {
   ONE_DAY_IN_SECONDS,
   RESERVED_KEY
 } from "@/utils/backend";
-import { executeTelnetCommand } from "@/utils/backend/executeTelnetCommand";
+import { executeMemcachedStatsCommand } from "@/utils/backend/executeMemcachedStatsCommand";
 
 class KeyController {
   constructor() {}
@@ -24,6 +24,7 @@ class KeyController {
       let storedKeys: string[] = [];
       try {
         const reservedData = await connection.client.get(RESERVED_KEY);
+
         if (reservedData.value) {
           storedKeys = JSON.parse(reservedData.value.toString());
         }
@@ -32,7 +33,11 @@ class KeyController {
       }
 
       // 2. Obtém as informações dos slabs usando "stats slabs"
-      const slabsOutput = await executeTelnetCommand(connection, "stats slabs");
+      const slabsOutput = await executeMemcachedStatsCommand(
+        connection,
+        "stats slabs"
+      );
+
       const slabUsedMap = extractUsedChunksFromSlabs(slabsOutput);
       const slabIds = Array.from(slabUsedMap.keys());
 
@@ -40,7 +45,7 @@ class KeyController {
       const keysInfoArrays = await Promise.all(
         slabIds.map(async (slabId) => {
           try {
-            const dumpOutput = await executeTelnetCommand(
+            const dumpOutput = await executeMemcachedStatsCommand(
               connection,
               `stats cachedump ${slabId} 1000`
             );
@@ -158,7 +163,10 @@ class KeyController {
         if (!response) return;
 
         try {
-          const storedKeys = JSON.parse(response?.value!.toString());
+          const storedKeys = response?.value
+            ? JSON.parse(response?.value.toString())
+            : [];
+
           const allKeys = Array.from(new Set([...storedKeys, key])).sort();
 
           connection.client

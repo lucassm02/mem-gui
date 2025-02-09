@@ -13,8 +13,7 @@ interface Connection {
   port: number;
   username?: string;
   password?: string;
-  timeout?: number;
-  ssl?: boolean;
+  timeout: number;
   id: string;
 }
 
@@ -31,8 +30,7 @@ const ConnectionModal = ({ onSubmit }: Props) => {
     port: 11211,
     username: "",
     password: "",
-    timeout: 30,
-    ssl: false
+    timeout: 300
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -123,41 +121,6 @@ const ConnectionModal = ({ onSubmit }: Props) => {
             </div>
           </div>
 
-          <div className="mt-4 space-y-3">
-            <div>
-              <label
-                className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
-              >
-                Usuário (opcional):
-              </label>
-              <input
-                type="text"
-                name="username"
-                placeholder="Digite seu usuário"
-                value={formData.username}
-                onChange={handleChange}
-                className={`w-full p-2 rounded-md border focus:outline-none transition
-                  ${darkMode ? "bg-gray-700 text-white border-gray-600 focus:border-blue-400" : "bg-gray-100 text-gray-900 border-gray-300 focus:border-blue-500"}`}
-              />
-            </div>
-            <div>
-              <label
-                className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
-              >
-                Senha (opcional):
-              </label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Digite sua senha"
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full p-2 rounded-md border focus:outline-none transition
-                  ${darkMode ? "bg-gray-700 text-white border-gray-600 focus:border-blue-400" : "bg-gray-100 text-gray-900 border-gray-300 focus:border-blue-500"}`}
-              />
-            </div>
-          </div>
-
           <div className="mt-4">
             <button
               type="button"
@@ -172,32 +135,58 @@ const ConnectionModal = ({ onSubmit }: Props) => {
           </div>
 
           {showAdvanced && (
-            <div className="mt-3 space-y-3">
-              <div>
-                <label
-                  className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
-                >
-                  Timeout (segundos):
-                </label>
-                <input
-                  type="number"
-                  name="timeout"
-                  value={formData.timeout}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded-md border"
-                />
+            <>
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label
+                    className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Usuário (opcional):
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="Digite seu usuário"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className={`w-full p-2 rounded-md border focus:outline-none transition
+                  ${darkMode ? "bg-gray-700 text-white border-gray-600 focus:border-blue-400" : "bg-gray-100 text-gray-900 border-gray-300 focus:border-blue-500"}`}
+                  />
+                </div>
+                <div>
+                  <label
+                    className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Senha (opcional):
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Digite sua senha"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full p-2 rounded-md border focus:outline-none transition
+                  ${darkMode ? "bg-gray-700 text-white border-gray-600 focus:border-blue-400" : "bg-gray-100 text-gray-900 border-gray-300 focus:border-blue-500"}`}
+                  />
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="ssl"
-                  checked={formData.ssl}
-                  onChange={handleChange}
-                  className="w-5 h-5"
-                />
-                <label className="text-sm">Habilitar SSL</label>
+              <div className="mt-3 space-y-3">
+                <div>
+                  <label
+                    className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Timeout (segundos):
+                  </label>
+                  <input
+                    type="number"
+                    name="timeout"
+                    value={formData.timeout}
+                    onChange={handleChange}
+                    className="w-full p-2 rounded-md border"
+                  />
+                </div>
               </div>
-            </div>
+            </>
           )}
 
           <div className="mt-5 flex justify-end gap-3">

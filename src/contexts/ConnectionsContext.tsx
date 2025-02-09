@@ -9,6 +9,9 @@ interface Connection {
   name: string;
   host: string;
   port: number;
+  username?: string;
+  password?: string;
+  timeout: number;
   id: string;
 }
 
@@ -98,7 +101,10 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     host: "",
     port: 11211,
     name: "",
-    id: ""
+    id: "",
+    timeout: 300,
+    username: "",
+    password: ""
   });
 
   const [isConnected, setIsConnected] = useState(false);
@@ -118,19 +124,26 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     }
   );
 
-  const handleConnect = async ({
-    host,
-    port,
-    name
-  }: Omit<Connection, "id">) => {
+  const handleConnect = async (params: Omit<Connection, "id">) => {
     try {
       showLoading();
-      const response = await api.post("/connections", { host, port });
+
+      const { host, port, timeout, password, username } = params;
+
+      const authentication =
+        username || password ? { password, username } : undefined;
+
+      const response = await api.post("/connections", {
+        host,
+        port,
+        connectionTimeout: timeout,
+        authentication
+      });
       const { connectionId } = response.data;
       setConnectionId(connectionId);
       setIsConnected(true);
 
-      const newConnection = { name, host, port, id: connectionId };
+      const newConnection = { ...params, id: connectionId };
       setSavedConnections((prev) => {
         const filtered = prev.filter((c) => c.host !== host || c.port !== port);
         const updated = [newConnection, ...filtered];
@@ -149,19 +162,24 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const handleChoseConnection = async ({
-    name,
-    host,
-    port
-  }: Omit<Connection, "id">) => {
+  const handleChoseConnection = async (params: Omit<Connection, "id">) => {
+    const { host, name, port, timeout, password, username } = params;
     try {
       showLoading();
+
       const connection = savedConnections.find(
         (c) => c.host === host && c.port === port
       );
 
       if (!connection) {
-        return await handleConnect({ name, host, port });
+        return await handleConnect({
+          host,
+          name,
+          port,
+          timeout,
+          password,
+          username
+        });
       }
 
       setConnectionId(connection.id);
@@ -174,7 +192,14 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       dismissLoading();
       if (err.status === 401) {
-        return await handleConnect({ name, host, port });
+        return await handleConnect({
+          host,
+          name,
+          port,
+          timeout,
+          password,
+          username
+        });
       }
 
       showError("Erro ao escolher conexão.");

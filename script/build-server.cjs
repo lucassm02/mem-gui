@@ -16,7 +16,7 @@ const buildOptions = {
 async function build() {
   try {
     await esbuild.build(buildOptions);
-    console.log("✨ Build concluído!");
+    console.info("✨ Build concluído!");
   } catch (error) {
     console.error("❌ Erro no build:", error);
   }

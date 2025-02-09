@@ -7,6 +7,7 @@ import express from "express";
 import yargs from "yargs";
 import connectionsRoutes from "./api/routes/connections";
 import keysRoutes from "./api/routes/keys";
+import { logger } from "./utils/backend";
 
 export async function server(port = 0, dev: boolean = false, host?: string) {
   try {
@@ -21,6 +22,7 @@ export async function server(port = 0, dev: boolean = false, host?: string) {
       const { createServer } = await import("vite");
 
       const vite = await createServer({
+        logLevel: "silent",
         server: { middlewareMode: true }
       });
 
@@ -67,10 +69,10 @@ export async function server(port = 0, dev: boolean = false, host?: string) {
 
     address = <{ port: number }>server.address()!;
 
-    console.log(`Servidor rodando em http://localhost:${address.port}`);
+    logger.info(`Servidor rodando em http://localhost:${address.port}`);
     return address!.port;
   } catch (error) {
-    console.log(error);
+    logger.error(error);
   }
 }
 

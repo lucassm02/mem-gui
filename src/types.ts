@@ -5,7 +5,9 @@ export interface MemcachedConnection {
   id: string;
   host: string;
   port: number;
+  authentication?: { username: string; password: string };
   client: memjs.Client;
+  connectionTimeout: number;
   lastActive: Date;
   timer: NodeJS.Timeout;
 }

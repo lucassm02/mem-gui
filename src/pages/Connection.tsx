@@ -5,23 +5,34 @@ import ConnectionModal from "@/components/ConnectionModal";
 import SetupGuide from "@/components/SetupGuide";
 import UnconnectedHeader from "@/components/UnconnectedHeader";
 
+import { useModal } from "@/hooks";
 import { useConnections } from "@/hooks/useConnections";
 import { useDarkMode } from "@/hooks/useDarkMode";
 
-type SubmitParams = { name: string; host: string; port: number };
+type SubmitParams = {
+  name: string;
+  host: string;
+  port: number;
+  timeout: number;
+  username?: string;
+  password?: string;
+};
 
 export function Connection() {
   const { handleConnect } = useConnections();
   const navigate = useNavigate();
 
   const { darkMode } = useDarkMode();
+  const { openConnectionModal } = useModal();
 
   async function handleSubmit(params: SubmitParams) {
     const redirect = await handleConnect(params);
 
-    if (redirect) {
-      navigate("/panel");
+    if (!redirect) {
+      openConnectionModal();
+      return;
     }
+    navigate("/panel");
   }
 
   return (
