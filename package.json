@@ -2,7 +2,7 @@
   "name": "MemGUI",
   "description": "GUI for managing Memcached",
   "private": false,
-  "version": "0.5.1",
+  "version": "1.0.0",
   "author": {
     "name": "Santos Código"
   },
@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "clean": "rimraf dist && rimraf release",
     "dev": "concurrently \"yarn dev:server\" \"wait-on http://localhost:5173 && yarn electron\"",
-    "dev:server": "yarn tsx src/server.ts --start --dev --port 5173",
+    "dev:server": "node --inspect --import tsx src/server.ts  --start --dev --port 5173",
     "electron": "electron .",
     "build:server": "node scripts/build-server.cjs",
     "build:ui": "vite build",

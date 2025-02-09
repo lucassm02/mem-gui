@@ -63,10 +63,9 @@ const SetupGuideModal = () => {
           </div>
 
           <div>
-            <h3 className="text-md font-semibold">🔹 Timeout e SSL</h3>
+            <h3 className="text-md font-semibold">🔹 Timeout</h3>
             <p className="mt-1 text-gray-400">
-              O timeout define o tempo máximo de resposta. Ative o SSL para
-              conexões seguras.
+              O timeout define o tempo máximo de resposta.
             </p>
           </div>
         </div>

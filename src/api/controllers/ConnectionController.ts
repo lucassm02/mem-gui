@@ -5,8 +5,12 @@ import memjs from "memjs";
 import z from "zod";
 
 import { MemcachedConnection } from "@/types";
-import { connectionManager, logger, parseSlabs } from "@/utils/backend";
-import { executeMemcachedStatsCommand } from "@/utils/backend/executeMemcachedStatsCommand";
+import {
+  connectionManager,
+  logger,
+  extractSlabInfoFromStatsSlabsOutput
+} from "@/utils/backend";
+import { executeMemcachedCommand } from "@/utils/backend/executeMemcachedCommand";
 import { connectionSchema } from "@/utils/backend/validationSchema";
 
 class ConnectionController {
@@ -51,11 +55,11 @@ class ConnectionController {
       }
 
       const [slabsOutput, serverInfo] = await Promise.all([
-        executeMemcachedStatsCommand(connection, "stats slabs"),
+        executeMemcachedCommand("stats slabs", connection),
         promisify(statsWrapper)()
       ]);
 
-      const slabs = parseSlabs(slabsOutput);
+      const { slabs, info } = extractSlabInfoFromStatsSlabsOutput(slabsOutput);
 
       response.json({
         status: "connected",
@@ -63,7 +67,7 @@ class ConnectionController {
         host: connection.host,
         port: connection.port,
         lastActive: connection.lastActive,
-        serverInfo: { ...serverInfo, slabs }
+        serverInfo: { ...serverInfo, ...info, slabs }
       });
     } catch (error) {
       const message = "Falha ao buscar status da conexão";

@@ -13,19 +13,23 @@ const route = Router();
 
 route.use(checkConnectionMiddleware);
 
-route.post("/keys", validationAdapter(cacheValueSchema), keyController.create);
-route.get("/keys", keyController.getAll);
+route.post(
+  "/keys",
+  validationAdapter(cacheValueSchema),
+  keyController.create.bind(keyController)
+);
+route.get("/keys", keyController.getAll.bind(keyController));
 
 route.get(
   "/keys/:key",
   validationAdapter(cacheKeySchema),
-  keyController.getById
+  keyController.getByName.bind(keyController)
 );
 
 route.delete(
   "/keys/:key",
   validationAdapter(cacheKeySchema),
-  keyController.deleteById
+  keyController.deleteByName.bind(keyController)
 );
 
 export default route;

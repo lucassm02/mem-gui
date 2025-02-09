@@ -1,29 +1,61 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { logger } from "./logger";
 import { Key } from "@/types";
 
 export function extractKeysInfoFromDump(
-  dumpOutput: string,
+  dumpOutput: Record<string, string>,
   slabId?: string
 ): Key[] {
-  const regex = /ITEM\s+(\S+)\s+\[(\d+)\s*b;\s*(\d+)\s*s\]/g;
   const results: Key[] = [];
-  for (const match of dumpOutput.matchAll(regex)) {
-    const key = match[1];
-    const size = parseInt(match[2], 10);
-    const expiration = parseInt(match[3], 10);
-    results.push({ key, size, expiration, slabId });
+
+  const entries = Object.entries(dumpOutput);
+
+  for (const [key, value] of entries) {
+    try {
+      const regex = /\[(?<bytes>\d+)\s\w; (?<seconds>\d+)\s\w\]/;
+
+      const match = value.match(regex);
+
+      if (match && match.groups) {
+        const bytes = parseInt(match.groups.bytes, 10);
+        const seconds = parseInt(match.groups.seconds, 10);
+
+        results.push({
+          key,
+          size: bytes,
+          expiration: seconds,
+          slabId: slabId
+        });
+      }
+    } catch (error) {
+      logger.error(error);
+      results.push({
+        key,
+        size: 0,
+        expiration: 0,
+        slabId: slabId
+      });
+    }
   }
+
   return results;
 }
 
 export function extractUsedChunksFromSlabs(
-  slabsOutput: string
+  slabsOutput: Record<string, any>
 ): Map<string, number> {
   const slabMap = new Map<string, number>();
-  const regex = /STAT\s+(\d+):used_chunks\s+(\d+)/g;
-  for (const match of slabsOutput.matchAll(regex)) {
-    const slabId = match[1];
-    const usedChunks = parseInt(match[2], 10);
-    slabMap.set(slabId, usedChunks);
+  try {
+    for (const key in slabsOutput) {
+      if (key.includes("used_chunks")) {
+        const [slabId] = key.split(":");
+        const usedChunks = parseInt(slabsOutput[key], 10);
+        slabMap.set(slabId, usedChunks);
+      }
+    }
+  } catch (error) {
+    logger.error(error);
   }
+
   return slabMap;
 }

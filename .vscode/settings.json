@@ -19,7 +19,16 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["memgui", "memjs", "unmaximize", "unmaximized", "Uturn"],
+  "cSpell.words": [
+    "cachedump",
+    "memgui",
+    "memjs",
+    "Sasl",
+    "SASL",
+    "unmaximize",
+    "unmaximized",
+    "Uturn"
+  ],
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "files.eol": "\n",
