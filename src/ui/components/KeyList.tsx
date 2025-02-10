@@ -22,7 +22,8 @@ const KeyList = () => {
     handleDeleteKey,
     handleCreateKey,
     handleEditKey,
-    currentConnection
+    currentConnection,
+    handleGetByKey
   } = useConnections();
 
   const { openCreateModal, openEditModal, openViewDataModal } = useModal();
@@ -48,6 +49,30 @@ const KeyList = () => {
       if (interval) clearInterval(interval);
     };
   }, [autoUpdate, handleLoadKeys]);
+
+  useEffect(() => {
+    (async () => {
+      if (searchTerm === "") {
+        return;
+      }
+
+      if (!(currentConnection.username && currentConnection.password)) {
+        return;
+      }
+
+      const item = keys.find((item) =>
+        new RegExp(searchTerm, "i").test(item.key)
+      );
+
+      if (!item) {
+        const value = await handleGetByKey(searchTerm);
+        if (value) {
+          console.log(value);
+          await handleLoadKeys();
+        }
+      }
+    })();
+  }, [searchTerm]);
 
   const filteredKeys = keys.filter((item) => {
     try {

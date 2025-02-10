@@ -83,6 +83,9 @@ interface ConnectionsContextType {
   handleDeleteKey: (key: string) => Promise<boolean>;
   handleDeleteConnection: (connection: Connection) => void;
   handleLoadServerData: (showLoadingModal?: boolean) => Promise<boolean>;
+  handleGetByKey: (
+    key: string
+  ) => Promise<{ key: string; value: string } | null>;
 }
 
 export const ConnectionsContext = createContext<
@@ -310,6 +313,18 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const handleGetByKey = async (
+    key: string
+  ): Promise<{ key: string; value: string } | null> => {
+    try {
+      const { data } = await api.get(`/keys/${key}`);
+
+      return data;
+    } catch (_error) {
+      return null;
+    }
+  };
+
   const handleDeleteConnection = (connection: Connection) => {
     setSavedConnections((prev) => {
       const updated = prev.filter(
@@ -337,7 +352,8 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
         handleDeleteKey,
         handleDeleteConnection,
         handleLoadServerData,
-        serverData
+        serverData,
+        handleGetByKey
       }}
     >
       {children}
