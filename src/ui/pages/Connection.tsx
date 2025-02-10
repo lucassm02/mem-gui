@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import ConnectionHome from "@/ui/components/ConnectionHome";
 import ConnectionList from "@/ui/components/ConnectionList";
@@ -5,7 +6,7 @@ import ConnectionModal from "@/ui/components/ConnectionModal";
 import SetupGuide from "@/ui/components/SetupGuide";
 import UnconnectedHeader from "@/ui/components/UnconnectedHeader";
 
-import { useModal } from "@/ui/hooks";
+import { useMenu, useModal } from "@/ui/hooks";
 import { useConnections } from "@/ui/hooks/useConnections";
 import { useDarkMode } from "@/ui/hooks/useDarkMode";
 
@@ -19,11 +20,18 @@ type SubmitParams = {
 };
 
 export function Connection() {
-  const { handleConnect } = useConnections();
+  const { handleConnect, savedConnections } = useConnections();
   const navigate = useNavigate();
 
   const { darkMode } = useDarkMode();
   const { openConnectionModal } = useModal();
+  const { openMenu } = useMenu();
+
+  useEffect(() => {
+    if (savedConnections.length > 0) {
+      openMenu();
+    }
+  }, [savedConnections]);
 
   async function handleSubmit(params: SubmitParams) {
     const redirect = await handleConnect(params);

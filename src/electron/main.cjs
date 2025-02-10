@@ -38,8 +38,7 @@ app.whenReady().then(async () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
-      preload: path.join(__dirname, "preload.js")
+      enableRemoteModule: true
     },
     icon: iconPath
   });

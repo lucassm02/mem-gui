@@ -91,7 +91,7 @@ export const ConnectionsContext = createContext<
 
 export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [savedConnections, setSavedConnections] = useState<Connection[]>(() => {
-    const connections = localStorage.getItem("memcachedConnections");
+    const connections = localStorage.getItem("CONNECTIONS");
     return connections ? JSON.parse(connections) : [];
   });
 
@@ -147,7 +147,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       setSavedConnections((prev) => {
         const filtered = prev.filter((c) => c.host !== host || c.port !== port);
         const updated = [newConnection, ...filtered];
-        localStorage.setItem("memcachedConnections", JSON.stringify(updated));
+        localStorage.setItem("CONNECTIONS", JSON.stringify(updated));
         return updated;
       });
 
@@ -315,7 +315,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       const updated = prev.filter(
         (c) => c.host !== connection.host || c.port !== connection.port
       );
-      localStorage.setItem("memcachedConnections", JSON.stringify(updated));
+      localStorage.setItem("CONNECTIONS", JSON.stringify(updated));
       return updated;
     });
   };

@@ -22,7 +22,7 @@
     "build:all": "yarn clean && yarn build:ui && yarn build:server && electron-builder"
   },
   "build": {
-    "asar": false,
+    "asar": true,
     "extraFiles": [
       {
         "from": "dist/",
@@ -33,7 +33,7 @@
     "productName": "MemGUI",
     "directories": {
       "output": "release",
-      "buildResources": "assets"
+      "buildResources": "asset"
     },
     "files": [
       "dist/**/*",
@@ -41,10 +41,10 @@
       "package.json"
     ],
     "win": {
-      "icon": "asset/images/icon.ico"
+      "icon": "asset/icon/icon.ico"
     },
     "linux": {
-      "icon": "asset/images/icon.png",
+      "icon": "asset/icon/icon.png",
       "target": [
         "AppImage",
         "deb",

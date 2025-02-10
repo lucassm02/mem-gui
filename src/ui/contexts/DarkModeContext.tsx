@@ -20,7 +20,7 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
   children
 }) => {
   const [darkMode, setDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem("darkMode");
+    const savedMode = localStorage.getItem("THEME");
     return savedMode
       ? JSON.parse(savedMode)
       : window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -28,9 +28,7 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("darkMode", JSON.stringify(darkMode));
-    }
+    localStorage.setItem("THEME", JSON.stringify(darkMode));
   }, [darkMode]);
 
   return (
