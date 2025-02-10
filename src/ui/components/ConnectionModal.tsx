@@ -6,6 +6,7 @@ import {
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "../hooks/useModal";
+import Disclaimer from "./Disclaimer";
 
 interface Connection {
   name: string;
@@ -186,6 +187,12 @@ const ConnectionModal = ({ onSubmit }: Props) => {
                   />
                 </div>
               </div>
+
+              <Disclaimer className="mt-5 mb-5" showDisclaimer={true}>
+                Com autenticação ativada, apenas chaves criadas no{" "}
+                <strong>MemGUI</strong> podem ser gerenciadas, devido a uma
+                limitação do protocolo do Memcached autenticado.
+              </Disclaimer>
             </>
           )}
 

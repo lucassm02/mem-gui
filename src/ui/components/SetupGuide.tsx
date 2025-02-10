@@ -1,6 +1,8 @@
 import { ServerIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "../hooks/useModal";
+import Disclaimer from "./Disclaimer";
 
 const SetupGuideModal = () => {
   const { darkMode } = useDarkMode();
@@ -28,25 +30,31 @@ const SetupGuideModal = () => {
           </button>
         </div>
 
+        <Disclaimer className="mt-5 mb-5" showDisclaimer={true}>
+          Com autenticação ativada, apenas chaves criadas no{" "}
+          <strong>MemGUI</strong> podem ser gerenciadas, devido a uma limitação
+          do protocolo do Memcached autenticado.
+        </Disclaimer>
+
         <div className="mt-4 space-y-4 text-sm">
           <div>
-            <h3 className="text-md font-semibold">🔹 Nome da Conexão</h3>
-            <p className="mt-1 text-gray-400">
+            <h3 className="text-md font-semibold">🔹Nome da Conexão</h3>
+            <p className="mt-1 ml-5 text-gray-400">
               Defina um nome para identificar a conexão dentro do sistema.
             </p>
           </div>
 
           <div>
-            <h3 className="text-md font-semibold">🔹 Endereço do Servidor</h3>
-            <p className="mt-1 text-gray-400">
+            <h3 className="text-md font-semibold">🔹Endereço do Servidor</h3>
+            <p className="mt-1 ml-5 text-gray-400">
               Insira o IP ou domínio do servidor Memcached. Para local, use{" "}
               <code>127.0.0.1</code> ou <code>localhost</code>.
             </p>
           </div>
 
           <div>
-            <h3 className="text-md font-semibold">🔹 Porta</h3>
-            <p className="mt-1 text-gray-400">
+            <h3 className="text-md font-semibold">🔹Porta</h3>
+            <p className="mt-1 ml-5 text-gray-400">
               O padrão do Memcached é{" "}
               <span className="font-semibold">11211</span>. Caso tenha sido
               alterado, utilize a porta configurada no servidor.
@@ -54,17 +62,15 @@ const SetupGuideModal = () => {
           </div>
 
           <div>
-            <h3 className="text-md font-semibold">
-              🔹 Autenticação (Opcional)
-            </h3>
-            <p className="mt-1 text-gray-400">
+            <h3 className="text-md font-semibold">🔹Autenticação (Opcional)</h3>
+            <p className="mt-1 ml-5 text-gray-400">
               Insira usuário e senha apenas se seu servidor exigir autenticação.
             </p>
           </div>
 
           <div>
-            <h3 className="text-md font-semibold">🔹 Timeout</h3>
-            <p className="mt-1 text-gray-400">
+            <h3 className="text-md font-semibold">🔹Timeout</h3>
+            <p className="mt-1 ml-5 text-gray-400">
               O timeout define o tempo máximo de resposta.
             </p>
           </div>

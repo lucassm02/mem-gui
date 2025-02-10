@@ -1,15 +1,16 @@
 import {
   ArrowPathIcon,
-  PlusIcon,
+  DocumentMagnifyingGlassIcon,
   PencilSquareIcon,
-  TrashIcon,
-  DocumentMagnifyingGlassIcon
+  PlusIcon,
+  TrashIcon
 } from "@heroicons/react/24/outline";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useConnections } from "../hooks/useConnections";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "../hooks/useModal";
 import CreateKeyModal from "./CreateKeyModal";
+import Disclaimer from "./Disclaimer";
 import EditKeyModal from "./EditKeyModal";
 import ViewDataModal from "./ViewDataModal";
 
@@ -20,7 +21,8 @@ const KeyList = () => {
     handleLoadKeys,
     handleDeleteKey,
     handleCreateKey,
-    handleEditKey
+    handleEditKey,
+    currentConnection
   } = useConnections();
 
   const { openCreateModal, openEditModal, openViewDataModal } = useModal();
@@ -28,6 +30,12 @@ const KeyList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [maxItems, setMaxItems] = useState(10);
   const [autoUpdate, setAutoUpdate] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    const show = !!(currentConnection.username && currentConnection.password);
+    setShowDisclaimer(show);
+  }, [currentConnection.password, currentConnection.username]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -55,6 +63,17 @@ const KeyList = () => {
         darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
       }`}
     >
+      <Disclaimer
+        className="mt-10 mb-10"
+        showDisclaimer={showDisclaimer}
+        hideDisclaimer={() => setShowDisclaimer(false)}
+      >
+        Quando o Memcached está configurado com autenticação, apenas as chaves
+        criadas dentro do <strong>MemGUI</strong> poderão ser listadas, editadas
+        ou excluídas. Isso ocorre devido a uma{" "}
+        <strong>limitação do protocolo do Memcached autenticado</strong>, que
+        restringe o acesso a chaves criadas por outras fontes.
+      </Disclaimer>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Chaves Armazenadas</h2>
 
