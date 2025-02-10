@@ -35,12 +35,21 @@ const ConnectionModal = ({ onSubmit }: Props) => {
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const getValue = (event: ChangeEvent<HTMLInputElement>) => {
+      if (event.target.type === "number") {
+        return Number(event.target.value);
+      }
+
+      if (event.target.type === "checkbox") {
+        return event.target.checked;
+      }
+
+      return event.target.value;
+    };
+
     setFormData((prev) => ({
       ...prev,
-      [event.target.name]:
-        event.target.type === "checkbox"
-          ? event.target.checked
-          : event.target.value
+      [event.target.name]: getValue(event)
     }));
   };
 
