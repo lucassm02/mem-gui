@@ -1,6 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import { createContext, ReactNode, useEffect, useState } from "react";
+import localforage from "localforage";
+import {
+  createContext,
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useState
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/useModal";
 import api, { clearConnectionId, setConnectionId } from "@/ui/services/api";
@@ -93,13 +98,7 @@ export const ConnectionsContext = createContext<
 >(undefined);
 
 export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
-  const [savedConnections, setSavedConnections] = useState<Connection[]>(() => {
-    const connections = localStorage.getItem("CONNECTIONS");
-    return connections ? JSON.parse(connections) : [];
-  });
-
-  const navigate = useNavigate();
-
+  const [savedConnections, setSavedConnections] = useState<Connection[]>([]);
   const [currentConnection, setCurrentConnection] = useState<Connection>({
     host: "",
     port: 11211,
@@ -115,7 +114,20 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [serverData, setServerData] = useState<ServerData | null>(null);
   const [error] = useState("");
 
+  const navigate = useNavigate();
   const { showError, showLoading, dismissLoading } = useModal();
+
+  async function loadConnections() {
+    const connections = await localforage.getItem<string>("CONNECTIONS");
+
+    if (connections) {
+      setSavedConnections(JSON.parse(connections));
+    }
+  }
+
+  useEffect(() => {
+    loadConnections();
+  }, []);
 
   api.interceptors.response.use(
     (response) => response,
@@ -150,7 +162,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       setSavedConnections((prev) => {
         const filtered = prev.filter((c) => c.host !== host || c.port !== port);
         const updated = [newConnection, ...filtered];
-        localStorage.setItem("CONNECTIONS", JSON.stringify(updated));
+        localforage.setItem("CONNECTIONS", JSON.stringify(updated));
         return updated;
       });
 
@@ -330,7 +342,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       const updated = prev.filter(
         (c) => c.host !== connection.host || c.port !== connection.port
       );
-      localStorage.setItem("CONNECTIONS", JSON.stringify(updated));
+      localforage.setItem("CONNECTIONS", JSON.stringify(updated));
       return updated;
     });
   };
