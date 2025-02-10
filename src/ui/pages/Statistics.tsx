@@ -103,7 +103,11 @@ export function Dashboard() {
             />
             <InfoCard
               title="Requisições/s"
-              value={serverData.serverInfo.requests_per_second}
+              value={(
+                (+serverData.serverInfo.cmd_get +
+                  +serverData.serverInfo.cmd_get) /
+                +serverData.serverInfo.uptime
+              ).toFixed(2)}
               icon={<SignalIcon className="w-10 h-10 text-teal-400" />}
             />
           </div>

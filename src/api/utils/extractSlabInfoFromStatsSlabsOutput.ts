@@ -42,7 +42,7 @@ export function extractSlabInfoFromStatsSlabsOutput(
     const slab = slabs.find((item) => item.id === id);
 
     if (!slab) {
-      slabs.push({ id });
+      slabs.push({ id, [property]: value });
       continue;
     }
 
