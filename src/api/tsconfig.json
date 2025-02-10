@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2019",
-    "rootDir": ".",
+    "rootDir": "../",
     "module": "CommonJS",
     "moduleResolution": "Node",
     "strict": true,
@@ -17,6 +17,13 @@
     "composite": true,
     "useUnknownInCatchVariables": false
   },
-  "include": [".", "../server.ts"],
-  "exclude": ["../../node_modules", "../electron/**/*", "../../dist"]
+  "include": [
+    ".",
+    "../server.ts"
+  ],
+  "exclude": [
+    "../../node_modules",
+    "../electron/**/*",
+    "../../dist"
+  ]
 }

@@ -40,7 +40,7 @@ const ConnectionHome = () => {
           Caso não tenha um servidor configurado, veja nosso{" "}
           <a
             onClick={openSetupGuideModal}
-            className="text-blue-400 hover:underline"
+            className="text-blue-400 hover:cursor-pointer"
           >
             guia de configuração
           </a>

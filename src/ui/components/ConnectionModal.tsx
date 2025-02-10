@@ -176,12 +176,14 @@ const ConnectionModal = ({ onSubmit }: Props) => {
                   <label
                     className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
                   >
-                    Timeout (segundos):
+                    Timeout em segundos (mínimo 300):
                   </label>
                   <input
                     type="number"
                     name="timeout"
                     value={formData.timeout}
+                    min={300}
+                    max={3600}
                     onChange={handleChange}
                     className="w-full p-2 rounded-md border"
                   />
