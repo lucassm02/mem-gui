@@ -2,9 +2,20 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/api/*": ["./src/api/*"],
-      "@/ui/*": ["./src/ui/*"]
+      "@/api/*": [
+        "./src/api/*"
+      ],
+      "@/ui/*": [
+        "./src/ui/*"
+      ]
     }
   },
-  "include": ["src"]
+  "references": [
+    {
+      "path": "./src/ui"
+    },
+    {
+      "path": "./src/api"
+    }
+  ]
 }

@@ -33,7 +33,7 @@
     "productName": "MemGUI",
     "directories": {
       "output": "release",
-      "buildResources": "asset"
+      "buildResources": "assets"
     },
     "files": [
       "dist/**/*",

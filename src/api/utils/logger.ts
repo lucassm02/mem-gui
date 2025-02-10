@@ -1,15 +1,10 @@
 import pino from "pino";
+import { PinoPretty } from "pino-pretty";
 
-process.stdout.setDefaultEncoding("utf8");
-
-export const logger = pino({
-  level: "info",
-  timestamp: pino.stdTimeFunctions.isoTime,
-  transport: {
-    target: "pino-pretty",
-    options: {
-      colorize: true,
-      translateTime: "SYS:standard"
-    }
-  }
-});
+export const logger = pino(
+  {
+    level: "info",
+    timestamp: pino.stdTimeFunctions.isoTime
+  },
+  PinoPretty()
+);
