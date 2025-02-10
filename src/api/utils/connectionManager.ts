@@ -1,4 +1,4 @@
-import { MemcachedConnection } from "@/types";
+import { MemcachedConnection } from "@/api/types";
 
 class ConnectionManager {
   private static instance: ConnectionManager;

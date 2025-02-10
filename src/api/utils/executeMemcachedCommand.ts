@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-undef */
 import net from "net";
-import { MemcachedConnection } from "@/types";
+import { MemcachedConnection } from "@/api/types";
 
 // ===================================
 // BINARY COMMUNICATION

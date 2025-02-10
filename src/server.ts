@@ -1,13 +1,13 @@
-/* eslint-disable no-undef */
-
 import http from "http";
 import path from "path";
 import express from "express";
 
 import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+
 import connectionsRoutes from "./api/routes/connections";
 import keysRoutes from "./api/routes/keys";
-import { logger } from "./utils/backend";
+import { logger } from "./api/utils";
 
 export async function server(port = 0, dev: boolean = false, host?: string) {
   try {
@@ -76,7 +76,7 @@ export async function server(port = 0, dev: boolean = false, host?: string) {
   }
 }
 
-const cli = yargs.usage("");
+const cli = yargs(hideBin(process.argv));
 
 cli.option("port", {
   alias: "p",
@@ -103,7 +103,7 @@ cli.option("dev", {
 
 type Argv = { port?: number; host?: string; start?: boolean; dev?: boolean };
 
-const { port, host, start, dev } = <Argv>cli.argv;
+const { port, host, start, dev } = cli.argv as Argv;
 
 if (start) {
   server(port, dev, host);

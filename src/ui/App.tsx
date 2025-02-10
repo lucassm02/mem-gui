@@ -1,15 +1,15 @@
 import { Route, Routes } from "react-router-dom";
-import ErrorModal from "@/components/ErrorModal";
-import LoadingModal from "@/components/LoadingModal";
+import ErrorModal from "@/ui/components/ErrorModal";
+import LoadingModal from "@/ui/components/LoadingModal";
 
-import TitleBar from "@/components/TitleBar";
-import { ConnectionsProvider } from "@/contexts/ConnectionsContext";
-import { DarkModeProvider } from "@/contexts/DarkModeContext";
-import { MenuProvider } from "@/contexts/MenuContext";
-import { ModalProvider } from "@/contexts/ModalContext";
-import { Connection } from "@/pages/Connection";
-import { Panel } from "@/pages/Panel";
-import { Dashboard } from "@/pages/Statistics";
+import TitleBar from "@/ui/components/TitleBar";
+import { ConnectionsProvider } from "@/ui/contexts/ConnectionsContext";
+import { DarkModeProvider } from "@/ui/contexts/DarkModeContext";
+import { MenuProvider } from "@/ui/contexts/MenuContext";
+import { ModalProvider } from "@/ui/contexts/ModalContext";
+import { Connection } from "@/ui/pages/Connection";
+import { Panel } from "@/ui/pages/Panel";
+import { Dashboard } from "@/ui/pages/Statistics";
 
 const App = () => (
   <DarkModeProvider>

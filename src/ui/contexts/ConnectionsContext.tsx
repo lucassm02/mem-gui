@@ -3,7 +3,7 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/useModal";
-import api, { clearConnectionId, setConnectionId } from "@/services/api";
+import api, { clearConnectionId, setConnectionId } from "@/ui/services/api";
 
 interface Connection {
   name: string;

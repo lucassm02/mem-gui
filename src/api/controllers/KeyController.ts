@@ -1,7 +1,6 @@
-/* eslint-disable no-undef */
 import { Request, Response } from "express";
 import pLimit from "p-limit";
-import { Key, MemcachedConnection } from "@/types";
+import { Key, MemcachedConnection } from "@/api/types";
 import {
   connectionManager,
   extractKeysInfoFromDump,
@@ -10,8 +9,8 @@ import {
   MAX_CONCURRENT_REQUESTS,
   ONE_DAY_IN_SECONDS,
   RESERVED_KEY
-} from "@/utils/backend";
-import { executeMemcachedCommand } from "@/utils/backend/executeMemcachedCommand";
+} from "@/api/utils";
+import { executeMemcachedCommand } from "@/api/utils/executeMemcachedCommand";
 
 type KeyPayload = {
   key: string;

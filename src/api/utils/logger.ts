@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import pino from "pino";
 
 process.stdout.setDefaultEncoding("utf8");

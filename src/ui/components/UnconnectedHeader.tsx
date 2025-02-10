@@ -1,5 +1,5 @@
 import { Bars3Icon, MoonIcon, SunIcon } from "@heroicons/react/24/outline";
-import { useDarkMode, useMenu } from "@/hooks";
+import { useDarkMode, useMenu } from "@/ui/hooks";
 
 const UnconnectedHeader = () => {
   const { openMenu } = useMenu();

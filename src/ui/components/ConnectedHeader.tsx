@@ -10,7 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useLocation, useNavigate } from "react-router";
 
-import { useConnections, useDarkMode, useMenu } from "@/hooks";
+import { useConnections, useDarkMode, useMenu } from "@/ui/hooks";
 
 const ConnectedHeader = () => {
   const { darkMode, toggleDarkMode } = useDarkMode();

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import {
   ArrowDownTrayIcon,
   ArrowUpTrayIcon,
@@ -12,9 +11,9 @@ import {
   SignalIcon
 } from "@heroicons/react/24/outline";
 import { ReactNode, useEffect } from "react";
-import ConnectedHeader from "@/components/ConnectedHeader";
-import ConnectionList from "@/components/ConnectionList";
-import { useConnections, useDarkMode } from "@/hooks";
+import ConnectedHeader from "@/ui/components/ConnectedHeader";
+import ConnectionList from "@/ui/components/ConnectionList";
+import { useConnections, useDarkMode } from "@/ui/hooks";
 
 export function Dashboard() {
   const { darkMode } = useDarkMode();

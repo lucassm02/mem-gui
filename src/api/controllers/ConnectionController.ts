@@ -4,14 +4,14 @@ import { Request, Response } from "express";
 import memjs from "memjs";
 import z from "zod";
 
-import { MemcachedConnection } from "@/types";
+import { MemcachedConnection } from "@/api/types";
 import {
   connectionManager,
   logger,
   extractSlabInfoFromStatsSlabsOutput
-} from "@/utils/backend";
-import { executeMemcachedCommand } from "@/utils/backend/executeMemcachedCommand";
-import { connectionSchema } from "@/utils/backend/validationSchema";
+} from "@/api/utils";
+import { executeMemcachedCommand } from "@/api/utils/executeMemcachedCommand";
+import { connectionSchema } from "@/api/utils/validationSchema";
 
 class ConnectionController {
   constructor() {}

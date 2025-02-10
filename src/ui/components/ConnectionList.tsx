@@ -5,7 +5,7 @@ import {
   XMarkIcon
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router";
-import { useConnections, useDarkMode, useMenu } from "@/hooks";
+import { useConnections, useDarkMode, useMenu } from "@/ui/hooks";
 
 type Connection = {
   name: string;

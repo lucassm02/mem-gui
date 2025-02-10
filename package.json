@@ -11,11 +11,11 @@
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "lint": "eslint ./src",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "clean": "rimraf dist && rimraf release",
     "dev": "concurrently \"yarn dev:server\" \"wait-on http://localhost:5173 && yarn electron\"",
-    "dev:server": "node --inspect --import tsx src/server.ts  --start --dev --port 5173",
+    "dev:server": "yarn tsx src/server.ts  --start --dev --port 5173",
     "electron": "electron .",
     "build:server": "node scripts/build-server.cjs",
     "build:ui": "vite build",
@@ -70,8 +70,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.5",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^11.0.5",
-    "yargs": "^13.2",
+    "yargs": "17",
     "zod": "^3.24.1"
   },
   "devDependencies": {

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import memjs from "memjs";
 
 export interface MemcachedConnection {

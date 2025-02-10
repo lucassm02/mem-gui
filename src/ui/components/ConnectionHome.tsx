@@ -1,6 +1,6 @@
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import { useDarkMode } from "../hooks/useDarkMode";
-import { useModal } from "@/hooks";
+import { useModal } from "@/ui/hooks";
 
 const ConnectionHome = () => {
   const { darkMode } = useDarkMode();

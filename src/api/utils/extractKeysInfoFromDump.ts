@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { logger } from "./logger";
-import { Key } from "@/types";
+import { Key } from "@/api/types";
 
 export function extractKeysInfoFromDump(
   dumpOutput: Record<string, string>,

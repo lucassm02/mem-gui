@@ -5,7 +5,7 @@ interface Result {
 }
 
 interface Slab {
-  slab_id: string;
+  id: string;
   chunk_size: string;
   chunks_per_page: string;
   total_pages: string;
@@ -39,10 +39,10 @@ export function extractSlabInfoFromStatsSlabsOutput(
 
     const [id, property] = key.split(":");
 
-    const slab = slabs.find((item) => item.slab_id === id);
+    const slab = slabs.find((item) => item.id === id);
 
     if (!slab) {
-      slabs.push({ slab_id: id });
+      slabs.push({ id });
       continue;
     }
 

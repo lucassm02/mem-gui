@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -20,7 +19,7 @@ export default defineConfig({
   build: {
     outDir: "dist/public",
     rollupOptions: {
-      external: ["src/api", "src/server.ts", "src/utils/backend"]
+      external: ["src/api", "src/server.ts"]
     }
   }
 });

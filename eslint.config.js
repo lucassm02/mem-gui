@@ -31,7 +31,8 @@ export default [
       globals: globals.browser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: "./tsconfig.json"
+        project: ["./src/api/tsconfig.json", "./src/ui/tsconfig.json"], // ✅ Agora usa os arquivos corretos
+        tsconfigRootDir: process.cwd()
       }
     },
     settings: {
@@ -54,6 +55,7 @@ export default [
       ...reactHooks.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
       ...eslintConfigPrettier.rules,
+      "no-undef": "off",
       "prettier/prettier": [
         "error",
         {

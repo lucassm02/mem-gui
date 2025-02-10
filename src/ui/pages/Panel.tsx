@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import ConnectedHeader from "@/components/ConnectedHeader";
-import ConnectionList from "@/components/ConnectionList";
-import KeyList from "@/components/KeyList";
-import { useConnections } from "@/hooks";
+import ConnectedHeader from "@/ui/components/ConnectedHeader";
+import ConnectionList from "@/ui/components/ConnectionList";
+import KeyList from "@/ui/components/KeyList";
+import { useConnections } from "@/ui/hooks";
 
-import { useDarkMode } from "@/hooks/useDarkMode";
+import { useDarkMode } from "@/ui/hooks/useDarkMode";
 
 export function Panel() {
   const { darkMode } = useDarkMode();

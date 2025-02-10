@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { connectionManager, logger } from "@/utils/backend";
+import { connectionManager, logger } from "@/api/utils";
 
 export function checkConnectionMiddleware(
   request: Request,

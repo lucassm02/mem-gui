@@ -1,11 +1,8 @@
 import { Router } from "express";
 import { checkConnectionMiddleware } from "../middlewares";
 import { makeKeyController } from "@/api/controllers";
-import { validationAdapter } from "@/utils/backend";
-import {
-  cacheValueSchema,
-  cacheKeySchema
-} from "@/utils/backend/validationSchema";
+import { validationAdapter } from "@/api/utils";
+import { cacheValueSchema, cacheKeySchema } from "@/api/utils/validationSchema";
 
 const keyController = makeKeyController();
 

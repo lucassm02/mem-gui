@@ -10,12 +10,8 @@
       "protocol": "inspector",
       "restart": true,
       "name": "DEBUG",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "outFiles": [
-        "${workspaceFolder}/**/*.js"
-      ]
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/**/*.js"]
     }
   ]
 }

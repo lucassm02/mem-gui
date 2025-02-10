@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { checkConnectionMiddleware } from "../middlewares";
 import { makeConnectionController } from "@/api/controllers";
-import { validationAdapter } from "@/utils/backend";
-import { connectionSchema } from "@/utils/backend/validationSchema";
+import { validationAdapter } from "@/api/utils";
+import { connectionSchema } from "@/api/utils/validationSchema";
 
 const route = Router();
 
