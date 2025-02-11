@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import ConnectionHome from "@/ui/components/ConnectionHome";
@@ -31,7 +32,6 @@ export function Connection() {
     if (savedConnections.length > 0) {
       openMenu();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedConnections]);
 
   async function handleSubmit(params: SubmitParams) {

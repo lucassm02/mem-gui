@@ -11,30 +11,33 @@ import {
   DarkModeProvider,
   MenuProvider,
   ModalProvider,
-  TitleBarProvider
+  TitleBarProvider,
+  StorageProvider
 } from "@/ui/providers";
 
 const App = () => (
-  <DarkModeProvider>
-    <TitleBarProvider>
-      <ModalProvider>
-        <ConnectionsProvider>
-          <MenuProvider>
-            <div className="h-screen flex flex-col">
-              <TitleBar />
-              <LoadingModal />
-              <ErrorModal />
-              <Routes>
-                <Route path="/" element={<Connection />} />
-                <Route path="/panel" element={<Panel />} />
-                <Route path="/statistics" element={<Dashboard />} />
-              </Routes>
-            </div>
-          </MenuProvider>
-        </ConnectionsProvider>
-      </ModalProvider>
-    </TitleBarProvider>
-  </DarkModeProvider>
+  <StorageProvider>
+    <DarkModeProvider>
+      <TitleBarProvider>
+        <ModalProvider>
+          <ConnectionsProvider>
+            <MenuProvider>
+              <div className="h-screen flex flex-col">
+                <TitleBar />
+                <LoadingModal />
+                <ErrorModal />
+                <Routes>
+                  <Route path="/" element={<Connection />} />
+                  <Route path="/panel" element={<Panel />} />
+                  <Route path="/statistics" element={<Dashboard />} />
+                </Routes>
+              </div>
+            </MenuProvider>
+          </ConnectionsProvider>
+        </ModalProvider>
+      </TitleBarProvider>
+    </DarkModeProvider>
+  </StorageProvider>
 );
 
 export default App;

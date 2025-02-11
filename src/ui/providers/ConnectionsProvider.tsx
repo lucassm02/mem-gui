@@ -1,7 +1,7 @@
-import localforage from "localforage";
 import { ReactNode, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import { ConnectionsContext } from "../contexts";
+import { useStorage } from "../hooks";
 import { useModal } from "../hooks/useModal";
 import api, { clearConnectionId, setConnectionId } from "@/ui/services/api";
 
@@ -84,13 +84,17 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
 
   const navigate = useNavigate();
   const { showError, showLoading, dismissLoading } = useModal();
+  const { getKey, setKey } = useStorage();
 
   async function loadConnections() {
-    const connections = await localforage.getItem<string>("CONNECTIONS");
+    const data = await getKey("CONNECTIONS");
 
-    if (connections) {
-      setSavedConnections(JSON.parse(connections));
-    }
+    if (!data) return;
+    console.log(data);
+
+    const { value } = data;
+
+    setSavedConnections(value as Connection[]);
   }
 
   useEffect(() => {
@@ -130,13 +134,10 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       setSavedConnections((prev) => {
         const filtered = prev.filter((c) => c.host !== host || c.port !== port);
         const updated = [newConnection, ...filtered];
-        localforage.setItem("CONNECTIONS", JSON.stringify(updated));
+        setKey("CONNECTIONS", updated);
         return updated;
       });
 
-      setCurrentConnection(newConnection);
-
-      dismissLoading();
       return true;
     } catch (_error) {
       dismissLoading();
@@ -316,7 +317,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       const updated = prev.filter(
         (c) => c.host !== connection.host || c.port !== connection.port
       );
-      localforage.setItem("CONNECTIONS", JSON.stringify(updated));
+      setKey("CONNECTIONS", updated);
       return updated;
     });
   };
