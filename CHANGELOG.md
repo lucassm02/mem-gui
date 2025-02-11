@@ -31,7 +31,7 @@ All notable changes to this project will be documented in this file. This projec
 - **Script path** and build process corrections.
 - **Window Title Handling** so it is not improperly displayed in browser environments.
 - **Form Value Type Conversion**, ensuring consistent data submission (e.g., numeric vs. string values).
-- **Local Storage** switched from `localStorage` to `localForage` to bypass limitations and prevent data loss.
+- **Local Storage** switched from `localStorage` to `API Storage` to bypass limitations and prevent data loss.
 - **Statistics Fields** adjustments, fixing calculations for requests per second and size metrics.
 
 ### Removed
