@@ -7,6 +7,7 @@ import { hideBin } from "yargs/helpers";
 
 import connectionsRoutes from "./api/routes/connections";
 import keysRoutes from "./api/routes/keys";
+import storagesRoutes from "./api/routes/storages";
 import { logger } from "./api/utils";
 
 export async function server(port = 0, dev: boolean = false, host?: string) {
@@ -15,6 +16,7 @@ export async function server(port = 0, dev: boolean = false, host?: string) {
 
     app.use(express.json());
 
+    app.use("/api", storagesRoutes);
     app.use("/api", connectionsRoutes);
     app.use("/api", keysRoutes);
 

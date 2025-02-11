@@ -4,7 +4,8 @@
   "private": false,
   "version": "1.0.0",
   "author": {
-    "name": "Santos Código"
+    "name": "Santos Código",
+    "email": "lucassm02@gmail.com"
   },
   "main": "src/electron/main.cjs",
   "type": "module",
@@ -58,6 +59,7 @@
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lang-xml": "^6.1.0",
     "@heroicons/react": "^2.2.0",
+    "@seald-io/nedb": "^4.0.4",
     "@tailwindcss/vite": "^4.0.1",
     "@uiw/react-codemirror": "^4.23.7",
     "axios": "^1.7.9",
