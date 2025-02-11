@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { MenuContext } from "@/ui/contexts";
+import { MenuContext, MenuContextType } from "@/ui/contexts/MenuContext";
 
-export const useMenu = () => {
+export const useMenu = (): MenuContextType => {
   const context = useContext(MenuContext);
   if (!context) {
     throw new Error(

@@ -14,6 +14,7 @@ export default [
     ignores: [
       "node_modules",
       "dist",
+      "release",
       "public",
       "coverage",
       ".vscode",
@@ -31,7 +32,7 @@ export default [
       globals: globals.browser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
-        project: ["./src/api/tsconfig.json", "./src/ui/tsconfig.json"], // ✅ Agora usa os arquivos corretos
+        project: ["./src/api/tsconfig.json", "./src/ui/tsconfig.json"],
         tsconfigRootDir: process.cwd()
       }
     },
@@ -56,6 +57,14 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...eslintConfigPrettier.rules,
       "no-undef": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "off",
+        {
+          varsIgnorePattern: "^_",
+          argsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_"
+        }
+      ],
       "prettier/prettier": [
         "error",
         {
@@ -68,10 +77,6 @@ export default [
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true }
-      ],
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_" }
       ],
       "@typescript-eslint/explicit-function-return-type": "off",
       "import/order": [

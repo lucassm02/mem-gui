@@ -1,7 +1,10 @@
 import { useContext } from "react";
-import { ConnectionsContext } from "../contexts/ConnectionsContext";
+import {
+  ConnectionsContext,
+  ConnectionsContextType
+} from "../contexts/ConnectionsContext";
 
-export const useConnections = () => {
+export const useConnections = (): ConnectionsContextType => {
   const context = useContext(ConnectionsContext);
   if (!context) {
     throw new Error(

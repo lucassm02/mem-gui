@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   MinusIcon,
   XMarkIcon,
@@ -5,18 +6,21 @@ import {
   ArrowsPointingInIcon
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
+import { useTitleBar } from "../hooks";
 
 const TitleBar = () => {
   let ipcRenderer = null;
 
-  if (typeof window !== "undefined" && window.require) {
+  const { disableTitleBar, titleBarIsEnabled } = useTitleBar();
+
+  if (titleBarIsEnabled) {
     ipcRenderer = window.require("electron").ipcRenderer;
   }
 
   const [isMaximized, setIsMaximized] = useState(false);
-
   useEffect(() => {
     if (!ipcRenderer) return;
+
     ipcRenderer.on("window-maximized", () => setIsMaximized(true));
     ipcRenderer.on("window-unmaximized", () => setIsMaximized(false));
 
@@ -30,7 +34,7 @@ const TitleBar = () => {
 
   return (
     <div
-      className="w-full h-10 bg-[#121212] flex items-center justify-between px-4 text-white"
+      className="w-full h-10 bg-[#121212] flex items-center justify-between px-4 text-white z-99"
       style={{ WebkitAppRegion: "drag" }}
     >
       <div

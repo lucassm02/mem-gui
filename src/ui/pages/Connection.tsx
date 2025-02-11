@@ -31,6 +31,7 @@ export function Connection() {
     if (savedConnections.length > 0) {
       openMenu();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedConnections]);
 
   async function handleSubmit(params: SubmitParams) {

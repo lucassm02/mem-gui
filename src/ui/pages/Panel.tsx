@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import ConnectedHeader from "@/ui/components/ConnectedHeader";
 import ConnectionList from "@/ui/components/ConnectionList";

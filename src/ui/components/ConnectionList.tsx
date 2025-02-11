@@ -5,12 +5,13 @@ import {
   XMarkIcon
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router";
-import { useConnections, useDarkMode, useMenu } from "@/ui/hooks";
+import { useConnections, useDarkMode, useMenu, useTitleBar } from "@/ui/hooks";
 
 type Connection = {
   name: string;
   host: string;
   port: number;
+  timeout: number;
 };
 
 const ConnectionList = () => {
@@ -20,7 +21,7 @@ const ConnectionList = () => {
     useConnections();
 
   const navigate = useNavigate();
-
+  const { titleBarIsEnabled } = useTitleBar();
   async function choseConnection(connection: Connection) {
     const redirect = await handleChoseConnection(connection);
 
@@ -32,11 +33,11 @@ const ConnectionList = () => {
   return (
     <>
       {menuIsOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40" onClick={closeMenu} />
+        <div className={`fixed inset-0 bg-black/50 z-40`} onClick={closeMenu} />
       )}
 
       <div
-        className={`fixed left-0 top-10 h-screen w-80 z-50 transition-transform duration-300 shadow-lg
+        className={`fixed left-0 ${titleBarIsEnabled ? "top-10" : "top-0"} h-screen w-80 z-50 transition-transform duration-300 shadow-lg
         ${
           darkMode
             ? "bg-gray-800 border-r border-gray-700"
