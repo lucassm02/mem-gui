@@ -199,4 +199,5 @@ dist
 .DS_Store
 
 /release
+/cert
 
