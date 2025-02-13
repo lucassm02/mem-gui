@@ -92,7 +92,7 @@
     "autoprefixer": "^10.4.20",
     "chokidar": "^4.0.3",
     "concurrently": "^9.1.2",
-    "electron": "^34.0.2",
+    "electron": "^34.1.1",
     "electron-builder": "^25.1.8",
     "electron-is-dev": "^3.0.1",
     "esbuild": "^0.24.2",

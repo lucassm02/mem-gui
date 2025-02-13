@@ -1,4 +1,10 @@
-const { app, BrowserWindow, ipcMain, screen, dialog } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  screen,
+  globalShortcut
+} = require("electron");
 const path = require("path");
 
 const DEV_SERVER_PORT = 5173;
@@ -52,6 +58,12 @@ app.whenReady().then(async () => {
   mainWindow.on("unmaximize", () => {
     mainWindow.webContents.send("window-unmaximized");
   });
+
+  if (isDev) {
+    globalShortcut.register("CommandOrControl+Shift+I", () => {
+      mainWindow.webContents.toggleDevTools({ mode: "detach" });
+    });
+  }
 });
 
 app.on("window-all-closed", () => {

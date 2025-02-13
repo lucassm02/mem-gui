@@ -8,11 +8,13 @@ export const ElectronProvider = ({ children }: { children: ReactNode }) => {
   const [electron, setElectron] = useState<Electron | null>(null);
   const [enabled, setEnabled] = useState(false);
 
-  if (typeof window.require === "function") {
-    const electron = window.require("electron");
-    setElectron(electron);
-    setEnabled(true);
-  }
+  useEffect(() => {
+    if (typeof window.require === "function") {
+      const electron = window.require("electron");
+      setElectron(electron);
+      setEnabled(true);
+    }
+  }, []);
 
   function getInstance(): Electron | null {
     return electron;

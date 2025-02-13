@@ -5,25 +5,29 @@ import {
   MinusIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
+import type e from "electron";
 import { useEffect, useState } from "react";
+import { useElectron } from "../hooks";
 
 const TitleBar = () => {
-  let ipcRenderer = null;
-
-  if (typeof window.require === "function") {
-    ipcRenderer = window.require("electron").ipcRenderer;
-  }
-
+  const { getInstance } = useElectron();
   const [isMaximized, setIsMaximized] = useState(false);
-  useEffect(() => {
-    if (!ipcRenderer) return;
+  const [ipcRenderer, setIpcRenderer] = useState<null | typeof e.ipcRenderer>(
+    null
+  );
 
-    ipcRenderer.on("window-maximized", () => setIsMaximized(true));
-    ipcRenderer.on("window-unmaximized", () => setIsMaximized(false));
+  useEffect(() => {
+    const electron = getInstance();
+
+    if (!electron) return () => {};
+    setIpcRenderer(electron.ipcRenderer);
+
+    electron.ipcRenderer.on("window-maximized", () => setIsMaximized(true));
+    electron.ipcRenderer.on("window-unmaximized", () => setIsMaximized(false));
 
     return () => {
-      ipcRenderer.removeAllListeners("window-maximized");
-      ipcRenderer.removeAllListeners("window-unmaximized");
+      electron.ipcRenderer.removeAllListeners("window-maximized");
+      electron.ipcRenderer.removeAllListeners("window-unmaximized");
     };
   }, []);
 
