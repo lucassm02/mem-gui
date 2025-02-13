@@ -5,16 +5,16 @@ import {
   MinusIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
-import type e from "electron";
+
 import { useEffect, useState } from "react";
 import { useElectron } from "../hooks";
 
 const TitleBar = () => {
   const { getInstance } = useElectron();
   const [isMaximized, setIsMaximized] = useState(false);
-  const [ipcRenderer, setIpcRenderer] = useState<null | typeof e.ipcRenderer>(
-    null
-  );
+  const [ipcRenderer, setIpcRenderer] = useState<
+    null | typeof Electron.ipcRenderer
+  >(null);
 
   useEffect(() => {
     const electron = getInstance();
@@ -22,8 +22,12 @@ const TitleBar = () => {
     if (!electron) return () => {};
     setIpcRenderer(electron.ipcRenderer);
 
-    electron.ipcRenderer.on("window-maximized", () => setIsMaximized(true));
-    electron.ipcRenderer.on("window-unmaximized", () => setIsMaximized(false));
+    electron.ipcRenderer.on("window-maximized", () => {
+      if (!isMaximized) setIsMaximized(true);
+    });
+    electron.ipcRenderer.on("window-unmaximized", () => {
+      if (isMaximized) setIsMaximized(false);
+    });
 
     return () => {
       electron.ipcRenderer.removeAllListeners("window-maximized");
@@ -59,11 +63,13 @@ const TitleBar = () => {
         <button
           className="hover:bg-gray-700 p-2 rounded transition"
           style={{ WebkitAppRegion: "no-drag" }}
-          onClick={() =>
+          onClick={() => {
+            const newState = !isMaximized;
+            setIsMaximized(newState);
             ipcRenderer.send(
-              isMaximized ? "window-unmaximize" : "window-maximize"
-            )
-          }
+              newState ? "window-maximize" : "window-unmaximize"
+            );
+          }}
         >
           {isMaximized ? (
             <ArrowsPointingInIcon className="w-5 h-5" />

@@ -1,8 +1,6 @@
-import type e from "electron";
 import { ReactNode, useEffect, useState } from "react";
 import { ElectronContext } from "../contexts/ElectronContext";
-
-type Electron = typeof e;
+import { Electron } from "@/ui/@types/global";
 
 export const ElectronProvider = ({ children }: { children: ReactNode }) => {
   const [electron, setElectron] = useState<Electron | null>(null);

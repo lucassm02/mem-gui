@@ -1,7 +1,6 @@
-import type e from "electron";
 import { createContext } from "react";
+import { Electron } from "../@types/global";
 
-type Electron = typeof e;
 export interface ElectronContextType {
   getInstance: () => Electron | null;
   enabled: boolean;
