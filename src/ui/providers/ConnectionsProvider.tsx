@@ -90,7 +90,6 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     const data = await getKey("CONNECTIONS");
 
     if (!data) return;
-    console.log(data);
 
     const { value } = data;
 

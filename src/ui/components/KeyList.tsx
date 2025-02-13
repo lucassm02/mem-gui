@@ -68,7 +68,6 @@ const KeyList = () => {
       if (!item) {
         const value = await handleGetByKey(searchTerm);
         if (value) {
-          console.log(value);
           await handleLoadKeys();
         }
       }
