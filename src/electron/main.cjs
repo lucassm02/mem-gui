@@ -39,6 +39,7 @@ app.whenReady().then(async () => {
     width: width - 100,
     height: height - 100,
     frame: false,
+    show: false,
     titleBarStyle: "hiddenInset",
     backgroundColor: "#1A1D2A",
     webPreferences: {
@@ -50,6 +51,10 @@ app.whenReady().then(async () => {
   });
 
   mainWindow.loadURL(startURL);
+
+  setTimeout(() => {
+    mainWindow.show();
+  }, 1_000);
 
   mainWindow.on("maximize", () => {
     mainWindow.webContents.send("window-maximized");
