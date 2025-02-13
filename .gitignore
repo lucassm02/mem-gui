@@ -13,7 +13,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -200,4 +199,7 @@ dist
 .DS_Store
 
 /release
+/cert
+
+*.db
 

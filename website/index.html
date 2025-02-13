@@ -1,68 +1,175 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
+    <!-- Required Meta Tags for SEO -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MemGUI - Download Page</title>
     <link
-      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+      rel="icon"
+      type="image/svg+xml"
+      href="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/images/logo-white.svg"
+    />
+    <meta
+      name="description"
+      content="MemGUI: A powerful, intuitive GUI for managing and monitoring Memcached servers. Easily handle keys, monitor performance, and automate tasks."
+    />
+    <meta
+      name="keywords"
+      content="MemGUI, Memcached, GUI, SASL Authentication, Cache, Key Management, Auto-update, Advanced Search"
+    />
+    <meta name="author" content="lucassm02" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Open Graph / Facebook -->
+    <meta
+      property="og:title"
+      content="MemGUI - The Ultimate GUI for Memcached"
+    />
+    <meta
+      property="og:description"
+      content="Easily manage and monitor your Memcached servers with MemGUI. Supports SASL authentication, auto-update, advanced search, and more."
+    />
+    <meta
+      property="og:image"
+      content="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/images/logo-white.svg"
+    />
+    <meta property="og:url" content="https://github.com/lucassm02/mem-gui" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <title>
+      MemGUI - Download Page | Manage Your Memcached Servers Efficiently
+    </title>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
     <style>
+      /* ROOT VARIABLES */
       :root {
         --bg-color: #121212;
         --header-bg: #1e1e1e;
-        --nav-bg: #1e1e1e;
+        --nav-bg: rgba(30, 30, 30, 0.8);
+        --card-bg: #1f1f1f;
         --primary-color: #007acc;
         --primary-hover: #005a9e;
         --text-color: #e0e0e0;
         --subtext-color: #a0a0a0;
         --border-color: #007acc;
-        --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        --shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
         --transition: 0.3s ease;
+        --heading-font: "Roboto", sans-serif;
+        --body-font: "Roboto", sans-serif;
       }
+
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
+
       html {
         scroll-behavior: smooth;
       }
+
       body {
-        font-family: "Roboto", sans-serif;
+        font-family: var(--body-font);
         background-color: var(--bg-color);
         color: var(--text-color);
         line-height: 1.6;
       }
+
+      /* HERO SECTION */
       .hero {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
         text-align: center;
-        padding: 60px 20px;
-        background: linear-gradient(135deg, var(--header-bg), #181818);
+        position: relative;
+        padding: 80px 20px;
+        background: linear-gradient(150deg, var(--header-bg) 50%, #181818 100%);
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -150px;
+        left: -150px;
+        width: 400px;
+        height: 400px;
+        background: var(--primary-color);
+        opacity: 0.1;
+        border-radius: 50%;
+        filter: blur(60px);
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        bottom: -150px;
+        right: -150px;
+        width: 400px;
+        height: 400px;
+        background: var(--primary-color);
+        opacity: 0.1;
+        border-radius: 50%;
+        filter: blur(60px);
       }
       .hero img {
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
         margin-bottom: 20px;
+        animation: floatLogo 3s ease-in-out infinite;
+      }
+      @keyframes floatLogo {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
       }
       .hero h1 {
-        font-size: 2.8rem;
-        margin-bottom: 10px;
+        font-size: 3rem;
         color: var(--primary-color);
+        font-family: var(--heading-font);
+        margin-bottom: 15px;
       }
       .hero p {
         font-size: 1.2rem;
         color: var(--subtext-color);
-        max-width: 600px;
+        max-width: 700px;
+        margin: 0 auto 30px auto;
       }
+      .hero .cta-buttons {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .hero .cta-buttons a {
+        display: inline-block;
+        padding: 14px 30px;
+        color: #fff;
+        text-decoration: none;
+        background: var(--primary-color);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        transition:
+          background-color var(--transition),
+          transform var(--transition);
+      }
+      .hero .cta-buttons a:hover {
+        background: var(--primary-hover);
+        transform: translateY(-3px);
+      }
+
+      /* NAVBAR */
       nav {
         position: sticky;
         top: 0;
         background-color: var(--nav-bg);
+        backdrop-filter: blur(10px);
         padding: 10px 0;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         z-index: 100;
@@ -78,16 +185,33 @@
       }
       nav ul li a {
         text-decoration: none;
-        color: var(--primary-color);
+        color: var(--text-color);
         font-weight: 500;
+        position: relative;
         transition: color var(--transition);
+        padding: 5px 0;
       }
       nav ul li a:hover {
-        color: var(--primary-hover);
+        color: var(--primary-color);
       }
+      nav ul li a::after {
+        content: "";
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--primary-color);
+        transition: width var(--transition);
+      }
+      nav ul li a:hover::after {
+        width: 100%;
+      }
+
+      /* MAIN CONTENT */
       main {
-        max-width: 1000px;
-        margin: 40px auto;
+        max-width: 1100px;
+        margin: 50px auto;
         padding: 0 20px;
       }
       section {
@@ -97,14 +221,13 @@
         font-size: 2rem;
         color: var(--primary-color);
         margin-bottom: 20px;
-        border-bottom: 2px solid var(--border-color);
         display: inline-block;
         padding-bottom: 5px;
+        border-bottom: 2px solid var(--border-color);
       }
       section p {
         margin-bottom: 15px;
         font-size: 1rem;
-        color: var(--text-color);
       }
       section ul {
         list-style: disc;
@@ -112,23 +235,59 @@
       }
       section ul li {
         margin-bottom: 10px;
-        color: var(--text-color);
       }
+      .sub-heading {
+        color: var(--subtext-color);
+        margin-top: -5px;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+      }
+
+      /* CARDS / HIGHLIGHTS (OPTIONAL FEATURE SECTION) */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .feature-card {
+        background: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        padding: 20px;
+        transition: transform var(--transition);
+      }
+      .feature-card h3 {
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        font-size: 1.3rem;
+      }
+      .feature-card p {
+        color: var(--subtext-color);
+      }
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+
+      /* DOWNLOAD BUTTON STYLE (GLOBAL REUSE) */
       .download-button {
         display: inline-block;
         background-color: var(--primary-color);
-        color: var(--bg-color);
+        color: #fff;
         padding: 15px 30px;
         font-size: 1.1rem;
         text-decoration: none;
         border-radius: 5px;
-        transition: background-color var(--transition), transform var(--transition);
+        transition:
+          background-color var(--transition),
+          transform var(--transition);
         box-shadow: var(--shadow);
       }
       .download-button:hover {
         background-color: var(--primary-hover);
         transform: translateY(-3px);
       }
+
+      /* SCREENSHOT SECTION */
       .screenshot {
         text-align: center;
       }
@@ -142,12 +301,18 @@
       .screenshot img:hover {
         transform: scale(1.02);
       }
+
+      /* FOOTER */
       footer {
         background-color: var(--header-bg);
         text-align: center;
-        padding: 20px;
+        padding: 30px;
         font-size: 0.9rem;
         border-top: 1px solid var(--primary-color);
+      }
+      footer p {
+        margin-bottom: 5px;
+        color: var(--subtext-color);
       }
       footer a {
         color: var(--primary-color);
@@ -157,6 +322,8 @@
       footer a:hover {
         color: var(--primary-hover);
       }
+
+      /* RESPONSIVE */
       @media (max-width: 600px) {
         .hero h1 {
           font-size: 2.2rem;
@@ -174,84 +341,255 @@
           padding: 12px 24px;
           font-size: 1rem;
         }
+        .feature-card h3 {
+          font-size: 1.15rem;
+        }
       }
     </style>
   </head>
   <body>
+    <!-- HERO / HEADER -->
     <header class="hero">
-      <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/assets/mem-gui.svg" alt="MemGUI Logo" />
+      <img
+        src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/images/logo-white.svg"
+        alt="MemGUI Logo"
+      />
       <h1>MemGUI</h1>
-      <p>Manage and monitor your system's memory in an intuitive and efficient way.</p>
+      <p>
+        The all-in-one GUI for Memcached—manage your servers, handle keys,
+        monitor performance, and more!
+      </p>
+      <div class="cta-buttons">
+        <a href="#download">Download Now</a>
+        <a href="https://github.com/lucassm02/mem-gui" target="_blank"
+          >View on GitHub</a
+        >
+      </div>
     </header>
+
+    <!-- NAVIGATION -->
     <nav>
       <ul>
         <li><a href="#about">About</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#download">Download</a></li>
+        <li><a href="#example">Example</a></li>
         <li><a href="#installation">Installation</a></li>
         <li><a href="#license">License</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
+
+    <!-- MAIN CONTENT -->
     <main>
+      <!-- ABOUT SECTION -->
       <section id="about">
         <h2>About MemGUI</h2>
         <p>
-          MemGUI is a modern and intuitive application for memory management and monitoring.
-          Developed with a focus on performance and usability, it offers a clean and efficient interface to track your system's resources.
+          <strong>MemGUI</strong> is a powerful, intuitive graphical user
+          interface tailored for <em>Memcached</em>—one of the most widely used
+          caching systems for high-performance applications. Our latest release
+          features <strong>SASL authentication</strong>,
+          <strong>auto-update functionality</strong>, and an
+          <strong>advanced search engine</strong>
+          with regex support, ensuring you have all the tools you need to
+          efficiently manage keys and monitor server activity.
+        </p>
+        <p class="sub-heading">
+          Experience a sleek UI, quick setup, and real-time data that keeps you
+          in full control of your Memcached environment.
         </p>
       </section>
+
+      <!-- FEATURES SECTION -->
       <section id="features">
-        <h2>Features</h2>
-        <ul>
-          <li>Modern and intuitive interface</li>
-          <li>Real-time memory usage monitoring</li>
-          <li>Low resource consumption</li>
-          <li>Compatible with multiple platforms</li>
-        </ul>
+        <h2>Key Features</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h3>SASL Authentication</h3>
+            <p>
+              Securely connect using username/password for protected servers.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>Auto-Update</h3>
+            <p>Keep your key listings fresh—no manual refreshes required.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Advanced Search</h3>
+            <p>
+              Filter keys by name, regex pattern, or partial matches for maximum
+              precision.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>Multi-Server Handling</h3>
+            <p>
+              Seamlessly switch between multiple Memcached instances and manage
+              them simultaneously.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>Detailed Statistics</h3>
+            <p>
+              Track uptime, connections, GET/SET counts, memory usage, and slab
+              allocation.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>User-Friendly UI</h3>
+            <p>
+              Enjoy a modern interface with dark/light modes, intuitive
+              navigation, and quick shortcuts.
+            </p>
+          </div>
+        </div>
       </section>
+
+      <!-- DOWNLOAD SECTION -->
       <section id="download">
         <h2>Download</h2>
         <p>
-          Download the latest version of MemGUI directly from GitHub. Click the button below to start your download.
+          Ready to streamline your Memcached workflow? Get the latest version of
+          MemGUI directly from our
+          <a
+            href="https://github.com/lucassm02/mem-gui/releases/latest"
+            target="_blank"
+            >GitHub Releases</a
+          >. We offer:
         </p>
-        <a class="download-button" href="https://github.com/lucassm02/mem-gui/releases/latest" target="_blank">
+        <ul>
+          <li>
+            <strong>Portable (Unpacked)</strong>: Just unzip and run—no
+            installation needed.
+          </li>
+          <li>
+            <strong>Setup (Installer)</strong>: A guided install for a seamless
+            setup on your system.
+          </li>
+        </ul>
+        <a
+          class="download-button"
+          href="https://github.com/lucassm02/mem-gui/releases/latest"
+          target="_blank"
+        >
           Download MemGUI
         </a>
       </section>
+
+      <!-- EXAMPLE / SCREENSHOT SECTION -->
       <section id="example">
         <h2>Example</h2>
-        <p>See an example of the MemGUI interface below:</p>
+        <p>
+          Dive into our intuitive interface! Below is a sneak peek of the MemGUI
+          dashboard for managing keys and viewing server stats.
+        </p>
         <div class="screenshot">
-          <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/screenshots/screnshot-02.png" alt="MemGUI Screenshot" />
+          <img
+            src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/screenshot/00-home.png"
+            alt="MemGUI Screenshot - Home"
+          />
+        </div>
+
+        <div class="screenshot">
+          <img
+            src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/screenshot/03-advanced-connection.png"
+            alt="MemGUI Screenshot - Connection"
+          />
+        </div>
+
+        <div class="screenshot">
+          <img
+            src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/screenshot/09-auto-refresh.png"
+            alt="MemGUI Screenshot - Key Listing"
+          />
+        </div>
+
+        <div class="screenshot">
+          <img
+            src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/screenshot/05-create-key.png"
+            alt="MemGUI Screenshot - Create Key"
+          />
+        </div>
+
+        <div class="screenshot">
+          <img
+            src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/screenshot/11-statistics.png"
+            alt="MemGUI Screenshot - Server Statistics"
+          />
         </div>
       </section>
+
+      <!-- INSTALLATION SECTION -->
       <section id="installation">
         <h2>Installation</h2>
         <p>
-          After downloading, run the installer and follow the on-screen instructions.
-          The installation is simple and fast, allowing you to start using MemGUI within minutes.
+          Whether you opt for the portable version or the setup wizard, you'll
+          be running MemGUI in just a few clicks:
+        </p>
+        <ul>
+          <li>Download your preferred package.</li>
+          <li>Unpack or run the installer.</li>
+          <li>Launch MemGUI and connect to your Memcached servers.</li>
+        </ul>
+        <p>
+          Need more help? Check out the README and our Wiki on GitHub for
+          detailed steps and troubleshooting tips.
         </p>
       </section>
+
+      <!-- LICENSE SECTION -->
       <section id="license">
         <h2>License</h2>
         <p>
-          This project is licensed under the <strong>Non-Commercial Use Only License</strong>. You are granted a limited, non-exclusive, and non-transferable license to use this software for personal, educational, or non-commercial research purposes only. Commercial use—including selling, offering paid services, or integrating this software into commercial products—is strictly prohibited. For the full details, please see the <a href="https://github.com/lucassm02/mem-gui/blob/main/LICENCE.md">LICENSE</a> file.
+          This project is distributed under a
+          <strong>Non-Commercial Use Only License</strong>. You are granted a
+          limited, non-exclusive, and non-transferable license to use this
+          software for personal, educational, or non-commercial research
+          purposes only. Commercial use—including selling, offering paid
+          services, or integrating this software into commercial products—is
+          strictly prohibited. For complete details, see our
+          <a
+            href="https://github.com/lucassm02/mem-gui/blob/main/LICENCE.md"
+            target="_blank"
+            >LICENSE</a
+          >
+          file.
         </p>
-        
       </section>
+
+      <!-- CONTACT SECTION -->
       <section id="contact">
         <h2>Contact</h2>
         <p>
-          If you have any questions or would like to contribute to the project, please visit the GitHub repository or get in touch.
+          Have questions or suggestions? Interested in contributing to
+          <strong>MemGUI</strong>? We’d love to hear from you! Please visit:
         </p>
         <p>
-          <a href="https://github.com/lucassm02/mem-gui" target="_blank">GitHub Repository</a>
+          <a href="https://github.com/lucassm02/mem-gui" target="_blank"
+            >Our GitHub Repository</a
+          >
+        </p>
+        <p>
+          Or open an
+          <a href="https://github.com/lucassm02/mem-gui/issues" target="_blank"
+            >issue on GitHub</a
+          >
+          to report bugs or request new features.
         </p>
       </section>
     </main>
+
+    <!-- FOOTER -->
     <footer>
-      <p>&copy; 2025 MemGUI. All rights reserved.</p>
+      <p>&copy; 2025 MemGUI. All Rights Reserved.</p>
+      <p>
+        <a href="https://github.com/lucassm02/mem-gui" target="_blank"
+          >View on GitHub</a
+        >
+        |
+        <a href="#top">Back to Top</a>
+      </p>
     </footer>
   </body>
 </html>
