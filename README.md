@@ -1,54 +1,66 @@
 # MemGUI
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/assets/mem-gui.svg" alt="MemGUI Logo" width="160" />
+  <img src="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/images/logo-white.svg" alt="MemGUI Logo" width="160" />
 </p>
 
-**MemGUI** is a graphical user interface (GUI) for managing **Memcached** databases and cache. It provides an intuitive experience for listing, creating, editing, and deleting keys, overcoming some of Memcached's limitations. It also allows users to view key details such as **content size and TTL** and supports multiple simultaneous connections to different servers.
+[![Latest Release](https://img.shields.io/github/v/release/lucassm02/mem-gui?color=blue&label=Download)](https://github.com/lucassm02/mem-gui/releases)
+[![License: Non-Commercial Use Only](https://img.shields.io/badge/license-NCU-orange.svg)](LICENSE)
 
-## 📌 Features
+**MemGUI** is a modern, intuitive GUI for **Memcached**—perfect for anyone wanting to visualize, monitor, and manage cached data without wrestling with the command line. Whether you're handling a single Memcached instance or multiple servers at once, MemGUI makes your workflow faster and simpler.
 
-- **Complete Key Management**
-  - Create new keys.
-  - Edit existing keys (value and expiration time).
-  - Delete keys from the cache.
-  - View stored keys with details:
-    - Key name.
-    - Stored value.
-    - Expiration time (TTL).
-    - Content size.
+---
 
-- **Multi-Server Support**
-  - Connect to multiple Memcached instances.
-  - Seamlessly switch between active connections without closing them.
+## 🚀 Why MemGUI?
 
-- **User-Friendly Interface**
-  - Light and dark mode for an enhanced user experience.
-  - Simplified navigation for efficient key and server management.
+- **Visually Manage Keys**: Create, edit (with text or JSON data), delete, and monitor keys in real time.
+- **Auto-Refreshing Listings**: Keep an always up-to-date view of your keys—no manual refresh needed (unless you want to!).
+- **Advanced Search**: Filter keys by keywords or use regex for pinpoint accuracy.
+- **SASL Authentication**: Safely connect using username/password when your server requires it.
+- **In-Depth Stats**: Get instant insights on uptime, memory usage, cache hits, slab details, and more.
+- **Multi-Server Connections**: Easily switch between different Memcached servers without losing your flow.
+- **Easy Setup Guide**: An optional step-by-step tutorial helps newcomers get started in seconds.
+- **Dark & Light Themes**: Choose the interface style that feels best for you.
+
+---
+
+## 📥 Installation
+
+To start using **MemGUI**, visit our [Releases page](https://github.com/lucassm02/mem-gui/releases). Two download options are provided:
+
+1. **Portable (Unpacked)**
+
+   - No installation required. Just unzip and run the executable.
+
+2. **Setup (Installer)**
+   - A guided installation wizard that walks you through setup on your system.
+
+Pick the format you prefer and launch **MemGUI** to begin managing your Memcached servers!
+
+---
 
 ## 🖼 Screenshots
 
-### Connection Screen
+![Home](./screenshot/00-home.png)
+![Help](./screenshot/01-help.png)
+![Connection](./screenshot/02-connection.png)
+![Advanced Connection](./screenshot/03-advanced-connection.png)
+![Empty List](./screenshot/04-empty-list.png)
+![Create key](./screenshot/05-create-key.png)
+![List](./screenshot/06-list.png)
+![Details](./screenshot/07-details.png)
+![Edit key](./screenshot/08-edit-key.png)
+![Auto refresh](./screenshot/09-auto-refresh.png)
+![Filters](./screenshot/10-filter.png)
+![Statistics](./screenshot/11-statistics.png)
 
-![Connection Screen](./screenshots/screnshot-00.png)
+---
 
-### Key List
+## 🤝 Contributing
 
-![Key List](./screenshots/screnshot-01.png)
-![Key List](./screenshots/screnshot-02.png)
-![Key List](./screenshots/screnshot-05.png)
+While **MemGUI** is licensed for **non-commercial use**, we welcome feedback and collaboration! Feel free to [open an issue](https://github.com/lucassm02/mem-gui/issues) or submit a pull request if you spot improvements, bugs, or have feature requests.
 
-### Key Creating
-
-![Key List](./screenshots/screnshot-04.png)
-
-### Key Editing
-
-![Key Editing](./screenshots/screnshot-03.png)
-
-### Switch Connection
-
-![Switch Connection](./screenshots/screnshot-06.png)
+---
 
 ## 📜 License
 

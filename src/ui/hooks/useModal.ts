@@ -1,11 +1,11 @@
-import { useContext } from 'react';
-import { ModalContext } from '../context/ModalContext';
+import { useContext } from "react";
+import { ModalContext, ModalContextType } from "../contexts/ModalContext";
 
-export const useModal = () => {
+export const useModal = (): ModalContextType => {
   const context = useContext(ModalContext);
   if (!context) {
     throw new Error(
-      'useConnections deve ser usado dentro de um ConnectionsProvider'
+      "useConnections deve ser usado dentro de um ConnectionsProvider"
     );
   }
   return context;

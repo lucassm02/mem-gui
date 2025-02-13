@@ -1,18 +1,21 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "useUnknownInCatchVariables": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/api/*": [
+        "./src/api/*"
+      ],
+      "@/ui/*": [
+        "./src/ui/*"
+      ]
+    }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "./src/ui"
+  "references": [
+    {
+      "path": "./src/ui"
+    },
+    {
+      "path": "./src/api"
+    }
   ]
 }

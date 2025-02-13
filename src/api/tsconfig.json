@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2019",
+    "rootDir": "../",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+    "declaration": true,
+    "sourceMap": true,
+    "composite": true,
+    "useUnknownInCatchVariables": false
+  },
+  "include": [
+    ".",
+    "../server.ts"
+  ],
+  "exclude": [
+    "../../node_modules",
+    "../electron/**/*",
+    "../../dist"
+  ]
+}

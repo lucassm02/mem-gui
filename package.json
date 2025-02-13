@@ -2,28 +2,28 @@
   "name": "MemGUI",
   "description": "GUI for managing Memcached",
   "private": false,
-  "version": "0.1.2",
+  "version": "1.0.0",
   "author": {
-    "name": "Lucas Santos"
+    "name": "Santos Código",
+    "email": "lucassm02@gmail.com"
   },
   "main": "src/electron/main.cjs",
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
+    "lint": "eslint ./src",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
     "clean": "rimraf dist && rimraf release",
-    "prestart": "yarn clean && tsc && node scripts/build-server.js",
-    "predev": "yarn clean && tsc && node scripts/build-server.js",
-    "dev": "concurrently \"npm run ui\" \"wait-on http://localhost:5173 && npm run electron\"",
-    "ui": "vite",
-    "server": "tsx src/server/index.ts",
+    "dev": "concurrently \"yarn dev:server\" \"wait-on http://localhost:5173 && yarn electron\"",
+    "dev:server": "yarn tsx src/server.ts  --start --dev --port 5173",
     "electron": "electron .",
-    "build:server": "tsc",
+    "build:server": "node script/build-server.cjs",
     "build:ui": "vite build",
-    "build:all": "yarn clean && yarn build:ui && yarn build:server && node scripts/build-server.js && electron-builder",
-    "start": "electron ."
+    "build:all": "yarn clean && yarn build:ui && yarn build:server && electron-builder"
   },
   "build": {
-    "asar": false,
+    "asar": true,
     "extraFiles": [
       {
         "from": "dist/",
@@ -34,7 +34,7 @@
     "productName": "MemGUI",
     "directories": {
       "output": "release",
-      "buildResources": "assets"
+      "buildResources": "asset"
     },
     "files": [
       "dist/**/*",
@@ -42,10 +42,10 @@
       "package.json"
     ],
     "win": {
-      "icon": "assets/mem-gui.ico"
+      "icon": "asset/icon/icon.ico"
     },
     "linux": {
-      "icon": "assets/mem-gui.png",
+      "icon": "asset/icon/icon.png",
       "target": [
         "AppImage",
         "deb",
@@ -54,37 +54,57 @@
     }
   },
   "dependencies": {
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-xml": "^6.1.0",
     "@heroicons/react": "^2.2.0",
+    "@seald-io/nedb": "^4.0.4",
     "@tailwindcss/vite": "^4.0.1",
+    "@uiw/react-codemirror": "^4.23.7",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "express-validator": "^7.2.1",
     "memjs": "^1.3.2",
     "p-limit": "3",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "uuid": "^11.0.5"
+    "react-router-dom": "^7.1.5",
+    "tsconfig-paths": "^4.2.0",
+    "uuid": "^11.0.5",
+    "yargs": "17",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/memjs": "^1.3.3",
-    "@types/node": "^22.13.0",
+    "@types/node": "^22.13.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@types/uuid": "^10.0.0",
+    "@types/yargs": "^17.0.33",
+    "@typescript-eslint/eslint-plugin": "^8.23.0",
+    "@typescript-eslint/parser": "^8.23.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "chokidar": "^4.0.3",
     "concurrently": "^9.1.2",
-    "electron": "^34.0.2",
+    "electron": "^34.1.1",
     "electron-builder": "^25.1.8",
     "electron-is-dev": "^3.0.1",
     "esbuild": "^0.24.2",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.16",
+    "prettier": "^3.4.2",
     "rimraf": "^5.0.0",
     "tailwindcss": "^4.0.1",
     "tsx": "^4.19.2",

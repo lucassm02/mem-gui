@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 /* Efeitos personalizados */
-input[type="text"], input[type="number"] {
+input[type="text"],
+input[type="number"] {
   transition: all 0.2s ease;
 }
 
@@ -13,21 +14,35 @@ button {
   transition: background-color 0.2s ease;
 }
 
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
+/* Custom Scroll*/
+*::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
+  opacity: 0;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
+*::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #888;
+*::-webkit-scrollbar-thumb {
+  background: transparent;
   border-radius: 4px;
+  transition: background 0.3s ease-in-out;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+*:hover::-webkit-scrollbar-thumb {
+  background: #5a5f6a;
+}
+
+*:active::-webkit-scrollbar-thumb {
+  background: #737884;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover {
+  scrollbar-color: #5a5f6a transparent;
 }

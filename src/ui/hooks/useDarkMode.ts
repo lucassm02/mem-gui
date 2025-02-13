@@ -1,10 +1,9 @@
+import { useContext } from "react";
+import {
+  DarkModeContext,
+  DarkModeContextType
+} from "../contexts/DarkModeContext";
 
-import { DarkModeContext } from '../context/DarkModeContext';
-
-import { useContext } from 'react';
-
-
-export const useDarkMode = () => {
+export const useDarkMode = (): DarkModeContextType => {
   return useContext(DarkModeContext);
 };
-
