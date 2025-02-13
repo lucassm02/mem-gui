@@ -5,7 +5,7 @@ import {
   XMarkIcon
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router";
-import { useConnections, useDarkMode, useMenu, useTitleBar } from "@/ui/hooks";
+import { useConnections, useDarkMode, useMenu, useElectron } from "@/ui/hooks";
 
 type Connection = {
   name: string;
@@ -21,7 +21,7 @@ const ConnectionList = () => {
     useConnections();
 
   const navigate = useNavigate();
-  const { titleBarIsEnabled } = useTitleBar();
+  const { enabled } = useElectron();
   async function choseConnection(connection: Connection) {
     const redirect = await handleChoseConnection(connection);
 
@@ -37,7 +37,7 @@ const ConnectionList = () => {
       )}
 
       <div
-        className={`fixed left-0 ${titleBarIsEnabled ? "top-10" : "top-0"} h-screen w-80 z-50 transition-transform duration-300 shadow-lg
+        className={`fixed left-0 ${enabled ? "top-10" : "top-0"} h-screen w-80 z-50 transition-transform duration-300 shadow-lg
         ${
           darkMode
             ? "bg-gray-800 border-r border-gray-700"

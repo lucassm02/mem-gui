@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import {
-  TitleBarContext,
-  TitleBarContextType
-} from "../contexts/TitleBarContext";
+  ElectronContext,
+  ElectronContextType
+} from "../contexts/ElectronContext";
 
-export const useTitleBar = (): TitleBarContextType => {
-  const context = useContext(TitleBarContext);
+export const useElectron = (): ElectronContextType => {
+  const context = useContext(ElectronContext);
   if (!context) {
     throw new Error(
       "useConnections deve ser usado dentro de um ConnectionsProvider"

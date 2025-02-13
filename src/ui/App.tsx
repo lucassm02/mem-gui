@@ -11,14 +11,14 @@ import {
   DarkModeProvider,
   MenuProvider,
   ModalProvider,
-  TitleBarProvider,
+  ElectronProvider,
   StorageProvider
 } from "@/ui/providers";
 
 const App = () => (
-  <StorageProvider>
-    <DarkModeProvider>
-      <TitleBarProvider>
+  <ElectronProvider>
+    <StorageProvider>
+      <DarkModeProvider>
         <ModalProvider>
           <ConnectionsProvider>
             <MenuProvider>
@@ -35,9 +35,9 @@ const App = () => (
             </MenuProvider>
           </ConnectionsProvider>
         </ModalProvider>
-      </TitleBarProvider>
-    </DarkModeProvider>
-  </StorageProvider>
+      </DarkModeProvider>
+    </StorageProvider>
+  </ElectronProvider>
 );
 
 export default App;

@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
-  MinusIcon,
-  XMarkIcon,
+  ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
-  ArrowsPointingInIcon
+  MinusIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import { useTitleBar } from "../hooks";
 
 const TitleBar = () => {
   let ipcRenderer = null;

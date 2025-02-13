@@ -3,4 +3,4 @@ export * from "./DarkModeProvider";
 export * from "./MenuProvider";
 export * from "./ModalProvider";
 export * from "./StorageProvider";
-export * from "./TitleBarProvider";
+export * from "./ElectronProvider";
