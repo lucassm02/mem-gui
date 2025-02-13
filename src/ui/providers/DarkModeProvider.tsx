@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { ReactNode, useEffect, useState } from "react";
 import { DarkModeContext } from "../contexts";
 import { useStorage } from "../hooks";
@@ -18,7 +19,7 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
   const [loaded, setLoaded] = useState(false);
   const { setKey, getKey } = useStorage();
 
-  async function loadTheme() {
+  async function load() {
     const data = await getKey("DARK_MODE");
     if (!data) {
       setDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -30,13 +31,14 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
   }
 
   useEffect(() => {
-    loadTheme();
+    load();
   }, []);
 
-  useEffect(() => {
+  function toggleDarkMode() {
     document.documentElement.classList.toggle("dark", darkMode);
-    setKey("DARK_MODE", darkMode);
-  }, [darkMode]);
+    setKey("DARK_MODE", !darkMode);
+    setDarkMode(!darkMode);
+  }
 
   if (!loaded) return null;
 
@@ -44,7 +46,7 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
     <DarkModeContext.Provider
       value={{
         darkMode,
-        toggleDarkMode: () => setDarkMode((prev: boolean) => !prev)
+        toggleDarkMode
       }}
     >
       {children}
