@@ -42,10 +42,10 @@
       "package.json"
     ],
     "win": {
-      "icon": "asset/icon/icon.ico"
+      "icon": "asset/icons/icon.ico"
     },
     "linux": {
-      "icon": "asset/icon/icon.png",
+      "icon": "asset/icons/icon.png",
       "target": [
         "AppImage",
         "deb",
