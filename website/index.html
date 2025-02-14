@@ -20,6 +20,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lucassm02.github.io/mem-gui/" />
     <meta
       property="og:title"
       content="MemGUI - The Ultimate GUI for Memcached"
@@ -30,10 +32,24 @@
     />
     <meta
       property="og:image"
-      content="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/images/logo-white.svg"
+      content="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/banners/banner-gray.png"
     />
-    <meta property="og:url" content="https://github.com/lucassm02/mem-gui" />
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://lucassm02.github.io/mem-gui/" />
+    <meta
+      name="twitter:title"
+      content="MemGUI - The Ultimate GUI for Memcached"
+    />
+    <meta
+      name="twitter:description"
+      content="Easily manage and monitor your Memcached servers with MemGUI. Supports SASL authentication, auto-update, advanced search, and more."
+    />
+    <meta
+      name="twitter:image"
+      content="https://raw.githubusercontent.com/lucassm02/mem-gui/main/asset/banners/banner-gray.png"
+    />
 
     <title>
       MemGUI - Download Page | Manage Your Memcached Servers Efficiently
@@ -44,308 +60,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      /* ROOT VARIABLES */
-      :root {
-        --bg-color: #121212;
-        --header-bg: #1e1e1e;
-        --nav-bg: rgba(30, 30, 30, 0.8);
-        --card-bg: #1f1f1f;
-        --primary-color: #007acc;
-        --primary-hover: #005a9e;
-        --text-color: #e0e0e0;
-        --subtext-color: #a0a0a0;
-        --border-color: #007acc;
-        --shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
-        --transition: 0.3s ease;
-        --heading-font: "Roboto", sans-serif;
-        --body-font: "Roboto", sans-serif;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        font-family: var(--body-font);
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        line-height: 1.6;
-      }
-
-      /* HERO SECTION */
-      .hero {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        position: relative;
-        padding: 80px 20px;
-        background: linear-gradient(150deg, var(--header-bg) 50%, #181818 100%);
-        overflow: hidden;
-      }
-      .hero::before {
-        content: "";
-        position: absolute;
-        top: -150px;
-        left: -150px;
-        width: 400px;
-        height: 400px;
-        background: var(--primary-color);
-        opacity: 0.1;
-        border-radius: 50%;
-        filter: blur(60px);
-      }
-      .hero::after {
-        content: "";
-        position: absolute;
-        bottom: -150px;
-        right: -150px;
-        width: 400px;
-        height: 400px;
-        background: var(--primary-color);
-        opacity: 0.1;
-        border-radius: 50%;
-        filter: blur(60px);
-      }
-      .hero img {
-        width: 90px;
-        height: 90px;
-        margin-bottom: 20px;
-        animation: floatLogo 3s ease-in-out infinite;
-      }
-      @keyframes floatLogo {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-8px);
-        }
-      }
-      .hero h1 {
-        font-size: 3rem;
-        color: var(--primary-color);
-        font-family: var(--heading-font);
-        margin-bottom: 15px;
-      }
-      .hero p {
-        font-size: 1.2rem;
-        color: var(--subtext-color);
-        max-width: 700px;
-        margin: 0 auto 30px auto;
-      }
-      .hero .cta-buttons {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-      .hero .cta-buttons a {
-        display: inline-block;
-        padding: 14px 30px;
-        color: #fff;
-        text-decoration: none;
-        background: var(--primary-color);
-        border-radius: 6px;
-        box-shadow: var(--shadow);
-        transition:
-          background-color var(--transition),
-          transform var(--transition);
-      }
-      .hero .cta-buttons a:hover {
-        background: var(--primary-hover);
-        transform: translateY(-3px);
-      }
-
-      /* NAVBAR */
-      nav {
-        position: sticky;
-        top: 0;
-        background-color: var(--nav-bg);
-        backdrop-filter: blur(10px);
-        padding: 10px 0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        z-index: 100;
-      }
-      nav ul {
-        list-style: none;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      nav ul li {
-        margin: 0 15px;
-      }
-      nav ul li a {
-        text-decoration: none;
-        color: var(--text-color);
-        font-weight: 500;
-        position: relative;
-        transition: color var(--transition);
-        padding: 5px 0;
-      }
-      nav ul li a:hover {
-        color: var(--primary-color);
-      }
-      nav ul li a::after {
-        content: "";
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: var(--primary-color);
-        transition: width var(--transition);
-      }
-      nav ul li a:hover::after {
-        width: 100%;
-      }
-
-      /* MAIN CONTENT */
-      main {
-        max-width: 1100px;
-        margin: 50px auto;
-        padding: 0 20px;
-      }
-      section {
-        margin-bottom: 60px;
-      }
-      section h2 {
-        font-size: 2rem;
-        color: var(--primary-color);
-        margin-bottom: 20px;
-        display: inline-block;
-        padding-bottom: 5px;
-        border-bottom: 2px solid var(--border-color);
-      }
-      section p {
-        margin-bottom: 15px;
-        font-size: 1rem;
-      }
-      section ul {
-        list-style: disc;
-        padding-left: 20px;
-      }
-      section ul li {
-        margin-bottom: 10px;
-      }
-      .sub-heading {
-        color: var(--subtext-color);
-        margin-top: -5px;
-        margin-bottom: 20px;
-        font-size: 0.95rem;
-      }
-
-      /* CARDS / HIGHLIGHTS (OPTIONAL FEATURE SECTION) */
-      .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-      }
-      .feature-card {
-        background: var(--card-bg);
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        padding: 20px;
-        transition: transform var(--transition);
-      }
-      .feature-card h3 {
-        color: var(--primary-color);
-        margin-bottom: 10px;
-        font-size: 1.3rem;
-      }
-      .feature-card p {
-        color: var(--subtext-color);
-      }
-      .feature-card:hover {
-        transform: translateY(-5px);
-      }
-
-      /* DOWNLOAD BUTTON STYLE (GLOBAL REUSE) */
-      .download-button {
-        display: inline-block;
-        background-color: var(--primary-color);
-        color: #fff;
-        padding: 15px 30px;
-        font-size: 1.1rem;
-        text-decoration: none;
-        border-radius: 5px;
-        transition:
-          background-color var(--transition),
-          transform var(--transition);
-        box-shadow: var(--shadow);
-      }
-      .download-button:hover {
-        background-color: var(--primary-hover);
-        transform: translateY(-3px);
-      }
-
-      /* SCREENSHOT SECTION */
-      .screenshot {
-        text-align: center;
-      }
-      .screenshot img {
-        max-width: 100%;
-        border: 2px solid var(--primary-color);
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        transition: transform var(--transition);
-      }
-      .screenshot img:hover {
-        transform: scale(1.02);
-      }
-
-      /* FOOTER */
-      footer {
-        background-color: var(--header-bg);
-        text-align: center;
-        padding: 30px;
-        font-size: 0.9rem;
-        border-top: 1px solid var(--primary-color);
-      }
-      footer p {
-        margin-bottom: 5px;
-        color: var(--subtext-color);
-      }
-      footer a {
-        color: var(--primary-color);
-        text-decoration: none;
-        transition: color var(--transition);
-      }
-      footer a:hover {
-        color: var(--primary-hover);
-      }
-
-      /* RESPONSIVE */
-      @media (max-width: 600px) {
-        .hero h1 {
-          font-size: 2.2rem;
-        }
-        .hero p {
-          font-size: 1rem;
-        }
-        nav ul li {
-          margin: 0 10px;
-        }
-        section h2 {
-          font-size: 1.8rem;
-        }
-        .download-button {
-          padding: 12px 24px;
-          font-size: 1rem;
-        }
-        .feature-card h3 {
-          font-size: 1.15rem;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <!-- HERO / HEADER -->
@@ -591,5 +306,6 @@
         <a href="#top">Back to Top</a>
       </p>
     </footer>
+    <script src="script.js"></script>
   </body>
 </html>
