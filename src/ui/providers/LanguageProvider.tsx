@@ -18,6 +18,26 @@ const normalizeLanguage = (value: string | undefined) => {
   return fallback || supportedLanguages[0];
 };
 
+const LOCAL_LANGUAGE_KEY = "LANGUAGE";
+
+const getLocalLanguage = () => {
+  if (typeof window === "undefined") return undefined;
+  try {
+    return window.localStorage.getItem(LOCAL_LANGUAGE_KEY) || undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const setLocalLanguage = (value: string) => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(LOCAL_LANGUAGE_KEY, value);
+  } catch {
+    return;
+  }
+};
+
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const { getKey, setKey, storageVersion } = useStorage();
   const [language, setLanguage] = useState(supportedLanguages[0]);
@@ -28,14 +48,16 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const load = async () => {
       const storedLanguage = await getKey("LANGUAGE");
+      const localLanguage = getLocalLanguage();
       const navigatorLanguage =
         (navigator.languages && navigator.languages[0]) || navigator.language;
 
       const selected = normalizeLanguage(
-        (storedLanguage?.value as string) || navigatorLanguage
+        (storedLanguage?.value as string) || localLanguage || navigatorLanguage
       );
 
       setLanguage(selected);
+      setLocalLanguage(selected);
       i18n.changeLanguage(selected);
       setLoaded(true);
     };
@@ -46,6 +68,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const changeLanguage = (newLanguage: string) => {
     const normalized = normalizeLanguage(newLanguage);
     setLanguage(normalized);
+    setLocalLanguage(normalized);
     setKey("LANGUAGE", normalized);
     i18n.changeLanguage(normalized);
   };

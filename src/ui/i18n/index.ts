@@ -13,8 +13,8 @@ import ptBR from "./locales/pt-BR.json";
 import zhCN from "./locales/zh-CN.json";
 
 export const supportedLanguages = [
-  "pt-BR",
   "en",
+  "pt-BR",
   "es",
   "fr",
   "de",
@@ -39,7 +39,7 @@ i18n
       ko: { translation: ko },
       ar: { translation: ar }
     },
-    fallbackLng: "pt-BR",
+    fallbackLng: "en",
     supportedLngs: supportedLanguages,
     detection: {
       order: ["navigator"],
