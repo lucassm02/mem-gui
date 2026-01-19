@@ -156,7 +156,11 @@
     "clearAll": "مسح الكل",
     "export": "تصدير dump",
     "import": "استيراد dump",
-    "searchPlaceholder": "اكتب مفتاحًا أو تعبيرًا نظاميًا...",
+    "searchPlaceholder": "اكتب استعلاما...",
+    "searchButton": "بحث",
+    "searchResults": "{{count}} نتائج",
+    "searchDuration": "{{duration}} مللي ثانية",
+    "searchSyntaxError": "خطأ في الصياغة: {{error}}",
     "columns": {
       "key": "المفتاح",
       "value": "القيمة",

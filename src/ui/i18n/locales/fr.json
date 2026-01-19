@@ -156,7 +156,11 @@
     "clearAll": "Tout effacer",
     "export": "Exporter le dump",
     "import": "Importer le dump",
-    "searchPlaceholder": "Tapez une clé ou une regex...",
+    "searchPlaceholder": "Tapez une requete...",
+    "searchButton": "Rechercher",
+    "searchResults": "{{count}} resultats",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "Erreur de syntaxe: {{error}}",
     "columns": {
       "key": "Clé",
       "value": "Valeur",

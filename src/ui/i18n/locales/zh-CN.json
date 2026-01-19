@@ -156,7 +156,11 @@
     "clearAll": "全部清除",
     "export": "导出 dump",
     "import": "导入 dump",
-    "searchPlaceholder": "输入键或正则...",
+    "searchPlaceholder": "输入查询...",
+    "searchButton": "搜索",
+    "searchResults": "{{count}} 条结果",
+    "searchDuration": "{{duration}} 毫秒",
+    "searchSyntaxError": "语法错误: {{error}}",
     "columns": {
       "key": "键",
       "value": "值",

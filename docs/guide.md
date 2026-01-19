@@ -62,10 +62,37 @@ Note: SSH connections, storage encryption, and dump import/export are available 
 
 ## Search and Filter
 
-- Use the search bar to filter keys.
-- Switch between plain text and regex depending on your workflow.
+- Use the search bar to filter keys with the query language below.
 - Backend search keeps results consistent on large datasets.
 - Index updates and stale key pruning keep lookups fast.
+
+### Query Language
+
+The search field now accepts a small DSL so you can filter by key and value, add ordering, and control limits.
+
+Basics:
+- `key` and `value` predicates support `=`, `!=`, `>`, `>=`, `<`, `<=`, `match`, `contains`, `startsWith`, `endsWith`.
+- `type value = number|string|boolean|null|json` lets you gate comparisons by value type.
+- Combine with `and`, `or`, `not` and parentheses.
+- Optional `order by key|value asc|desc` and `limit N offset M`.
+
+Examples:
+```text
+key match /^age$/ and type value = number and value > 18 and value < 60
+```
+
+```text
+key startsWith "user:" and value contains "active" order by key desc limit 50 offset 0
+```
+
+```text
+type value = json and key contains "profile" order by value asc limit 20
+```
+
+Notes:
+- Regex uses `/.../` with optional flags like `/pattern/i`.
+- String comparisons are case sensitive. For case-insensitive match, use regex with the `i` flag.
+- Numeric comparisons only match when the value can be parsed as a number.
 
 ## Bulk Delete
 

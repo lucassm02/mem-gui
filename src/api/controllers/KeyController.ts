@@ -2,15 +2,20 @@ import { EventEmitter } from "events";
 import { Request, Response } from "express";
 import pLimit from "p-limit";
 import { Key, MemcachedConnection } from "@/api/types";
+import type { KeyQueryAst } from "@/api/utils";
 import {
   connectionManager,
+  evaluateKeyQuery,
+  evaluateKeyQueryKeyOnly,
   extractKeysInfoFromDump,
   extractUsedChunksFromSlabs,
+  inferValueOrderMode,
   logger,
   MAX_CONCURRENT_REQUESTS,
   MEMCACHED_MAX_VALUE_BYTES,
   ONE_MINUTE_IN_SECONDS,
   ONE_DAY_IN_SECONDS,
+  parseKeyQuery,
   RESERVED_KEYS,
   isReservedKey,
   touchConnection
@@ -217,21 +222,44 @@ class KeyController {
     const { connection, connectionId } = this.resolveConnection(request);
     const searchTerm =
       typeof request.query.search === "string" ? request.query.search : "";
-    const parsedLimit = this.parseLimitParam(request.query.limit);
-    if ("error" in parsedLimit) {
+    const rawQuery =
+      typeof request.query.query === "string" ? request.query.query : "";
+    const queryParam = rawQuery.trim();
+    const parsedQuery = queryParam ? parseKeyQuery(queryParam) : null;
+    if (parsedQuery && "error" in parsedQuery) {
       response.status(400).json({
-        error: parsedLimit.error
+        error: parsedQuery.error
       });
       return;
     }
-    const { limit } = parsedLimit;
+
+    const query = parsedQuery?.query;
+    let limit: number;
+    if (query?.limit !== undefined) {
+      limit = query.limit;
+    } else {
+      const parsedLimit = this.parseLimitParam(request.query.limit);
+      if ("error" in parsedLimit) {
+        response.status(400).json({
+          error: parsedLimit.error
+        });
+        return;
+      }
+      limit = parsedLimit.limit;
+    }
+
+    const queryWithDefaults: KeyQueryAst | undefined = query
+      ? { ...query, limit, offset: query.offset ?? 0 }
+      : undefined;
 
     try {
       this.logDebug("Listagem de chaves solicitada", {
         connectionId,
         limit,
         hasSearch: searchTerm.length > 0,
-        searchLength: searchTerm.length
+        searchLength: searchTerm.length,
+        hasQuery: queryParam.length > 0,
+        queryLength: queryParam.length
       });
       const serverUnixTime = await this.getServerUnixTime(connection);
       const allowReservedKeys = this.shouldExposeReservedKeys();
@@ -246,6 +274,44 @@ class KeyController {
         reservedIndexKeys: reservedIndexKeys.length,
         allowReservedKeys
       });
+
+      if (queryWithDefaults) {
+        if (connection.authentication) {
+          const payload = await this.queryKeysInBatches(
+            listKeys,
+            connection,
+            queryWithDefaults,
+            {
+              serverUnixTime
+            }
+          );
+          response.json(payload);
+          return;
+        }
+
+        if (storedKeys.length > 0) {
+          const payload = await this.queryKeysInBatches(
+            listKeys,
+            connection,
+            queryWithDefaults,
+            {
+              serverUnixTime
+            }
+          );
+          response.json(payload);
+          this.emitIndexRefresh(connection);
+          return;
+        }
+
+        const { payload, cachedump } = await this.fetchKeysFromCachedumpByQuery(
+          connection,
+          queryWithDefaults,
+          serverUnixTime
+        );
+        response.json(payload);
+        this.emitIndexRefresh(connection, cachedump);
+        return;
+      }
 
       if (connection.authentication) {
         const filteredKeys = this.applyKeyFilters(
@@ -1025,6 +1091,209 @@ class KeyController {
     );
 
     return { payload, cachedump };
+  }
+
+  private async fetchKeysFromCachedumpByQuery(
+    connection: MemcachedConnection,
+    query: KeyQueryAst,
+    serverUnixTime: number
+  ): Promise<{ payload: KeyPayload[]; cachedump: CachedumpResult }> {
+    const cachedump = await this.getCachedumpKeysInfo(connection);
+    const keysInfo = cachedump.keysInfo;
+    const slabKeys = keysInfo.map((info) => info.key);
+    const allKeys = Array.from(new Set(slabKeys)).sort();
+    const payload = await this.queryKeysInBatches(allKeys, connection, query, {
+      keysInfo,
+      serverUnixTime
+    });
+
+    return { payload, cachedump };
+  }
+
+  private async queryKeysInBatches(
+    keys: string[],
+    connection: MemcachedConnection,
+    query: KeyQueryAst,
+    options: {
+      keysInfo?: Key[];
+      serverUnixTime?: number;
+    } = {}
+  ): Promise<KeyPayload[]> {
+    const limiter = pLimit(MAX_CONCURRENT_REQUESTS);
+    const currentUnixTime =
+      options.serverUnixTime ?? (await this.getServerUnixTime(connection));
+    const allowReservedKeys = this.shouldExposeReservedKeys();
+    const filteredKeys = allowReservedKeys
+      ? keys
+      : keys.filter((key) => !isReservedKey(key));
+    const fallbackKeysInfo =
+      options.keysInfo ??
+      (!connection.authentication
+        ? this.getCachedumpSnapshot(connection)
+        : null);
+    const keysInfoMap = fallbackKeysInfo
+      ? new Map(fallbackKeysInfo.map((info) => [info.key, info]))
+      : null;
+
+    const orderBy = query.orderBy ?? { field: "key", direction: "asc" };
+    const limit = query.limit;
+    const offset = query.offset ?? 0;
+    const maxNeeded = limit !== undefined ? limit + offset : undefined;
+    const valueOrderMode =
+      orderBy.field === "value" ? inferValueOrderMode(query.filter) : "string";
+    const batchSize = Math.max(
+      1,
+      Math.min(MAX_CONCURRENT_REQUESTS, maxNeeded ?? MAX_CONCURRENT_REQUESTS)
+    );
+    const totalKeys = filteredKeys.length;
+    const useDescKeys = orderBy.field === "key" && orderBy.direction === "desc";
+
+    const parseNumericValue = (value: string): number | null => {
+      const trimmed = value.trim();
+      if (!/^-?\d+(?:\.\d+)?$/.test(trimmed)) {
+        return null;
+      }
+      const parsed = Number(trimmed);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+
+    const compareValue = (a: KeyPayload, b: KeyPayload): number => {
+      if (valueOrderMode === "number") {
+        const aNum = parseNumericValue(a.value);
+        const bNum = parseNumericValue(b.value);
+        if (aNum === null && bNum === null) {
+          return a.value.localeCompare(b.value);
+        }
+        if (aNum === null) return 1;
+        if (bNum === null) return -1;
+        return aNum - bNum;
+      }
+      return a.value.localeCompare(b.value);
+    };
+
+    const compare = (a: KeyPayload, b: KeyPayload): number => {
+      const base = compareValue(a, b);
+      return orderBy.direction === "asc" ? base : -base;
+    };
+
+    const results: KeyPayload[] = [];
+
+    const insertOrdered = (item: KeyPayload) => {
+      if (maxNeeded === undefined) {
+        results.push(item);
+        return;
+      }
+
+      if (results.length >= maxNeeded) {
+        const last = results[results.length - 1];
+        if (compare(item, last) >= 0) {
+          return;
+        }
+      }
+
+      let inserted = false;
+      for (let i = 0; i < results.length; i += 1) {
+        if (compare(item, results[i]) < 0) {
+          results.splice(i, 0, item);
+          inserted = true;
+          break;
+        }
+      }
+      if (!inserted) {
+        results.push(item);
+      }
+      if (maxNeeded !== undefined && results.length > maxNeeded) {
+        results.pop();
+      }
+    };
+
+    let index = 0;
+    while (index < totalKeys) {
+      if (orderBy.field === "key" && maxNeeded !== undefined) {
+        if (results.length >= maxNeeded) {
+          break;
+        }
+      }
+
+      const batchKeys: string[] = [];
+      while (batchKeys.length < batchSize && index < totalKeys) {
+        const keyIndex = useDescKeys ? totalKeys - 1 - index : index;
+        const key = filteredKeys[keyIndex];
+        index += 1;
+        if (evaluateKeyQueryKeyOnly(query.filter, key) === false) {
+          continue;
+        }
+        batchKeys.push(key);
+      }
+
+      if (batchKeys.length === 0) {
+        continue;
+      }
+
+      const batchResults = await Promise.all(
+        batchKeys.map((key) =>
+          limiter(async () => {
+            try {
+              const { value } = await connection.client.get(key);
+              if (!value) {
+                return null;
+              }
+
+              const valueToString = value.toString();
+              if (
+                query.filter &&
+                !evaluateKeyQuery(query.filter, {
+                  key,
+                  value: valueToString
+                })
+              ) {
+                return null;
+              }
+
+              const info = keysInfoMap?.get(key);
+              const expiration = info ? info.expiration : 0;
+              const timeUntilExpiration =
+                expiration > 0 ? Math.max(expiration - currentUnixTime, 0) : 0;
+              const size = info
+                ? info.size
+                : Buffer.from(valueToString, "utf8").length;
+
+              return {
+                key,
+                value: valueToString,
+                timeUntilExpiration,
+                size
+              };
+            } catch (error) {
+              logger.error(`Erro ao obter a chave ${key}`, error as Error);
+              return null;
+            }
+          })
+        )
+      );
+
+      for (const item of batchResults) {
+        if (!item) {
+          continue;
+        }
+        if (orderBy.field === "value") {
+          insertOrdered(item);
+          continue;
+        }
+        results.push(item);
+        if (maxNeeded !== undefined && results.length >= maxNeeded) {
+          break;
+        }
+      }
+    }
+
+    if (orderBy.field === "value" && maxNeeded === undefined) {
+      results.sort(compare);
+    }
+
+    const start = Math.max(0, offset);
+    const end = limit !== undefined ? start + limit : undefined;
+    return results.slice(start, end);
   }
 
   private async getServerUnixTime(

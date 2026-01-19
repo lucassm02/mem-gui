@@ -26,7 +26,7 @@ MemGUI is a desktop GUI client for Memcached. Manage keys, monitor stats, run bu
 - SSH connections with host key verification (v1.2.0)
 - Storage encryption for local data and SSH secrets
 - Bulk delete with confirmation to avoid accidental data loss
-- Server-side key search with regex or plain text filters
+- Server-side query language for key/value filters, ordering, and limits
 - Faster key indexing with stale key pruning
 - Multi-server connections with inline editing and quick switching
 - SASL authentication support for secured Memcached instances

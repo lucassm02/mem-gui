@@ -1,12 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { EditorView, keymap } from "@codemirror/view";
 import {
   ArrowPathIcon,
+  ClockIcon,
   DocumentMagnifyingGlassIcon,
+  ListBulletIcon,
+  MagnifyingGlassIcon,
   PencilSquareIcon,
   PlusIcon,
   TrashIcon
 } from "@heroicons/react/24/outline";
-import { useEffect, useRef, useState } from "react";
+import CodeMirror from "@uiw/react-codemirror";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { useConnections } from "../hooks/useConnections";
@@ -14,10 +19,12 @@ import { useDarkMode } from "../hooks/useDarkMode";
 import { useModal } from "../hooks/useModal";
 import { toneButton } from "../utils/buttonTone";
 import { formatBytes } from "../utils/formatBytes";
+import { queryLanguage } from "../utils/queryLanguage";
 import CreateKeyModal from "./CreateKeyModal";
 import Disclaimer from "./Disclaimer";
 import EditKeyModal from "./EditKeyModal";
 import ViewDataModal from "./ViewDataModal";
+import { parseKeyQuery } from "@/api/utils/keyQuery";
 
 const KeyList = () => {
   const { darkMode } = useDarkMode();
@@ -28,16 +35,26 @@ const KeyList = () => {
     handleCreateKey,
     handleEditKey,
     currentConnection,
-    totalKeyCount
+    totalKeyCount,
+    lastQueryMetrics
   } = useConnections();
 
   const { openCreateModal, openEditModal, openViewDataModal } = useModal();
   const { t } = useTranslation();
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [queryInput, setQueryInput] = useState("");
+  const [activeQuery, setActiveQuery] = useState("");
   const [maxItems, setMaxItems] = useState(5);
   const [autoUpdate, setAutoUpdate] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const queryError = useMemo(() => {
+    const trimmed = queryInput.trim();
+    if (!trimmed) {
+      return "";
+    }
+    const parsed = parseKeyQuery(trimmed);
+    return "error" in parsed ? parsed.error : "";
+  }, [queryInput]);
 
   useEffect(() => {
     const show = !!(currentConnection.username && currentConnection.password);
@@ -48,19 +65,59 @@ const KeyList = () => {
     let interval: NodeJS.Timeout;
     if (autoUpdate) {
       interval = setInterval(() => {
-        handleLoadKeys(false, searchTerm, maxItems);
+        handleLoadKeys(false, activeQuery, maxItems);
       }, 5000);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
     // handleLoadKeys identity is stable enough; omit from deps to prevent loops
-  }, [autoUpdate, searchTerm, maxItems]);
+  }, [autoUpdate, activeQuery, maxItems]);
 
   const lastLoadParams = useRef<string>("");
   const lastConnectionIdRef = useRef<string>("");
   const skipNextLoadRef = useRef(true);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const buildLoadKey = (query: string) =>
+    `${currentConnection.id}|${query}|${maxItems}`;
+
+  const handleSearch = useCallback(async () => {
+    if (!currentConnection.id) return;
+    if (queryError) return;
+    const normalizedQuery = queryInput.trim();
+    const ok = await handleLoadKeys(true, normalizedQuery, maxItems, {
+      force: true
+    });
+    if (ok) {
+      lastLoadParams.current = buildLoadKey(normalizedQuery);
+      setActiveQuery(normalizedQuery);
+    }
+  }, [currentConnection.id, handleLoadKeys, maxItems, queryError, queryInput]);
+
+  const queryExtensions = useMemo(
+    () => [
+      queryLanguage,
+      EditorView.lineWrapping,
+      keymap.of([
+        {
+          key: "Ctrl-Enter",
+          run: () => {
+            void handleSearch();
+            return true;
+          }
+        },
+        {
+          key: "Cmd-Enter",
+          run: () => {
+            void handleSearch();
+            return true;
+          }
+        }
+      ])
+    ],
+    [handleSearch]
+  );
+
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -78,13 +135,13 @@ const KeyList = () => {
     }
 
     debounceRef.current = setTimeout(() => {
-      const currentKey = `${currentConnection.id}|${searchTerm}|${maxItems}`;
+      const currentKey = buildLoadKey(activeQuery);
       if (lastLoadParams.current === currentKey) return;
       lastLoadParams.current = currentKey;
 
-      const showLoading = searchTerm.trim() === "" && !skipNextLoadRef.current;
+      const showLoading = activeQuery.trim() === "" && !skipNextLoadRef.current;
       skipNextLoadRef.current = false;
-      handleLoadKeys(showLoading, searchTerm, maxItems);
+      handleLoadKeys(showLoading, activeQuery, maxItems);
     }, 300);
 
     return () => {
@@ -92,7 +149,7 @@ const KeyList = () => {
         clearTimeout(debounceRef.current);
       }
     };
-  }, [searchTerm, maxItems, currentConnection.id]);
+  }, [activeQuery, maxItems, currentConnection.id]);
 
   const filteredKeys = keys;
   return (
@@ -120,7 +177,7 @@ const KeyList = () => {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => handleLoadKeys(true, searchTerm, maxItems)}
+              onClick={() => handleLoadKeys(true, activeQuery, maxItems)}
               className={toneButton("primary", darkMode)}
             >
               <ArrowPathIcon className="w-5 h-5" />
@@ -168,37 +225,103 @@ const KeyList = () => {
       </div>
 
       <div
-        className={`p-3 rounded-lg mb-6 flex items-center justify-between ${
-          darkMode ? "bg-gray-800" : "bg-gray-200"
-        } shadow-md`}
+        className={`p-4 rounded-xl mb-6 border shadow-lg ${
+          darkMode
+            ? "bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-800/80 border-slate-700/60"
+            : "bg-gradient-to-br from-white via-slate-50 to-slate-100 border-slate-200"
+        }`}
       >
-        <input
-          type="text"
-          placeholder={t("keyList.searchPlaceholder")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm ${
-            darkMode
-              ? "bg-gray-900 text-gray-100 placeholder-gray-400"
-              : "bg-white text-gray-700 placeholder-gray-500 border border-gray-300"
-          }`}
-        />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div
+              className={`w-full flex-1 rounded-lg border shadow-sm transition ${
+                queryError
+                  ? "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,0.6)]"
+                  : darkMode
+                    ? "border-white/5"
+                    : "border-gray-300"
+              }`}
+            >
+              <CodeMirror
+                value={queryInput}
+                onChange={(value) => setQueryInput(value)}
+                theme={darkMode ? "dark" : "light"}
+                extensions={queryExtensions}
+                placeholder={t("keyList.searchPlaceholder")}
+                minHeight="96px"
+                spellCheck={false}
+                className="text-sm"
+                basicSetup={{
+                  lineNumbers: false,
+                  foldGutter: false,
+                  highlightActiveLine: false,
+                  highlightSelectionMatches: false
+                }}
+              />
+            </div>
 
-        <select
-          value={maxItems}
-          onChange={(e) => setMaxItems(Number(e.target.value))}
-          className={`ml-4 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-            darkMode
-              ? "bg-gray-900 text-gray-100 border-gray-700"
-              : "bg-white text-gray-700 border border-gray-300"
-          } cursor-pointer`}
-        >
-          {[5, 10, 15, 20, 50, 100].map((num) => (
-            <option key={num} value={num}>
-              {num}
-            </option>
-          ))}
-        </select>
+            <div className="flex flex-col gap-3 lg:w-56">
+              <button
+                onClick={handleSearch}
+                className={toneButton("primary", darkMode)}
+              >
+                <MagnifyingGlassIcon className="w-5 h-5" />
+                {t("keyList.searchButton")}
+              </button>
+
+              <select
+                value={maxItems}
+                onChange={(e) => setMaxItems(Number(e.target.value))}
+                className={`px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  darkMode
+                    ? "bg-gray-900 text-gray-100 border-gray-700"
+                    : "bg-white text-gray-700 border border-gray-300"
+                } cursor-pointer`}
+              >
+                {[5, 10, 15, 20, 50, 100].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {queryError ? (
+            <p className="text-xs text-red-500">
+              {t("keyList.searchSyntaxError", { error: queryError })}
+            </p>
+          ) : null}
+
+          {lastQueryMetrics ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium border ${
+                  darkMode
+                    ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
+                    : "bg-white text-slate-700 border-slate-200"
+                }`}
+              >
+                <ListBulletIcon className="w-4 h-4" />
+                {t("keyList.searchResults", {
+                  count: lastQueryMetrics.count
+                })}
+              </span>
+              <span
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium border ${
+                  darkMode
+                    ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
+                    : "bg-white text-slate-700 border-slate-200"
+                }`}
+              >
+                <ClockIcon className="w-4 h-4" />
+                {t("keyList.searchDuration", {
+                  duration: lastQueryMetrics.durationMs
+                })}
+              </span>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <div

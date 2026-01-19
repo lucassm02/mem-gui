@@ -3,5 +3,6 @@ export * from "./constants";
 export * from "./extractKeysInfoFromDump";
 export * from "./logger";
 export * from "./extractSlabInfoFromStatsSlabsOutput";
+export * from "./keyQuery";
 export * from "./validationAdapter";
 export * from "./validationSchema";

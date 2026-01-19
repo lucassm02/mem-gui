@@ -77,6 +77,11 @@ export interface ConnectionsContextType {
   keys: KeyData[];
   serverData: ServerData | null;
   error: string;
+  lastQueryMetrics?: {
+    durationMs: number;
+    count: number;
+    query: string;
+  } | null;
   handleConnect: (connection: Omit<Connection, "id">) => Promise<boolean>;
   handleTestConnection: (
     connection: Omit<Connection, "id">
@@ -87,7 +92,7 @@ export interface ConnectionsContextType {
   handleDisconnect: () => void;
   handleLoadKeys: (
     showLoadingModal?: boolean,
-    search?: string,
+    query?: string,
     limit?: number,
     options?: { force?: boolean }
   ) => Promise<boolean>;

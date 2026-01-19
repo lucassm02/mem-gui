@@ -156,7 +156,11 @@
     "clearAll": "모두 지우기",
     "export": "덤프 내보내기",
     "import": "덤프 가져오기",
-    "searchPlaceholder": "키 또는 정규식을 입력...",
+    "searchPlaceholder": "쿼리를 입력...",
+    "searchButton": "검색",
+    "searchResults": "{{count}}건",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "구문 오류: {{error}}",
     "columns": {
       "key": "키",
       "value": "값",

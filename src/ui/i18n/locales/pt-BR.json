@@ -156,7 +156,11 @@
     "clearAll": "Limpar Tudo",
     "export": "Exportar dump",
     "import": "Importar dump",
-    "searchPlaceholder": "Digite uma chave ou regex...",
+    "searchPlaceholder": "Digite uma query...",
+    "searchButton": "Buscar",
+    "searchResults": "{{count}} resultados",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "Erro de sintaxe: {{error}}",
     "columns": {
       "key": "Chave",
       "value": "Valor",
