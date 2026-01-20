@@ -160,7 +160,7 @@
     "searchButton": "Rechercher",
     "searchResults": "{{count}} resultats",
     "searchDuration": "{{duration}} ms",
-    "searchSyntaxError": "Erreur de syntaxe: {{error}}",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "Clé",
       "value": "Valeur",

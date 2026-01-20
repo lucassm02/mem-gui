@@ -160,7 +160,7 @@
     "searchButton": "搜索",
     "searchResults": "{{count}} 条结果",
     "searchDuration": "{{duration}} 毫秒",
-    "searchSyntaxError": "语法错误: {{error}}",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "键",
       "value": "值",

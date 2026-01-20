@@ -121,7 +121,7 @@ const tokenize = (input: string): Token[] => {
         continue;
       }
       if (char === "!" && next !== "=") {
-        throw new Error("Operador invalido");
+        throw new Error("Invalid operator");
       }
       tokens.push({ type: "operator", value: char as Token["value"] });
       index += 1;
@@ -150,7 +150,7 @@ const tokenize = (input: string): Token[] => {
         source += current;
       }
       if (cursor >= input.length) {
-        throw new Error("Regex invalida");
+        throw new Error("Unterminated regex");
       }
       let flags = "";
       cursor += 1;
@@ -185,7 +185,7 @@ const tokenize = (input: string): Token[] => {
         value += current;
       }
       if (cursor >= input.length) {
-        throw new Error("String invalida");
+        throw new Error("Unterminated string");
       }
       tokens.push({ type: "string", value });
       index = cursor + 1;
@@ -195,7 +195,7 @@ const tokenize = (input: string): Token[] => {
     if (char === "-" || isDigit(char)) {
       const match = /^-?\d+(?:\.\d+)?/.exec(input.slice(index));
       if (!match) {
-        throw new Error("Numero invalido");
+        throw new Error("Invalid number");
       }
       tokens.push({ type: "number", value: Number(match[0]) });
       index += match[0].length;
@@ -205,14 +205,14 @@ const tokenize = (input: string): Token[] => {
     if (isAlpha(char)) {
       const match = /^[A-Za-z_][A-Za-z0-9_]*/.exec(input.slice(index));
       if (!match) {
-        throw new Error("Identificador invalido");
+        throw new Error("Invalid identifier");
       }
       tokens.push({ type: "identifier", value: match[0] });
       index += match[0].length;
       continue;
     }
 
-    throw new Error("Caracter invalido");
+    throw new Error("Invalid character");
   }
 
   return tokens;
@@ -280,7 +280,7 @@ class Parser {
     if (this.matchParen("(")) {
       const node = this.parseExpression();
       if (!this.matchParen(")")) {
-        throw new Error("Parenteses desbalanceados");
+        throw new Error("Unbalanced parentheses");
       }
       return node;
     }
@@ -290,7 +290,7 @@ class Parser {
   private parsePredicate(): KeyQueryFilter {
     const token = this.peek();
     if (!token || token.type !== "identifier") {
-      throw new Error("Predicado invalido");
+      throw new Error("Invalid predicate");
     }
 
     const keyword = token.value.toLowerCase();
@@ -299,11 +299,11 @@ class Parser {
     if (keyword === "type") {
       const next = this.expectIdentifier();
       if (next !== "value") {
-        throw new Error("Predicado de tipo invalido");
+      throw new Error("Invalid type predicate");
       }
       const operator = this.expectOperator();
       if (operator !== "=") {
-        throw new Error("Operador de tipo invalido");
+      throw new Error("Invalid type operator");
       }
       const typeName = this.expectIdentifier();
       if (
@@ -313,7 +313,7 @@ class Parser {
         typeName !== "null" &&
         typeName !== "json"
       ) {
-        throw new Error("Tipo invalido");
+      throw new Error("Invalid type");
       }
       return {
         type: "predicate",
@@ -322,7 +322,7 @@ class Parser {
     }
 
     if (keyword !== "key" && keyword !== "value") {
-      throw new Error("Predicado invalido");
+      throw new Error("Invalid predicate");
     }
 
     const operator = this.parseComparator();
@@ -335,7 +335,7 @@ class Parser {
         operator === "<" ||
         operator === "<="
       ) {
-        throw new Error("Operador invalido para key");
+      throw new Error("Invalid operator for key");
       }
     }
 
@@ -346,7 +346,7 @@ class Parser {
       operator !== "startswith" &&
       operator !== "endswith"
     ) {
-      throw new Error("Regex apenas com match");
+      throw new Error("Regex predicates require match");
     }
 
     return {
@@ -362,7 +362,7 @@ class Parser {
   private parseComparator(): ComparisonOperator {
     const token = this.peek();
     if (!token) {
-      throw new Error("Operador ausente");
+      throw new Error("Missing operator");
     }
 
     if (token.type === "operator") {
@@ -383,13 +383,13 @@ class Parser {
       }
     }
 
-    throw new Error("Operador invalido");
+    throw new Error("Invalid operator");
   }
 
   private parseLiteral(): Literal {
     const token = this.peek();
     if (!token) {
-      throw new Error("Literal ausente");
+      throw new Error("Missing literal");
     }
 
     if (token.type === "number") {
@@ -408,7 +408,7 @@ class Parser {
         const compiled = new RegExp(token.value.source, token.value.flags);
         return { kind: "regex", value: compiled };
       } catch {
-        throw new Error("Regex invalida");
+        throw new Error("Invalid regex");
       }
     }
 
@@ -423,13 +423,13 @@ class Parser {
         return { kind: "null", value: null };
       }
       if (RESERVED_WORDS.has(value)) {
-        throw new Error("Literal invalido");
+        throw new Error("Invalid literal");
       }
       this.consume();
       return { kind: "string", value: token.value };
     }
 
-    throw new Error("Literal invalido");
+    throw new Error("Invalid literal");
   }
 
   expectOperator(): Token["value"] {
@@ -498,7 +498,7 @@ export const parseKeyQuery = (input: string): ParseResult => {
       const parser = new Parser(filterTokens);
       query.filter = parser.parseExpression();
       if (parser.hasRemaining()) {
-        throw new Error("Filtro invalido");
+        throw new Error("Invalid filter");
       }
     }
 
@@ -507,14 +507,14 @@ export const parseKeyQuery = (input: string): ParseResult => {
       while (parser.hasRemaining()) {
         if (parser.matchIdentifier("order")) {
           if (query.orderBy) {
-            throw new Error("Order duplicado");
+            throw new Error("Duplicate order clause");
           }
           if (!parser.matchIdentifier("by")) {
-            throw new Error("Order invalido");
+            throw new Error("Invalid order clause");
           }
           const field = parser.expectIdentifier();
           if (field !== "key" && field !== "value") {
-            throw new Error("Campo de order invalido");
+            throw new Error("Invalid order field");
           }
           let direction: "asc" | "desc" = "asc";
           if (parser.matchIdentifier("asc")) {
@@ -528,37 +528,37 @@ export const parseKeyQuery = (input: string): ParseResult => {
 
         if (parser.matchIdentifier("limit")) {
           if (query.limit !== undefined) {
-            throw new Error("Limit duplicado");
+            throw new Error("Duplicate limit clause");
           }
           const limitToken = parser.consume();
           if (!limitToken || limitToken.type !== "number") {
-            throw new Error("Limit invalido");
+            throw new Error("Invalid limit");
           }
           if (!Number.isFinite(limitToken.value) || limitToken.value <= 0) {
-            throw new Error("Limit invalido");
+            throw new Error("Invalid limit");
           }
           if (!Number.isInteger(limitToken.value)) {
-            throw new Error("Limit deve ser inteiro");
+            throw new Error("Limit must be an integer");
           }
           query.limit = limitToken.value;
 
           if (parser.matchIdentifier("offset")) {
             const offsetToken = parser.consume();
             if (!offsetToken || offsetToken.type !== "number") {
-              throw new Error("Offset invalido");
+              throw new Error("Invalid offset");
             }
             if (!Number.isFinite(offsetToken.value) || offsetToken.value < 0) {
-              throw new Error("Offset invalido");
+              throw new Error("Invalid offset");
             }
             if (!Number.isInteger(offsetToken.value)) {
-              throw new Error("Offset deve ser inteiro");
+              throw new Error("Offset must be an integer");
             }
             query.offset = offsetToken.value;
           }
           continue;
         }
 
-        throw new Error("Query invalida");
+        throw new Error("Invalid query");
       }
     }
 

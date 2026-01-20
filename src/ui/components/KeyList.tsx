@@ -47,6 +47,7 @@ const KeyList = () => {
   const [maxItems, setMaxItems] = useState(5);
   const [autoUpdate, setAutoUpdate] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showSyntaxError, setShowSyntaxError] = useState(false);
   const queryError = useMemo(() => {
     const trimmed = queryInput.trim();
     if (!trimmed) {
@@ -55,11 +56,16 @@ const KeyList = () => {
     const parsed = parseKeyQuery(trimmed);
     return "error" in parsed ? parsed.error : "";
   }, [queryInput]);
+  const showErrorMessage = showSyntaxError && !!queryError;
 
   useEffect(() => {
     const show = !!(currentConnection.username && currentConnection.password);
     setShowDisclaimer(show);
   }, [currentConnection.password, currentConnection.username]);
+
+  useEffect(() => {
+    setShowSyntaxError(false);
+  }, [queryInput]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -83,7 +89,11 @@ const KeyList = () => {
 
   const handleSearch = useCallback(async () => {
     if (!currentConnection.id) return;
-    if (queryError) return;
+    if (queryError) {
+      setShowSyntaxError(true);
+      return;
+    }
+    setShowSyntaxError(false);
     const normalizedQuery = queryInput.trim();
     const ok = await handleLoadKeys(true, normalizedQuery, maxItems, {
       force: true
@@ -225,21 +235,19 @@ const KeyList = () => {
       </div>
 
       <div
-        className={`p-4 rounded-xl mb-6 border shadow-lg ${
+        className={`p-4 rounded-2xl mb-6 border shadow-2xl backdrop-blur-sm ${
           darkMode
-            ? "bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-800/80 border-slate-700/60"
-            : "bg-gradient-to-br from-white via-slate-50 to-slate-100 border-slate-200"
+            ? "bg-gradient-to-br from-slate-950/90 via-slate-900/80 to-slate-900/70 border-slate-800/80"
+            : "bg-gradient-to-br from-white via-slate-50 to-slate-50 border-slate-200"
         }`}
       >
         <div className="flex flex-col gap-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div
-              className={`w-full flex-1 rounded-lg border shadow-sm transition ${
-                queryError
-                  ? "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,0.6)]"
-                  : darkMode
-                    ? "border-white/5"
-                    : "border-gray-300"
+              className={`w-full flex-1 rounded-none border border-slate-700/70 shadow-[0_30px_60px_rgba(2,6,23,0.85)] transition-all ${
+                showErrorMessage
+                  ? "border-red-500 bg-[#0b0f1a] shadow-[0_0_0_1px_rgba(239,68,68,0.9),0_25px_40px_rgba(220,38,38,0.35)]"
+                  : "bg-[#0c1423]"
               }`}
             >
               <CodeMirror
@@ -250,7 +258,7 @@ const KeyList = () => {
                 placeholder={t("keyList.searchPlaceholder")}
                 minHeight="96px"
                 spellCheck={false}
-                className="text-sm"
+                className={`text-sm text-white/80`}
                 basicSetup={{
                   lineNumbers: false,
                   foldGutter: false,
@@ -274,7 +282,7 @@ const KeyList = () => {
                 onChange={(e) => setMaxItems(Number(e.target.value))}
                 className={`px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                   darkMode
-                    ? "bg-gray-900 text-gray-100 border-gray-700"
+                    ? "bg-blue-900/40 text-white border border-blue-500/50"
                     : "bg-white text-gray-700 border border-gray-300"
                 } cursor-pointer`}
               >
@@ -287,7 +295,7 @@ const KeyList = () => {
             </div>
           </div>
 
-          {queryError ? (
+          {showErrorMessage ? (
             <p className="text-xs text-red-500">
               {t("keyList.searchSyntaxError", { error: queryError })}
             </p>

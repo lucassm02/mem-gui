@@ -144,7 +144,7 @@ class KeyController {
               );
             } catch (error) {
               logger.error(
-                "Erro ao atualizar indice via cachedump",
+            "Failed to refresh index via cachedump",
                 error as Error
               );
             } finally {
@@ -393,7 +393,7 @@ class KeyController {
         serverUnixTime
       );
     } catch (error) {
-      const message = "Falha ao recuperar chaves";
+      const message = "Failed to fetch keys";
       logger.error(message, error);
       response.status(500).json({
         error: message
@@ -420,7 +420,7 @@ class KeyController {
       const count = Number.parseInt(stats.curr_items ?? "", 10);
 
       if (!Number.isFinite(count)) {
-        throw new Error("Valor curr_items invalido");
+        throw new Error("Invalid curr_items value");
       }
 
       const reservedCount = await this.getReservedKeyCount(connection);
@@ -428,7 +428,7 @@ class KeyController {
 
       response.json({ count: visibleCount });
     } catch (error) {
-      const message = "Falha ao contar chaves";
+      const message = "Failed to count keys";
       logger.error(message, error);
       response.status(500).json({
         error: message
@@ -446,7 +446,7 @@ class KeyController {
       const success = await connection.client.set(key, value, options);
 
       if (!success) {
-        throw new Error("Falha ao armazenar valor");
+        throw new Error("Failed to store value");
       }
 
       response.status(201).json({
@@ -464,7 +464,7 @@ class KeyController {
         this.emitIndexAdd(connection, key);
       }
     } catch (error) {
-      const message = "Erro ao definir chave";
+      const message = "Failed to create key";
       logger.error(message, error);
       response.status(500).json({
         error: message
@@ -485,7 +485,7 @@ class KeyController {
         this.emitIndexRefresh(connection);
       }
     } catch (error) {
-      const message = `Erro ao deletar chave ${request.params.key}`;
+      const message = `Failed to delete key ${request.params.key}`;
       logger.error(message, error);
       response.status(500).json({
         error: message
@@ -508,7 +508,7 @@ class KeyController {
         this.emitIndexRefresh(connection);
       }
     } catch (error) {
-      const message = "Erro ao limpar todas as chaves";
+      const message = "Failed to flush keys";
       logger.error(message, error);
       response.status(500).json({
         error: message
@@ -535,7 +535,7 @@ class KeyController {
         this.emitIndexRefresh(connection);
       }
     } catch (error) {
-      const message = `Erro ao obter chave ${request.params.key}`;
+      const message = `Failed to fetch key ${request.params.key}`;
       logger.error(message, error);
       response.status(500).json({
         error: message
@@ -696,7 +696,7 @@ class KeyController {
             const success = await connection.client.set(key, value, options);
             return { ok: Boolean(success), key };
           } catch (error) {
-            logger.error(`Erro ao importar chave ${key}`, error as Error);
+            logger.error(`Failed to import key ${key}`, error as Error);
             return { ok: false, key };
           }
         })
@@ -777,12 +777,12 @@ class KeyController {
     limitParam: unknown
   ): { limit: number } | { error: string } {
     if (typeof limitParam !== "string") {
-      return { error: "Parâmetro limit obrigatório" };
+      return { error: 'Parameter "limit" is required' };
     }
 
     const limit = Number(limitParam);
     if (!Number.isFinite(limit) || limit <= 0) {
-      return { error: "Parâmetro limit invalido" };
+      return { error: 'Parameter "limit" must be a positive number' };
     }
 
     return { limit };
@@ -800,7 +800,7 @@ class KeyController {
     try {
       storedKeys = await this.getStoredKeysFromIndex(connection);
     } catch (err) {
-      logger.error("Erro ao obter indice de chaves", err as Error);
+      logger.error("Failed to fetch index keys", err as Error);
     }
 
     const reservedIndexKeys = allowReservedKeys
@@ -840,13 +840,13 @@ class KeyController {
           );
         }
       } catch (error) {
-        logger.error("Erro ao ler indice de chaves", error as Error);
+        logger.error("Failed to read key index", error as Error);
         return 1;
       }
 
       return 1 + indexKeys.length;
     } catch (error) {
-      logger.error("Erro ao obter chaves reservadas", error as Error);
+      logger.error("Failed to fetch reserved keys", error as Error);
       return 0;
     }
   }
@@ -948,7 +948,7 @@ class KeyController {
       .catch(() => undefined)
       .then(task)
       .catch((error) => {
-        logger.error("Erro ao processar atualizacao leve do indice", error);
+        logger.error("Failed to process index update", error);
       })
       .finally(() => {
         if (KeyController.indexUpdateQueues.get(queueKey) === next) {
@@ -971,7 +971,7 @@ class KeyController {
       .catch(() => undefined)
       .then(task)
       .catch((error) => {
-        logger.error("Erro ao processar evento de indice autenticado", error);
+        logger.error("Failed to process authenticated index event", error);
       })
       .finally(() => {
         if (KeyController.authIndexQueues.get(queueKey) === next) {
@@ -1038,7 +1038,7 @@ class KeyController {
 
           return extractKeysInfoFromDump(dumpOutput, slabId);
         } catch (error) {
-          logger.error(`Erro ao processar slab ${slabId}`, error as Error);
+          logger.error(`Failed to process slab ${slabId}`, error as Error);
           return [];
         }
       })
@@ -1265,7 +1265,7 @@ class KeyController {
                 size
               };
             } catch (error) {
-              logger.error(`Erro ao obter a chave ${key}`, error as Error);
+              logger.error(`Failed to fetch key ${key}`, error as Error);
               return null;
             }
           })
@@ -1318,7 +1318,7 @@ class KeyController {
       }
     } catch (error) {
       logger.warn(
-        "Falha ao obter o tempo do servidor Memcached, usando horario local",
+        "Failed to retrieve Memcached server time, falling back to local clock",
         error as Error
       );
     }
@@ -1400,7 +1400,7 @@ class KeyController {
                 size
               };
             } catch (error) {
-              logger.error(`Erro ao obter a chave ${key}`, error as Error);
+              logger.error(`Failed to fetch key ${key}`, error as Error);
               return null;
             }
           })
@@ -1437,7 +1437,7 @@ class KeyController {
             const { value } = await connection.client.get(key);
             return value ? key : null;
           } catch (error) {
-            logger.error(`Erro ao validar a chave ${key}`, error as Error);
+            logger.error(`Failed to validate key ${key}`, error as Error);
             return null;
           }
         })
@@ -1581,7 +1581,7 @@ class KeyController {
         )
       );
     } catch (error) {
-      logger.error("Erro ao ler indice de chaves", error as Error);
+      logger.error("Failed to read key index", error as Error);
       return [];
     }
   }
@@ -1605,7 +1605,7 @@ class KeyController {
         (key): key is string => typeof key === "string" && !isReservedKey(key)
       );
     } catch (error) {
-      logger.error("Erro ao ler indice de chaves", error as Error);
+      logger.error("Failed to read key index", error as Error);
       return [];
     }
   }
@@ -1734,7 +1734,7 @@ class KeyController {
       try {
         storedKeys = await this.getStoredKeysFromIndex(connection);
       } catch (error) {
-        logger.error("Erro ao ler indice para exportacao", error as Error);
+      logger.error("Failed to read index for export", error as Error);
       }
       const keys = allowReservedKeys
         ? storedKeys
@@ -1751,7 +1751,7 @@ class KeyController {
     try {
       storedKeys = await this.getStoredKeysFromIndex(connection);
     } catch (error) {
-      logger.error("Erro ao ler indice para exportacao", error as Error);
+      logger.error("Failed to read index for export", error as Error);
     }
 
     let cachedumpKeysInfo: Key[] | null = null;
@@ -1761,7 +1761,7 @@ class KeyController {
         ? cachedump.keysInfo
         : cachedump.keysInfo.filter((info) => !isReservedKey(info.key));
     } catch (error) {
-      logger.error("Erro ao obter cachedump para exportacao", error as Error);
+      logger.error("Failed to fetch cachedump for export", error as Error);
     }
 
     const storedKeysFiltered = allowReservedKeys

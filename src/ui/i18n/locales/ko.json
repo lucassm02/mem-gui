@@ -160,7 +160,7 @@
     "searchButton": "검색",
     "searchResults": "{{count}}건",
     "searchDuration": "{{duration}} ms",
-    "searchSyntaxError": "구문 오류: {{error}}",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "키",
       "value": "값",

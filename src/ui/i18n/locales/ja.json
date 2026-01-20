@@ -160,7 +160,7 @@
     "searchButton": "検索",
     "searchResults": "{{count}} 件",
     "searchDuration": "{{duration}} ms",
-    "searchSyntaxError": "構文エラー: {{error}}",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "キー",
       "value": "値",
