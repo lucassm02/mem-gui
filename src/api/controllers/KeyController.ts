@@ -1,8 +1,11 @@
 import { EventEmitter } from "events";
+import os from "node:os";
+import { fileURLToPath } from "node:url";
 import { Request, Response } from "express";
 import pLimit from "p-limit";
+import Piscina from "piscina";
 import { Key, MemcachedConnection } from "@/api/types";
-import type { KeyQueryAst } from "@/api/utils";
+import type { KeyQueryAst, KeyQueryFilter } from "@/api/utils";
 import {
   connectionManager,
   evaluateKeyQuery,
@@ -21,6 +24,14 @@ import {
   touchConnection
 } from "@/api/utils";
 import { executeMemcachedCommand } from "@/api/utils/executeMemcachedCommand";
+import {
+  memcachedDelete,
+  memcachedFlush,
+  memcachedGet,
+  memcachedGetMulti,
+  memcachedSet,
+  memcachedStats
+} from "@/api/utils/memcachedClient";
 
 type KeyPayload = {
   key: string;
@@ -33,6 +44,41 @@ type ImportItem = {
   key?: string;
   value?: unknown;
   timeUntilExpiration?: number;
+};
+
+const CPU_COUNT = Math.max(1, os.cpus().length);
+const WORKER_CONCURRENCY = Math.max(
+  1,
+  Math.min(3, Math.max(1, Math.floor(CPU_COUNT / 2)))
+);
+const QUERY_EVALUATOR_POOL = new Piscina({
+  filename: fileURLToPath(
+    new URL("../workers/queryEvaluator.worker.ts", import.meta.url)
+  ),
+  concurrency: WORKER_CONCURRENCY
+});
+const MULTI_GET_BATCH_SIZE = Math.max(
+  1,
+  Math.min(1024, MAX_CONCURRENT_REQUESTS)
+);
+const WORKER_CHUNK_SIZE = 128;
+
+const chunkArray = <T>(items: T[], size: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
+};
+
+const normalizeValue = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (Buffer.isBuffer(value)) {
+    return value.toString("utf8");
+  }
+  return value === undefined || value === null ? "" : String(value);
 };
 
 const INDEX_REFRESH_EVENT = "index-refresh";
@@ -144,7 +190,7 @@ class KeyController {
               );
             } catch (error) {
               logger.error(
-            "Failed to refresh index via cachedump",
+                "Failed to refresh index via cachedump",
                 error as Error
               );
             } finally {
@@ -405,17 +451,7 @@ class KeyController {
     try {
       const { connection } = this.resolveConnection(request);
 
-      const stats = await new Promise<Record<string, string>>(
-        (resolve, reject) => {
-          connection.client.stats((error, _server, serverStats) => {
-            if (error) {
-              return reject(error);
-            }
-
-            resolve(serverStats ?? {});
-          });
-        }
-      );
+      const stats = await memcachedStats(connection);
 
       const count = Number.parseInt(stats.curr_items ?? "", 10);
 
@@ -441,9 +477,9 @@ class KeyController {
       const { connection } = this.resolveConnection(request);
 
       const { key, value, expires } = request.body;
-      const options = expires ? { expires: expires } : undefined;
+      const ttl = Number.isFinite(expires ?? NaN) ? expires! : undefined;
 
-      const success = await connection.client.set(key, value, options);
+      const success = await memcachedSet(connection, key, value, ttl ?? 0);
 
       if (!success) {
         throw new Error("Failed to store value");
@@ -452,7 +488,7 @@ class KeyController {
       response.status(201).json({
         key,
         status: "created",
-        ttl: options?.expires
+        ttl
       });
       if (connection.authentication) {
         const storedKeys = await this.getStoredKeysFromIndex(connection);
@@ -477,7 +513,7 @@ class KeyController {
       const { connection } = this.resolveConnection(request);
 
       const key = <string>request.params.key;
-      await connection.client.delete(key);
+      await memcachedDelete(connection, key);
       response.status(204).send();
       if (connection.authentication) {
         this.emitAuthIndexEvent(AUTH_INDEX_EVENT_REMOVE, { connection, key });
@@ -497,7 +533,7 @@ class KeyController {
     try {
       const { connection } = this.resolveConnection(request);
 
-      await connection.client.flush();
+      await memcachedFlush(connection);
       response.status(200).json({ status: "flushed" });
       if (connection.authentication) {
         this.emitAuthIndexEvent(AUTH_INDEX_EVENT_REMOVE, {
@@ -522,13 +558,13 @@ class KeyController {
 
       const key = <string>request.params.key;
 
-      const { value } = await connection!.client.get(key);
+      const value = await memcachedGet(connection, key);
 
-      if (!value) {
+      if (value === null) {
         throw new Error();
       }
 
-      response.json({ key, value: value.toString() });
+      response.json({ key, value: normalizeValue(value) });
       if (connection.authentication) {
         this.emitAuthIndexEvent(AUTH_INDEX_EVENT_UPDATE, { connection, key });
       } else {
@@ -687,13 +723,14 @@ class KeyController {
             : 0;
           const resolvedExpiration =
             ttl > maxRelativeExpiration ? nowUnixTime + ttl : ttl;
-          const options =
-            resolvedExpiration > 0
-              ? { expires: resolvedExpiration }
-              : undefined;
 
           try {
-            const success = await connection.client.set(key, value, options);
+            const success = await memcachedSet(
+              connection,
+              key,
+              value,
+              resolvedExpiration
+            );
             return { ok: Boolean(success), key };
           } catch (error) {
             logger.error(`Failed to import key ${key}`, error as Error);
@@ -820,14 +857,14 @@ class KeyController {
     connection: MemcachedConnection
   ): Promise<number> {
     try {
-      const response = await connection.client.get(RESERVED_KEYS.INDEXES);
-      if (!response?.value) {
+      const response = await memcachedGet(connection, RESERVED_KEYS.INDEXES);
+      if (!response) {
         return 0;
       }
 
       let indexKeys: string[] = [];
       try {
-        const parsed = JSON.parse(response.value.toString());
+        const parsed = JSON.parse(normalizeValue(response));
         if (Array.isArray(parsed)) {
           indexKeys = Array.from(
             new Set(
@@ -1230,45 +1267,14 @@ class KeyController {
         continue;
       }
 
-      const batchResults = await Promise.all(
-        batchKeys.map((key) =>
-          limiter(async () => {
-            try {
-              const { value } = await connection.client.get(key);
-              if (!value) {
-                return null;
-              }
-
-              const valueToString = value.toString();
-              if (
-                query.filter &&
-                !evaluateKeyQuery(query.filter, {
-                  key,
-                  value: valueToString
-                })
-              ) {
-                return null;
-              }
-
-              const info = keysInfoMap?.get(key);
-              const expiration = info ? info.expiration : 0;
-              const timeUntilExpiration =
-                expiration > 0 ? Math.max(expiration - currentUnixTime, 0) : 0;
-              const size = info
-                ? info.size
-                : Buffer.from(valueToString, "utf8").length;
-
-              return {
-                key,
-                value: valueToString,
-                timeUntilExpiration,
-                size
-              };
-            } catch (error) {
-              logger.error(`Failed to fetch key ${key}`, error as Error);
-              return null;
-            }
-          })
+      const batchResults = await limiter(() =>
+        this.evaluateQueryBatch(
+          connection,
+          batchKeys,
+          query.filter,
+          keysInfoMap,
+          currentUnixTime,
+          maxNeeded
         )
       );
 
@@ -1300,17 +1306,7 @@ class KeyController {
     connection: MemcachedConnection
   ): Promise<number> {
     try {
-      const stats = await new Promise<Record<string, string>>(
-        (resolve, reject) => {
-          connection.client.stats((error, _server, stats) => {
-            if (error) {
-              return reject(error);
-            }
-            resolve(stats ?? {});
-          });
-        }
-      );
-
+      const stats = await memcachedStats(connection);
       const serverTime = Number(stats.time);
 
       if (Number.isFinite(serverTime)) {
@@ -1378,9 +1374,9 @@ class KeyController {
         batch.map((key) =>
           limiter(async () => {
             try {
-              const { value } = await connection.client.get(key);
+              const value = await memcachedGet(connection, key);
 
-              if (!value) {
+              if (value === null) {
                 return null;
               }
 
@@ -1388,7 +1384,7 @@ class KeyController {
               const expiration = info ? info.expiration : 0;
               const timeUntilExpiration =
                 expiration > 0 ? Math.max(expiration - currentUnixTime, 0) : 0;
-              const valueToString = value.toString();
+              const valueToString = normalizeValue(value);
               const size = info
                 ? info.size
                 : Buffer.from(valueToString, "utf8").length;
@@ -1420,6 +1416,85 @@ class KeyController {
     return validKeys;
   }
 
+  private async evaluateQueryBatch(
+    connection: MemcachedConnection,
+    keys: string[],
+    filter: KeyQueryFilter | undefined,
+    keysInfoMap: Map<string, Key> | null,
+    currentUnixTime: number,
+    maxNeeded?: number
+  ): Promise<KeyPayload[]> {
+    try {
+      const payloads: KeyPayload[] = [];
+
+      for (const multiChunk of chunkArray(keys, MULTI_GET_BATCH_SIZE)) {
+        const chunkValues = await memcachedGetMulti(connection, multiChunk);
+        if (Object.keys(chunkValues).length === 0) {
+          continue;
+        }
+
+        const entries: { key: string; value: string }[] = [];
+        for (const key of multiChunk) {
+          const value = chunkValues[key];
+          if (value === undefined || value === null) {
+            continue;
+          }
+          entries.push({ key, value: normalizeValue(value) });
+        }
+
+        if (entries.length === 0) {
+          continue;
+        }
+
+        for (const workerChunk of chunkArray(entries, WORKER_CHUNK_SIZE)) {
+          const matchedKeys =
+            !filter || workerChunk.length === 0
+              ? workerChunk.map((entry) => entry.key)
+              : (
+                  await QUERY_EVALUATOR_POOL.run({
+                    keyValues: workerChunk,
+                    filter
+                  })
+                ).keys;
+
+          const matchedSet = new Set(matchedKeys);
+
+          for (const entry of workerChunk) {
+            if (!matchedSet.has(entry.key)) {
+              continue;
+            }
+            const info = keysInfoMap?.get(entry.key);
+            const expiration = info ? info.expiration : 0;
+            const timeUntilExpiration =
+              expiration > 0 ? Math.max(expiration - currentUnixTime, 0) : 0;
+            const size = info
+              ? info.size
+              : Buffer.from(entry.value, "utf8").length;
+            payloads.push({
+              key: entry.key,
+              value: entry.value,
+              timeUntilExpiration,
+              size
+            });
+
+            if (maxNeeded !== undefined && payloads.length >= maxNeeded) {
+              return payloads.slice(0, maxNeeded);
+            }
+          }
+        }
+
+        if (maxNeeded !== undefined && payloads.length >= maxNeeded) {
+          return payloads.slice(0, maxNeeded);
+        }
+      }
+
+      return payloads;
+    } catch (error) {
+      logger.error("Failed to evaluate query batch", error as Error);
+      return [];
+    }
+  }
+
   private async filterExistingKeys(
     keys: string[],
     connection: MemcachedConnection
@@ -1434,7 +1509,7 @@ class KeyController {
       candidateKeys.map((key) =>
         limit(async () => {
           try {
-            const { value } = await connection.client.get(key);
+            const value = await memcachedGet(connection, key);
             return value ? key : null;
           } catch (error) {
             logger.error(`Failed to validate key ${key}`, error as Error);
@@ -1528,22 +1603,20 @@ class KeyController {
 
     await Promise.all(
       indexKeys.map((indexKey) =>
-        connection.client.set(
+        memcachedSet(
+          connection,
           indexKey,
           JSON.stringify(payloads[indexKey] ?? []),
-          {
-            expires: ONE_DAY_IN_SECONDS
-          }
+          ONE_DAY_IN_SECONDS
         )
       )
     );
 
-    await connection.client.set(
+    await memcachedSet(
+      connection,
       RESERVED_KEYS.INDEXES,
       JSON.stringify(indexKeys),
-      {
-        expires: ONE_DAY_IN_SECONDS
-      }
+      ONE_DAY_IN_SECONDS
     );
 
     const staleKeys = previousIndexKeys.filter(
@@ -1552,7 +1625,7 @@ class KeyController {
 
     await Promise.all(
       Array.from(new Set(staleKeys)).map((key) =>
-        connection.client.delete(key).catch(() => false)
+        memcachedDelete(connection, key).catch(() => false)
       )
     );
   }
@@ -1560,13 +1633,13 @@ class KeyController {
   private async getIndexKeyList(
     connection: MemcachedConnection
   ): Promise<string[]> {
-    const response = await connection.client.get(RESERVED_KEYS.INDEXES);
-    if (!response?.value) {
+    const response = await memcachedGet(connection, RESERVED_KEYS.INDEXES);
+    if (!response) {
       return [];
     }
 
     try {
-      const parsed = JSON.parse(response.value.toString());
+      const parsed = JSON.parse(normalizeValue(response));
       if (!Array.isArray(parsed)) {
         return [];
       }
@@ -1590,13 +1663,13 @@ class KeyController {
     connection: MemcachedConnection,
     indexKey: string
   ): Promise<string[]> {
-    const response = await connection.client.get(indexKey);
-    if (!response?.value) {
+    const response = await memcachedGet(connection, indexKey);
+    if (!response) {
       return [];
     }
 
     try {
-      const parsed = JSON.parse(response.value.toString());
+      const parsed = JSON.parse(normalizeValue(response));
       if (!Array.isArray(parsed)) {
         return [];
       }
@@ -1734,7 +1807,7 @@ class KeyController {
       try {
         storedKeys = await this.getStoredKeysFromIndex(connection);
       } catch (error) {
-      logger.error("Failed to read index for export", error as Error);
+        logger.error("Failed to read index for export", error as Error);
       }
       const keys = allowReservedKeys
         ? storedKeys

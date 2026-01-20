@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
-import { promisify } from "node:util";
 import { Request, Response } from "express";
-import memjs from "memjs";
+import Memcached from "memcached";
 import z from "zod";
 
 import { MemcachedConnection } from "@/api/types";
@@ -15,6 +14,7 @@ import {
   touchConnection
 } from "@/api/utils";
 import { executeMemcachedCommand } from "@/api/utils/executeMemcachedCommand";
+import { memcachedStats } from "@/api/utils/memcachedClient";
 import {
   closeSshTunnel,
   createSshTunnel,
@@ -63,17 +63,9 @@ class ConnectionController {
       const connectionId = <string>request.headers["x-connection-id"];
       const connection = connections.get(connectionId)!;
 
-      function statsWrapper(
-        cb: (error: unknown, stats: Record<string, string> | null) => void
-      ) {
-        connection.client.stats((error, _, stats) => {
-          cb(error, stats);
-        });
-      }
-
       const [slabsOutput, serverInfo] = await Promise.all([
         executeMemcachedCommand("stats slabs", connection),
-        promisify(statsWrapper)()
+        memcachedStats(connection)
       ]);
 
       const { slabs, info } = extractSlabInfoFromStatsSlabsOutput(slabsOutput);
@@ -97,7 +89,7 @@ class ConnectionController {
 
   async create(request: Request, response: Response): Promise<void> {
     const connections = connectionManager();
-    let client: memjs.Client | null = null;
+    let client: Memcached | null = null;
     let tunnel: MemcachedConnection["tunnel"] | null = null;
 
     try {
@@ -153,28 +145,23 @@ class ConnectionController {
       const targetHost = tunnel ? tunnel.localHost : host;
       const targetPort = tunnel ? tunnel.localPort : port;
 
-      const memcachedClient = memjs.Client.create(
-        `${targetHost}:${targetPort}`,
-        {
-          retries: 1,
-          username: auth?.username,
-          password: auth?.password,
-          timeout: connectionTimeout,
-          conntimeout: connectTimeoutSeconds,
-          keepAlive: true,
-          keepAliveDelay: MEMCACHED_KEEPALIVE_DELAY_SECONDS
-        }
-      );
+      const timeoutMs = Math.round(connectionTimeout * 1000);
+      const memcachedClient = new Memcached(`${targetHost}:${targetPort}`, {
+        retries: 1,
+        timeout: timeoutMs,
+        idle: MEMCACHED_KEEPALIVE_DELAY_SECONDS * 1000,
+        username: auth?.username,
+        password: auth?.password
+      });
       client = memcachedClient;
 
-      const memcachedTimeoutMs = Math.round(connectionTimeout * 1000);
       await new Promise<void>((resolve, reject) => {
         let settled = false;
         const timeout = setTimeout(() => {
           if (settled) return;
           settled = true;
           try {
-            memcachedClient.close();
+            memcachedClient.end();
           } catch {
             // Ignore close errors.
           }
@@ -185,10 +172,10 @@ class ConnectionController {
           client = null;
           reject(
             new Error(
-              `Timeout: No response from memcached within ${memcachedTimeoutMs}ms`
+              `Timeout: No response from memcached within ${timeoutMs}ms`
             )
           );
-        }, memcachedTimeoutMs);
+        }, timeoutMs);
 
         memcachedClient.stats((error: unknown) => {
           if (settled) return;
@@ -236,7 +223,7 @@ class ConnectionController {
     } catch (error) {
       if (error instanceof SshHostKeyError) {
         if (client) {
-          client.close();
+          client.end();
         }
         if (tunnel) {
           closeSshTunnel(tunnel);
@@ -250,7 +237,7 @@ class ConnectionController {
         return;
       }
       if (client) {
-        client.close();
+        client.end();
       }
       if (tunnel) {
         closeSshTunnel(tunnel);

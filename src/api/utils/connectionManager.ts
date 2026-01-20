@@ -61,7 +61,7 @@ export function closeConnection(connection: MemcachedConnection) {
   clearTimeout(connection.timer);
   closeSshTunnel(connection.tunnel);
   try {
-    connection.client.close();
+    connection.client.end();
   } catch {
     // Ignore close errors.
   }

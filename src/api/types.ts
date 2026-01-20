@@ -1,5 +1,5 @@
 import net from "net";
-import memjs from "memjs";
+import Memcached from "memcached";
 import { Client as SshClient } from "ssh2";
 
 export interface SshConfig {
@@ -25,7 +25,7 @@ export interface MemcachedConnection {
   host: string;
   port: number;
   authentication?: { username: string; password: string };
-  client: memjs.Client;
+  client: Memcached;
   connectionTimeout: number;
   lastActive: Date;
   timer: NodeJS.Timeout;

@@ -299,11 +299,11 @@ class Parser {
     if (keyword === "type") {
       const next = this.expectIdentifier();
       if (next !== "value") {
-      throw new Error("Invalid type predicate");
+        throw new Error("Invalid type predicate");
       }
       const operator = this.expectOperator();
       if (operator !== "=") {
-      throw new Error("Invalid type operator");
+        throw new Error("Invalid type operator");
       }
       const typeName = this.expectIdentifier();
       if (
@@ -313,7 +313,7 @@ class Parser {
         typeName !== "null" &&
         typeName !== "json"
       ) {
-      throw new Error("Invalid type");
+        throw new Error("Invalid type");
       }
       return {
         type: "predicate",
@@ -335,7 +335,7 @@ class Parser {
         operator === "<" ||
         operator === "<="
       ) {
-      throw new Error("Invalid operator for key");
+        throw new Error("Invalid operator for key");
       }
     }
 
