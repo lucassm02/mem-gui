@@ -37,7 +37,7 @@ export type KeyQueryPredicate =
       literal: Literal;
     }
   | {
-      kind: "type";
+      kind: "is";
       valueType: ValueType;
     };
 
@@ -69,7 +69,7 @@ const RESERVED_WORDS = new Set([
   "not",
   "key",
   "value",
-  "type",
+  "is",
   "order",
   "by",
   "limit",
@@ -79,7 +79,11 @@ const RESERVED_WORDS = new Set([
   "match",
   "contains",
   "startswith",
-  "endswith"
+  "endswith",
+  "json",
+  "number",
+  "boolean",
+  "null"
 ]);
 
 const NUMERIC_RE = /^-?\d+(?:\.\d+)?$/;
@@ -296,19 +300,10 @@ class Parser {
     const keyword = token.value.toLowerCase();
     this.consume();
 
-    if (keyword === "type") {
-      const next = this.expectIdentifier();
-      if (next !== "value") {
-        throw new Error("Invalid type predicate");
-      }
-      const operator = this.expectOperator();
-      if (operator !== "=") {
-        throw new Error("Invalid type operator");
-      }
+    if (keyword === "is") {
       const typeName = this.expectIdentifier();
       if (
         typeName !== "number" &&
-        typeName !== "string" &&
         typeName !== "boolean" &&
         typeName !== "null" &&
         typeName !== "json"
@@ -317,7 +312,7 @@ class Parser {
       }
       return {
         type: "predicate",
-        predicate: { kind: "type", valueType: typeName }
+        predicate: { kind: "is", valueType: typeName }
       };
     }
 
@@ -430,14 +425,6 @@ class Parser {
     }
 
     throw new Error("Invalid literal");
-  }
-
-  expectOperator(): Token["value"] {
-    const token = this.consume();
-    if (!token || token.type !== "operator") {
-      throw new Error("Operador ausente");
-    }
-    return token.value;
   }
 
   expectIdentifier(): string {
@@ -746,7 +733,7 @@ export const evaluateKeyQuery = (
       case "not":
         return !evaluate(node.expr);
       case "predicate":
-        if (node.predicate.kind === "type") {
+        if (node.predicate.kind === "is") {
           return resolveValueType(context.value) === node.predicate.valueType;
         }
         if (node.predicate.kind === "key") {
@@ -834,7 +821,7 @@ export const inferValueOrderMode = (
       case "not":
         return hasNumericPredicate(node.expr);
       case "predicate":
-        if (node.predicate.kind === "type") {
+        if (node.predicate.kind === "is") {
           return node.predicate.valueType === "number";
         }
         if (node.predicate.kind === "value") {

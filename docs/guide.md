@@ -73,14 +73,14 @@ The search field now accepts a small DSL so you can filter by key and value, add
 Basics:
 
 - `key` and `value` predicates support `=`, `!=`, `>`, `>=`, `<`, `<=`, `match`, `contains`, `startsWith`, `endsWith`.
-- `type value = number|string|boolean|null|json` lets you gate comparisons by value type.
+- `is number|boolean|null|json` lets you gate comparisons by value type.
 - Combine with `and`, `or`, `not` and parentheses.
 - Optional `order by key|value asc|desc` and `limit N offset M`.
 
 Examples:
 
 ```text
-key match /^age$/ and type value = number and value > 18 and value < 60
+key match /^age$/ and is number and value > 18 and value < 60
 ```
 
 ```text
@@ -88,7 +88,7 @@ key startsWith "user:" and value contains "active" order by key desc limit 50 of
 ```
 
 ```text
-type value = json and key contains "profile" order by value asc limit 20
+is json and key contains "profile" order by value asc limit 20
 ```
 
 Notes:
@@ -96,6 +96,8 @@ Notes:
 - Regex uses `/.../` with optional flags like `/pattern/i`.
 - String comparisons are case sensitive. For case-insensitive match, use regex with the `i` flag.
 - Numeric comparisons only match when the value can be parsed as a number.
+- `json`, `number`, `boolean`, and `null` are reserved keywords; use quotes to match them as strings.
+- `is` only accepts `number`, `boolean`, `null`, or `json`. Strings are the default value type.
 
 ## Bulk Delete
 
