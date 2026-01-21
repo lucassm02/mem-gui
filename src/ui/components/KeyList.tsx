@@ -5,8 +5,8 @@ import {
   ClockIcon,
   DocumentMagnifyingGlassIcon,
   ListBulletIcon,
-  MagnifyingGlassIcon,
   PencilSquareIcon,
+  PlayIcon,
   PlusIcon,
   TrashIcon
 } from "@heroicons/react/24/outline";
@@ -25,6 +25,14 @@ import Disclaimer from "./Disclaimer";
 import EditKeyModal from "./EditKeyModal";
 import ViewDataModal from "./ViewDataModal";
 import { parseKeyQuery } from "@/api/utils/keyQuery";
+import { DEFAULT_KEY_QUERY } from "@/ui/constants/keyQuery";
+
+const MAX_ITEMS = 10;
+
+const normalizeQuery = (value: string) => {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : DEFAULT_KEY_QUERY;
+};
 
 const KeyList = () => {
   const { darkMode } = useDarkMode();
@@ -35,16 +43,15 @@ const KeyList = () => {
     handleCreateKey,
     handleEditKey,
     currentConnection,
-    totalKeyCount,
-    lastQueryMetrics
+    lastQueryMetrics,
+    totalKeyCount
   } = useConnections();
 
   const { openCreateModal, openEditModal, openViewDataModal } = useModal();
   const { t } = useTranslation();
 
-  const [queryInput, setQueryInput] = useState("");
-  const [activeQuery, setActiveQuery] = useState("");
-  const [maxItems, setMaxItems] = useState(5);
+  const [queryInput, setQueryInput] = useState(DEFAULT_KEY_QUERY);
+  const [activeQuery, setActiveQuery] = useState(DEFAULT_KEY_QUERY);
   const [autoUpdate, setAutoUpdate] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showSyntaxError, setShowSyntaxError] = useState(false);
@@ -67,25 +74,12 @@ const KeyList = () => {
     setShowSyntaxError(false);
   }, [queryInput]);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (autoUpdate) {
-      interval = setInterval(() => {
-        handleLoadKeys(false, activeQuery, maxItems);
-      }, 5000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-    // handleLoadKeys identity is stable enough; omit from deps to prevent loops
-  }, [autoUpdate, activeQuery, maxItems]);
-
   const lastLoadParams = useRef<string>("");
   const lastConnectionIdRef = useRef<string>("");
   const skipNextLoadRef = useRef(true);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const buildLoadKey = (query: string) =>
-    `${currentConnection.id}|${query}|${maxItems}`;
+    `${currentConnection.id}|${normalizeQuery(query)}|${MAX_ITEMS}`;
 
   const handleSearch = useCallback(async () => {
     if (!currentConnection.id) return;
@@ -94,15 +88,18 @@ const KeyList = () => {
       return;
     }
     setShowSyntaxError(false);
-    const normalizedQuery = queryInput.trim();
-    const ok = await handleLoadKeys(true, normalizedQuery, maxItems, {
+    const normalizedQuery = normalizeQuery(queryInput);
+    if (!queryInput.trim()) {
+      setQueryInput(normalizedQuery);
+    }
+    const ok = await handleLoadKeys(true, normalizedQuery, MAX_ITEMS, {
       force: true
     });
     if (ok) {
       lastLoadParams.current = buildLoadKey(normalizedQuery);
       setActiveQuery(normalizedQuery);
     }
-  }, [currentConnection.id, handleLoadKeys, maxItems, queryError, queryInput]);
+  }, [currentConnection.id, handleLoadKeys, queryError, queryInput]);
 
   const queryExtensions = useMemo(
     () => [
@@ -129,6 +126,19 @@ const KeyList = () => {
   );
 
   useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (autoUpdate) {
+      interval = setInterval(() => {
+        handleLoadKeys(false, normalizeQuery(activeQuery), MAX_ITEMS);
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+    // handleLoadKeys identity is stable enough; omit from deps to prevent loops
+  }, [autoUpdate, activeQuery]);
+
+  useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
@@ -145,13 +155,15 @@ const KeyList = () => {
     }
 
     debounceRef.current = setTimeout(() => {
-      const currentKey = buildLoadKey(activeQuery);
+      const resolvedQuery = normalizeQuery(activeQuery);
+      const currentKey = buildLoadKey(resolvedQuery);
       if (lastLoadParams.current === currentKey) return;
       lastLoadParams.current = currentKey;
 
-      const showLoading = activeQuery.trim() === "" && !skipNextLoadRef.current;
+      const showLoading =
+        resolvedQuery.trim() === "" && !skipNextLoadRef.current;
       skipNextLoadRef.current = false;
-      handleLoadKeys(showLoading, activeQuery, maxItems);
+      handleLoadKeys(showLoading, resolvedQuery, MAX_ITEMS);
     }, 300);
 
     return () => {
@@ -159,17 +171,17 @@ const KeyList = () => {
         clearTimeout(debounceRef.current);
       }
     };
-  }, [activeQuery, maxItems, currentConnection.id]);
+  }, [activeQuery, currentConnection.id]);
 
   const filteredKeys = keys;
   return (
     <div
-      className={`w-full px-2 sm:px-3 max-w-none mx-auto mt-10 transition-all ${
+      className={`w-full px-2 sm:px-3 max-w-none mx-auto mt-6 transition-all ${
         darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
       }`}
     >
       <Disclaimer
-        className="mt-10 mb-10"
+        className="mt-6 mb-6"
         showDisclaimer={showDisclaimer}
         hideDisclaimer={() => setShowDisclaimer(false)}
       >
@@ -178,87 +190,34 @@ const KeyList = () => {
           components={{ strong: <strong /> }}
         />
       </Disclaimer>
-      <div className="flex flex-col gap-3 mb-6">
-        <h2 className="text-xl font-semibold">
-          {t("keyList.title")}
-          {totalKeyCount !== undefined ? `\u2068 (${totalKeyCount})\u2069` : ""}
-        </h2>
-
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => handleLoadKeys(true, activeQuery, maxItems)}
-              className={toneButton("primary", darkMode)}
-            >
-              <ArrowPathIcon className="w-5 h-5" />
-              {t("keyList.refresh")}
-            </button>
-
-            <button
-              onClick={() => setAutoUpdate((prev) => !prev)}
-              className={`${toneButton(
-                autoUpdate ? "primary" : "neutral",
-                darkMode
-              )} pl-3 pr-4`}
-            >
-              <span
-                className={`w-10 h-5 flex items-center rounded-full transition-all ${
-                  autoUpdate
-                    ? "bg-blue-400"
-                    : darkMode
-                      ? "bg-gray-600"
-                      : "bg-gray-300"
-                }`}
-              >
-                <span
-                  className={`w-4 h-4 bg-white rounded-full shadow transform transition-all ${
-                    autoUpdate ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </span>
-              <span className="whitespace-nowrap">
-                {t("keyList.autoRefresh")}
-              </span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={openCreateModal}
-              className={toneButton("success", darkMode)}
-            >
-              <PlusIcon className="w-5 h-5" />
-              {t("keyList.create")}
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div
-        className={`p-4 rounded-2xl mb-6 border shadow-2xl backdrop-blur-sm ${
+        className={`p-3 rounded-lg mb-2 border ${
           darkMode
-            ? "bg-gradient-to-br from-slate-950/90 via-slate-900/80 to-slate-900/70 border-slate-800/80"
-            : "bg-gradient-to-br from-white via-slate-50 to-slate-50 border-slate-200"
+            ? "bg-slate-940/60 border-slate-800/80"
+            : "bg-white border-slate-200"
         }`}
       >
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
             <div
-              className={`w-full flex-1 rounded-none border border-slate-700/70 shadow-[0_30px_60px_rgba(2,6,23,0.85)] transition-all ${
-                showErrorMessage
-                  ? "border-red-500 bg-[#0b0f1a] shadow-[0_0_0_1px_rgba(239,68,68,0.9),0_25px_40px_rgba(220,38,38,0.35)]"
-                  : "bg-[#0c1423]"
+              className={`w-full flex-1  border transition-colors ${
+                darkMode
+                  ? "border-slate-700/60 bg-slate-950/60"
+                  : "border-slate-200 bg-white"
+              } ${
+                showErrorMessage ? "border-red-500 ring-1 ring-red-500/30" : ""
               }`}
             >
               <CodeMirror
                 value={queryInput}
                 onChange={(value) => setQueryInput(value)}
                 theme={darkMode ? "dark" : "light"}
+                color="blue"
                 extensions={queryExtensions}
                 placeholder={t("keyList.searchPlaceholder")}
-                minHeight="96px"
+                minHeight="40px"
                 spellCheck={false}
-                className={`text-sm text-white/80`}
+                className="text-sm"
                 basicSetup={{
                   lineNumbers: false,
                   foldGutter: false,
@@ -267,31 +226,23 @@ const KeyList = () => {
                 }}
               />
             </div>
-
-            <div className="flex flex-col gap-3 lg:w-56">
+            <div className="flex items-center gap-1">
               <button
                 onClick={handleSearch}
-                className={toneButton("primary", darkMode)}
+                className={`${toneButton("primary", darkMode, "icon")} !p-2`}
+                aria-label={t("keyList.searchButton")}
+                title={t("keyList.searchButton")}
               >
-                <MagnifyingGlassIcon className="w-5 h-5" />
-                {t("keyList.searchButton")}
+                <PlayIcon className="h-5 w-5" />
               </button>
-
-              <select
-                value={maxItems}
-                onChange={(e) => setMaxItems(Number(e.target.value))}
-                className={`px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                  darkMode
-                    ? "bg-blue-900/40 text-white border border-blue-500/50"
-                    : "bg-white text-gray-700 border border-gray-300"
-                } cursor-pointer`}
+              <button
+                onClick={openCreateModal}
+                className={`${toneButton("success", darkMode, "icon")} !p-2`}
+                aria-label={t("keyList.create")}
+                title={t("keyList.create")}
               >
-                {[5, 10, 15, 20, 50, 100].map((num) => (
-                  <option key={num} value={num}>
-                    {num}
-                  </option>
-                ))}
-              </select>
+                <PlusIcon className="h-5 w-5" />
+              </button>
             </div>
           </div>
 
@@ -300,57 +251,85 @@ const KeyList = () => {
               {t("keyList.searchSyntaxError", { error: queryError })}
             </p>
           ) : null}
-
-          {lastQueryMetrics ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium border ${
-                  darkMode
-                    ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
-                    : "bg-white text-slate-700 border-slate-200"
-                }`}
-              >
-                <ListBulletIcon className="w-4 h-4" />
-                {t("keyList.searchResults", {
-                  count: lastQueryMetrics.count
-                })}
-              </span>
-              <span
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium border ${
-                  darkMode
-                    ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
-                    : "bg-white text-slate-700 border-slate-200"
-                }`}
-              >
-                <ClockIcon className="w-4 h-4" />
-                {t("keyList.searchDuration", {
-                  duration: lastQueryMetrics.durationMs
-                })}
-              </span>
-            </div>
-          ) : null}
         </div>
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {totalKeyCount !== undefined ? (
+          <span
+            className={`inline-flex items-center gap-1 rounded-md px-2 py-1 border text-[11px] ${
+              darkMode
+                ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
+                : "bg-white text-slate-700 border-slate-200"
+            }`}
+          >
+            {t("keyList.title")}: {totalKeyCount}
+          </span>
+        ) : null}
+        {lastQueryMetrics ? (
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+            <span
+              className={`inline-flex items-center gap-1 rounded-md px-2 py-1 border ${
+                darkMode
+                  ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
+                  : "bg-white text-slate-700 border-slate-200"
+              }`}
+            >
+              <ListBulletIcon className="h-3 w-3" />
+              {t("keyList.searchResults", {
+                count: lastQueryMetrics.count
+              })}
+            </span>
+            <span
+              className={`inline-flex items-center gap-1 rounded-md px-2 py-1 border ${
+                darkMode
+                  ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
+                  : "bg-white text-slate-700 border-slate-200"
+              }`}
+            >
+              <ClockIcon className="h-3 w-3" />
+              {t("keyList.searchDuration", {
+                duration: lastQueryMetrics.durationMs
+              })}
+            </span>
+          </div>
+        ) : null}
+        <button
+          onClick={() => setAutoUpdate((prev) => !prev)}
+          className={`${toneButton(
+            autoUpdate ? "primary" : "neutral",
+            darkMode,
+            "sm"
+          )} !px-2 !py-1 text-[11px]`}
+          aria-pressed={autoUpdate}
+          title={t("keyList.autoRefresh")}
+        >
+          <ArrowPathIcon className="h-3 w-3" />
+          <span className="hidden sm:inline">{t("keyList.autoRefresh")}</span>
+        </button>
+      </div>
+
       <div
-        className={`overflow-hidden mb-8 rounded-lg shadow ${
-          darkMode ? "bg-gray-800" : "bg-white"
+        className={`overflow-hidden mb-6 rounded-md border ${
+          darkMode
+            ? "bg-slate-900/40 border-slate-700/60"
+            : "bg-white border-slate-200"
         }`}
       >
-        <table className="w-full text-sm text-left">
+        <table className="w-full text-xs text-left">
           <thead
-            className={`text-xs uppercase ${
+            className={`text-[10px] uppercase tracking-wide ${
               darkMode
                 ? "bg-gray-700 text-gray-300"
                 : "bg-gray-200 text-gray-700"
             }`}
           >
             <tr>
-              <th className="px-6 py-3">{t("keyList.columns.key")}</th>
-              <th className="px-6 py-3">{t("keyList.columns.value")}</th>
-              <th className="px-6 py-3">{t("keyList.columns.expiration")}</th>
-              <th className="px-6 py-3">{t("keyList.columns.size")}</th>
-              <th className="px-6 py-3 text-right">
+              <th className="px-3 py-2">{t("keyList.columns.key")}</th>
+              <th className="px-3 py-2">{t("keyList.columns.value")}</th>
+              <th className="px-3 py-2">{t("keyList.columns.expiration")}</th>
+              <th className="px-3 py-2">{t("keyList.columns.size")}</th>
+              <th className="px-3 py-2 text-right">
                 {t("keyList.columns.actions")}
               </th>
             </tr>
@@ -367,53 +346,65 @@ const KeyList = () => {
                   }`}
                 >
                   <td
-                    className={`px-6 py-4 truncate max-w-[300px] ${
+                    className={`px-3 py-2 truncate max-w-[240px] ${
                       darkMode ? "text-gray-100" : "text-gray-800"
                     }`}
                   >
                     {item.key}
                   </td>
                   <td
-                    className={`px-6 py-4 truncate max-w-[250px] ${
+                    className={`px-3 py-2 truncate max-w-[220px] ${
                       darkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
                     {item.value}
                   </td>
                   <td
-                    className={`px-6 py-4 truncate max-w-[300px] ${
+                    className={`px-3 py-2 truncate max-w-[220px] ${
                       darkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
                     {item.timeUntilExpiration}
                   </td>
                   <td
-                    className={`px-6 py-4 truncate max-w-[300px] ${
+                    className={`px-3 py-2 truncate max-w-[220px] ${
                       darkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                     title={`${item.size} B`}
                   >
                     {formatBytes(item.size)}
                   </td>
-                  <td className="px-6 py-4 text-right align-middle">
-                    <div className="flex justify-end items-center gap-3">
+                  <td className="px-3 py-2 text-right align-middle">
+                    <div className="flex justify-end items-center gap-2">
                       <button
                         onClick={() => openViewDataModal(item)}
-                        className={`${toneButton("primary", darkMode, "icon")} !px-2 !py-2`}
+                        className={`${toneButton(
+                          "primary",
+                          darkMode,
+                          "icon"
+                        )} !p-1.5`}
                       >
-                        <DocumentMagnifyingGlassIcon className="w-5 h-5" />
+                        <DocumentMagnifyingGlassIcon className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => openEditModal(item)}
-                        className={`${toneButton("primary", darkMode, "icon")} !px-2 !py-2`}
+                        className={`${toneButton(
+                          "primary",
+                          darkMode,
+                          "icon"
+                        )} !p-1.5`}
                       >
-                        <PencilSquareIcon className="w-5 h-5" />
+                        <PencilSquareIcon className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteKey(item.key)}
-                        className={`${toneButton("danger", darkMode, "icon")} !px-2 !py-2`}
+                        className={`${toneButton(
+                          "danger",
+                          darkMode,
+                          "icon"
+                        )} !p-1.5`}
                       >
-                        <TrashIcon className="w-5 h-5" />
+                        <TrashIcon className="h-4 w-4" />
                       </button>
                     </div>
                   </td>
@@ -421,7 +412,7 @@ const KeyList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={5} className="px-3 py-3 text-center text-gray-500">
                   {t("keyList.empty")}
                 </td>
               </tr>

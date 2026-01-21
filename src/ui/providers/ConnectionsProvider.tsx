@@ -10,6 +10,7 @@ import {
   getConnectionIdentity,
   isSameConnection as isSameConnectionByIdentity
 } from "@/ui/utils/connectionIdentity";
+import { DEFAULT_KEY_QUERY } from "@/ui/constants/keyQuery";
 
 export interface ServerData {
   status: string;
@@ -422,9 +423,12 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const fetchKeys = async (attempt: number): Promise<KeyData[]> => {
+        const normalizedQuery = query?.trim()
+          ? query.trim()
+          : DEFAULT_KEY_QUERY;
         const response = await api.get("/keys", {
           params: {
-            query: query || undefined,
+            query: normalizedQuery,
             limit: limit || undefined
           }
         });
@@ -454,7 +458,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
           setLastQueryMetrics({
             durationMs,
             count: fetchedKeys.length,
-            query: query?.trim() ?? ""
+            query: query?.trim() ? query.trim() : DEFAULT_KEY_QUERY
           });
         }
         if (showLoadingModal) dismissLoading();

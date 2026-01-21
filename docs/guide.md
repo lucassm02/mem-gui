@@ -71,12 +71,14 @@ Note: SSH connections, storage encryption, and dump import/export are available 
 The search field now accepts a small DSL so you can filter by key and value, add ordering, and control limits.
 
 Basics:
+
 - `key` and `value` predicates support `=`, `!=`, `>`, `>=`, `<`, `<=`, `match`, `contains`, `startsWith`, `endsWith`.
 - `type value = number|string|boolean|null|json` lets you gate comparisons by value type.
 - Combine with `and`, `or`, `not` and parentheses.
 - Optional `order by key|value asc|desc` and `limit N offset M`.
 
 Examples:
+
 ```text
 key match /^age$/ and type value = number and value > 18 and value < 60
 ```
@@ -90,6 +92,7 @@ type value = json and key contains "profile" order by value asc limit 20
 ```
 
 Notes:
+
 - Regex uses `/.../` with optional flags like `/pattern/i`.
 - String comparisons are case sensitive. For case-insensitive match, use regex with the `i` flag.
 - Numeric comparisons only match when the value can be parsed as a number.
