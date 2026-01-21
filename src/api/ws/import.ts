@@ -2,11 +2,7 @@ import http from "http";
 import { WebSocketServer, WebSocket, type RawData } from "ws";
 
 import { makeKeyController } from "@/api/controllers";
-import {
-  connectionManager,
-  logger,
-  MAX_CONCURRENT_REQUESTS
-} from "@/api/utils";
+import { ensureConnection, logger, MAX_CONCURRENT_REQUESTS } from "@/api/utils";
 
 type ImportItem = {
   key?: string;
@@ -100,7 +96,7 @@ export function registerImportWebsocket() {
       }
 
       running = false;
-      const connection = connectionManager().get(connectionId);
+      const connection = await ensureConnection(connectionId);
       if (connection && importedKeys.length > 0) {
         try {
           await keyController.registerImportedKeys(connection, importedKeys);
@@ -126,7 +122,7 @@ export function registerImportWebsocket() {
       cancelRequested = true;
     });
 
-    socket.on("message", (data) => {
+    socket.on("message", async (data) => {
       const message = parseClientMessage(data);
       if (!message) {
         sendMessage(socket, {
@@ -164,7 +160,7 @@ export function registerImportWebsocket() {
           return;
         }
 
-        const connection = connectionManager().get(connectionId);
+        const connection = await ensureConnection(connectionId);
         if (!connection) {
           sendMessage(socket, {
             type: "import-error",
@@ -218,7 +214,7 @@ export function registerImportWebsocket() {
               return;
             }
 
-            const connection = connectionManager().get(connectionId);
+            const connection = await ensureConnection(connectionId);
             if (!connection) {
               sendMessage(socket, {
                 type: "import-error",

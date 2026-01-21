@@ -2,7 +2,7 @@ import http from "http";
 import { WebSocketServer, WebSocket, type RawData } from "ws";
 
 import { makeKeyController } from "@/api/controllers";
-import { connectionManager, logger } from "@/api/utils";
+import { ensureConnection, logger } from "@/api/utils";
 
 type ClientMessage =
   | { type: "start"; batchSize?: number }
@@ -87,7 +87,7 @@ export function registerDumpWebsocket() {
           return;
         }
 
-        const connection = connectionManager().get(connectionId);
+        const connection = await ensureConnection(connectionId);
         if (!connection) {
           sendMessage(socket, {
             type: "dump-error",
@@ -121,7 +121,7 @@ export function registerDumpWebsocket() {
         return;
       }
 
-      const connection = connectionManager().get(connectionId);
+      const connection = await ensureConnection(connectionId);
       if (!connection) {
         sendMessage(socket, {
           type: "dump-error",

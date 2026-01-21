@@ -2,11 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import {
   closeConnection,
   connectionManager,
-  logger,
-  touchConnection
+  ensureConnection,
+  logger
 } from "@/api/utils";
 
-export function checkConnectionMiddleware(
+export async function checkConnectionMiddleware(
   request: Request,
   response: Response,
   next: NextFunction
@@ -18,23 +18,21 @@ export function checkConnectionMiddleware(
     return;
   }
 
-  const connections = connectionManager();
-  const connection = connections.get(connectionId);
-
-  if (!connection) {
-    response
-      .status(401)
-      .json({ error: "Nao autorizado, conexao nao encontrada" });
-    return;
-  }
-
   try {
-    touchConnection(connection);
-
+    const connection = await ensureConnection(connectionId);
+    if (!connection) {
+      response
+        .status(401)
+        .json({ error: "Nao autorizado, conexao nao encontrada" });
+      return;
+    }
     next();
   } catch (error) {
     logger.error(`Conexao ${connectionId} inativa`, error as Error);
-    closeConnection(connection);
+    const connection = connectionManager().get(connectionId);
+    if (connection) {
+      closeConnection(connection);
+    }
     response.status(503).json({ error: "Conexao com Memcached perdida" });
   }
 }

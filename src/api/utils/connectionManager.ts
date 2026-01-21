@@ -1,10 +1,11 @@
 import { logger } from "./logger";
 import { closeSshTunnel } from "./sshTunnel";
-import { MemcachedConnection } from "@/api/types";
+import { ConnectionProfile, MemcachedConnection } from "@/api/types";
 
 class ConnectionManager {
   private static instance: ConnectionManager;
   private connections = new Map<string, MemcachedConnection>();
+  private profiles = new Map<string, ConnectionProfile>();
 
   constructor() {}
 
@@ -25,6 +26,18 @@ class ConnectionManager {
 
   public delete(key: string) {
     this.connections.delete(key);
+  }
+
+  public getProfile(key: string) {
+    return this.profiles.get(key);
+  }
+
+  public setProfile(key: string, value: ConnectionProfile) {
+    this.profiles.set(key, value);
+  }
+
+  public deleteProfile(key: string) {
+    this.profiles.delete(key);
   }
 }
 

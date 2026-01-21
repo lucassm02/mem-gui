@@ -1,5 +1,7 @@
 export * from "./connectionManager";
 export * from "./constants";
+export * from "./createMemcachedConnection";
+export * from "./ensureConnection";
 export * from "./extractKeysInfoFromDump";
 export * from "./logger";
 export * from "./extractSlabInfoFromStatsSlabsOutput";

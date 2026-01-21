@@ -33,6 +33,15 @@ export interface MemcachedConnection {
   tunnel?: SshTunnel;
 }
 
+export interface ConnectionProfile {
+  id: string;
+  host: string;
+  port: number;
+  authentication?: { username: string; password: string };
+  connectionTimeout: number;
+  ssh?: SshConfig;
+}
+
 export interface CacheResponse {
   key: string;
   value: string | null;
