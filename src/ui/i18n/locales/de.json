@@ -178,6 +178,31 @@
     },
     "flushSuccess": "Alle Schlüssel wurden erfolgreich gelöscht."
   },
+  "queryGuide": {
+    "title": "Suchsprache",
+    "buttonLabel": "Suchhilfe",
+    "description": "Erstellen Sie Filter f?r Schl?ssel/Werte und f?gen Sie Sortierung/Limit hinzu.",
+    "sections": {
+      "filters": {
+        "title": "Filter",
+        "item1": "Vergleichen Sie <code>key</code> oder <code>value</code> mit <code>= != > >= < <=</code>.",
+        "item2": "Textoperatoren: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (Regex).",
+        "item3": "Kombinieren mit <code>and</code>, <code>or</code>, <code>not</code> und Klammern.",
+        "item4": "Typen pr?fen mit <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "Sortierung & Paginierung",
+        "item1": "Sortieren mit <code>order by key asc</code> oder <code>order by value desc</code>.",
+        "item2": "Paginieren mit <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "Beispiele",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
+  },
   "createKeyModal": {
     "title": "Neuer Schlüssel",
     "fields": {

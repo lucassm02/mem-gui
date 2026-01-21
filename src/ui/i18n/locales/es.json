@@ -178,6 +178,31 @@
     },
     "flushSuccess": "Todas las claves se han eliminado correctamente."
   },
+  "queryGuide": {
+    "title": "Lenguaje de b?squeda",
+    "buttonLabel": "Ayuda de b?squeda",
+    "description": "Crea filtros para claves/valores y agrega orden/l?mite.",
+    "sections": {
+      "filters": {
+        "title": "Filtros",
+        "item1": "Compara <code>key</code> o <code>value</code> con <code>= != > >= < <=</code>.",
+        "item2": "Operadores de texto: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
+        "item3": "Combina con <code>and</code>, <code>or</code>, <code>not</code> y par?ntesis.",
+        "item4": "Comprueba tipos con <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "Orden y paginaci?n",
+        "item1": "Ordena con <code>order by key asc</code> o <code>order by value desc</code>.",
+        "item2": "Paginar con <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "Ejemplos",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
+  },
   "createKeyModal": {
     "title": "Nueva clave",
     "fields": {

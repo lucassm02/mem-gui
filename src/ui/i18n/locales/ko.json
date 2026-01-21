@@ -178,6 +178,31 @@
     },
     "flushSuccess": "모든 키를 성공적으로 삭제했습니다."
   },
+  "queryGuide": {
+    "title": "?? ??",
+    "buttonLabel": "?? ???",
+    "description": "?/? ??? ??? ??/??? ?????.",
+    "sections": {
+      "filters": {
+        "title": "??",
+        "item1": "<code>key</code> ?? <code>value</code> ? <code>= != > >= < <=</code> ? ?????.",
+        "item2": "??? ???: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (???).",
+        "item3": "<code>and</code>, <code>or</code>, <code>not</code> ? ??? ?????.",
+        "item4": "<code>is number|boolean|null|json</code> ? ??? ?????."
+      },
+      "ordering": {
+        "title": "?? ? ???",
+        "item1": "<code>order by key asc</code> ?? <code>order by value desc</code> ? ?????.",
+        "item2": "<code>limit 10 offset 0</code> ?? ???? ????."
+      },
+      "examples": {
+        "title": "??",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
+  },
   "createKeyModal": {
     "title": "새 키",
     "fields": {

@@ -178,6 +178,31 @@
     },
     "flushSuccess": "All keys were cleared successfully."
   },
+  "queryGuide": {
+    "title": "Search language",
+    "buttonLabel": "Search help",
+    "description": "Build filters for keys/values and add order/limit clauses.",
+    "sections": {
+      "filters": {
+        "title": "Filters",
+        "item1": "Compare <code>key</code> or <code>value</code> with <code>= != > >= < <=</code>.",
+        "item2": "Text operators: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
+        "item3": "Combine with <code>and</code>, <code>or</code>, <code>not</code> and parentheses.",
+        "item4": "Check types with <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "Ordering & pagination",
+        "item1": "Sort with <code>order by key asc</code> or <code>order by value desc</code>.",
+        "item2": "Paginate with <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "Examples",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
+  },
   "createKeyModal": {
     "title": "New Key",
     "fields": {

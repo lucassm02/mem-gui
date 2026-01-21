@@ -8,6 +8,7 @@ import {
   PencilSquareIcon,
   PlayIcon,
   PlusIcon,
+  QuestionMarkCircleIcon,
   TrashIcon
 } from "@heroicons/react/24/outline";
 import CodeMirror from "@uiw/react-codemirror";
@@ -23,6 +24,7 @@ import { queryLanguage } from "../utils/queryLanguage";
 import CreateKeyModal from "./CreateKeyModal";
 import Disclaimer from "./Disclaimer";
 import EditKeyModal from "./EditKeyModal";
+import QueryGuideModal from "./QueryGuideModal";
 import ViewDataModal from "./ViewDataModal";
 import { parseKeyQuery } from "@/api/utils/keyQuery";
 import { DEFAULT_KEY_QUERY } from "@/ui/constants/keyQuery";
@@ -47,7 +49,12 @@ const KeyList = () => {
     totalKeyCount
   } = useConnections();
 
-  const { openCreateModal, openEditModal, openViewDataModal } = useModal();
+  const {
+    openCreateModal,
+    openEditModal,
+    openViewDataModal,
+    openQueryGuideModal
+  } = useModal();
   const { t } = useTranslation();
 
   const [queryInput, setQueryInput] = useState(DEFAULT_KEY_QUERY);
@@ -242,6 +249,14 @@ const KeyList = () => {
               >
                 <PlusIcon className="h-5 w-5" />
               </button>
+              <button
+                onClick={openQueryGuideModal}
+                className={`${toneButton("neutral", darkMode, "icon")} !p-2`}
+                aria-label={t("queryGuide.buttonLabel")}
+                title={t("queryGuide.buttonLabel")}
+              >
+                <QuestionMarkCircleIcon className="h-5 w-5" />
+              </button>
             </div>
           </div>
 
@@ -423,6 +438,7 @@ const KeyList = () => {
       <CreateKeyModal onSave={handleCreateKey} />
       <EditKeyModal onSave={handleEditKey} />
       <ViewDataModal />
+      <QueryGuideModal />
     </div>
   );
 };

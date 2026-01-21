@@ -39,6 +39,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [viewDataModalIsOpen, setViewDataModalIsOpen] = useState(false);
   const [connectionModalIsOpen, setConnectionModalIsOpen] = useState(false);
   const [setupGuideModalIsOpen, setSetupGuideModalIsOpen] = useState(false);
+  const [queryGuideModalIsOpen, setQueryGuideModalIsOpen] = useState(false);
   const [connectionToEdit, setConnectionToEdit] = useState<Connection | null>(
     null
   );
@@ -93,6 +94,14 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   const closeSetupGuideModal = () => {
     setSetupGuideModalIsOpen(false);
+  };
+
+  const openQueryGuideModal = () => {
+    setQueryGuideModalIsOpen(true);
+  };
+
+  const closeQueryGuideModal = () => {
+    setQueryGuideModalIsOpen(false);
   };
 
   const showAlert = (message: string, type: AlertType = "error") => {
@@ -198,6 +207,9 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
         closeSetupGuideModal,
         openSetupGuideModal,
         setupGuideModalIsOpen,
+        openQueryGuideModal,
+        closeQueryGuideModal,
+        queryGuideModalIsOpen,
         isEditingConnection,
         connectionToEdit
       }}

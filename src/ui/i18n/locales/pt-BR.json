@@ -178,6 +178,31 @@
     },
     "flushSuccess": "Todas as chaves foram removidas com sucesso."
   },
+  "queryGuide": {
+    "title": "Linguagem de busca",
+    "buttonLabel": "Ajuda da busca",
+    "description": "Monte filtros para chaves/valores e adicione ordenação/limite.",
+    "sections": {
+      "filters": {
+        "title": "Filtros",
+        "item1": "Compare <code>key</code> ou <code>value</code> com <code>= != > >= < <=</code>.",
+        "item2": "Operadores de texto: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
+        "item3": "Combine com <code>and</code>, <code>or</code>, <code>not</code> e parênteses.",
+        "item4": "Cheque tipos com <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "Ordenação e paginação",
+        "item1": "Ordene com <code>order by key asc</code> ou <code>order by value desc</code>.",
+        "item2": "Pagine com <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "Exemplos",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
+  },
   "createKeyModal": {
     "title": "Nova Chave",
     "fields": {
