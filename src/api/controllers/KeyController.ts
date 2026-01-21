@@ -1,9 +1,6 @@
 import { EventEmitter } from "events";
-import os from "node:os";
-import { fileURLToPath } from "node:url";
 import { Request, Response } from "express";
 import pLimit from "p-limit";
-import Piscina from "piscina";
 import { Key, MemcachedConnection } from "@/api/types";
 import type { KeyQueryAst, KeyQueryFilter } from "@/api/utils";
 import {
@@ -46,22 +43,10 @@ type ImportItem = {
   timeUntilExpiration?: number;
 };
 
-const CPU_COUNT = Math.max(1, os.cpus().length);
-const WORKER_CONCURRENCY = Math.max(
-  1,
-  Math.min(3, Math.max(1, Math.floor(CPU_COUNT / 2)))
-);
-const QUERY_EVALUATOR_POOL = new Piscina({
-  filename: fileURLToPath(
-    new URL("../workers/queryEvaluator.worker.ts", import.meta.url)
-  ),
-  concurrency: WORKER_CONCURRENCY
-});
 const MULTI_GET_BATCH_SIZE = Math.max(
   1,
   Math.min(1024, MAX_CONCURRENT_REQUESTS)
 );
-const WORKER_CHUNK_SIZE = 128;
 
 const chunkArray = <T>(items: T[], size: number): T[][] => {
   const chunks: T[][] = [];
@@ -79,6 +64,25 @@ const normalizeValue = (value: unknown): string => {
     return value.toString("utf8");
   }
   return value === undefined || value === null ? "" : String(value);
+};
+
+const buildKeyPayload = (
+  key: string,
+  value: string,
+  keysInfoMap: Map<string, Key> | null,
+  currentUnixTime: number
+): KeyPayload => {
+  const info = keysInfoMap?.get(key);
+  const expiration = info ? info.expiration : 0;
+  const timeUntilExpiration =
+    expiration > 0 ? Math.max(expiration - currentUnixTime, 0) : 0;
+  const size = info ? info.size : Buffer.from(value, "utf8").length;
+  return {
+    key,
+    value,
+    timeUntilExpiration,
+    size
+  };
 };
 
 const INDEX_REFRESH_EVENT = "index-refresh";
@@ -1380,21 +1384,13 @@ class KeyController {
                 return null;
               }
 
-              const info = keysInfoMap?.get(key);
-              const expiration = info ? info.expiration : 0;
-              const timeUntilExpiration =
-                expiration > 0 ? Math.max(expiration - currentUnixTime, 0) : 0;
               const valueToString = normalizeValue(value);
-              const size = info
-                ? info.size
-                : Buffer.from(valueToString, "utf8").length;
-
-              return {
+              return buildKeyPayload(
                 key,
-                value: valueToString,
-                timeUntilExpiration,
-                size
-              };
+                valueToString,
+                keysInfoMap,
+                currentUnixTime
+              );
             } catch (error) {
               logger.error(`Failed to fetch key ${key}`, error as Error);
               return null;
@@ -1433,53 +1429,24 @@ class KeyController {
           continue;
         }
 
-        const entries: { key: string; value: string }[] = [];
         for (const key of multiChunk) {
           const value = chunkValues[key];
           if (value === undefined || value === null) {
             continue;
           }
-          entries.push({ key, value: normalizeValue(value) });
-        }
+          const normalizedValue = normalizeValue(value);
+          if (
+            filter &&
+            !evaluateKeyQuery(filter, { key, value: normalizedValue })
+          ) {
+            continue;
+          }
+          payloads.push(
+            buildKeyPayload(key, normalizedValue, keysInfoMap, currentUnixTime)
+          );
 
-        if (entries.length === 0) {
-          continue;
-        }
-
-        for (const workerChunk of chunkArray(entries, WORKER_CHUNK_SIZE)) {
-          const matchedKeys =
-            !filter || workerChunk.length === 0
-              ? workerChunk.map((entry) => entry.key)
-              : (
-                  await QUERY_EVALUATOR_POOL.run({
-                    keyValues: workerChunk,
-                    filter
-                  })
-                ).keys;
-
-          const matchedSet = new Set(matchedKeys);
-
-          for (const entry of workerChunk) {
-            if (!matchedSet.has(entry.key)) {
-              continue;
-            }
-            const info = keysInfoMap?.get(entry.key);
-            const expiration = info ? info.expiration : 0;
-            const timeUntilExpiration =
-              expiration > 0 ? Math.max(expiration - currentUnixTime, 0) : 0;
-            const size = info
-              ? info.size
-              : Buffer.from(entry.value, "utf8").length;
-            payloads.push({
-              key: entry.key,
-              value: entry.value,
-              timeUntilExpiration,
-              size
-            });
-
-            if (maxNeeded !== undefined && payloads.length >= maxNeeded) {
-              return payloads.slice(0, maxNeeded);
-            }
+          if (maxNeeded !== undefined && payloads.length >= maxNeeded) {
+            return payloads.slice(0, maxNeeded);
           }
         }
 

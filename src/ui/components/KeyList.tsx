@@ -173,7 +173,6 @@ const KeyList = () => {
     };
   }, [activeQuery, currentConnection.id]);
 
-  const filteredKeys = keys;
   return (
     <div
       className={`w-full px-2 sm:px-3 max-w-none mx-auto mt-6 transition-all ${
@@ -335,8 +334,8 @@ const KeyList = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredKeys.length > 0 ? (
-              filteredKeys.map((item) => (
+            {keys.length > 0 ? (
+              keys.map((item) => (
                 <tr
                   key={item.key}
                   className={`border-b transition-all ${
