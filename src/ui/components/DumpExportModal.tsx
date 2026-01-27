@@ -152,6 +152,7 @@ const DumpExportModal = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveHandleName, setSaveHandleName] = useState("");
   const [queryInput, setQueryInput] = useState("");
+  const [queryValidationActive, setQueryValidationActive] = useState(false);
 
   const socketRef = useRef<WebSocket | null>(null);
   const dataRef = useRef<KeyData[]>([]);
@@ -195,9 +196,10 @@ const DumpExportModal = ({
     []
   );
   const hasQueryError = queryError.length > 0;
+  const shouldShowQueryError = queryValidationActive && hasQueryError;
   const inputsDisabled =
     status === "running" || status === "connecting" || status === "prefetching";
-  const actionDisabled = !connectionId || hasQueryError;
+  const actionDisabled = !connectionId;
 
   const buildDumpFilters = useCallback((): DumpFilters | undefined => {
     const filters: DumpFilters = {};
@@ -243,6 +245,7 @@ const DumpExportModal = ({
     dataRef.current = [];
     payloadRef.current = null;
     startedAtRef.current = "";
+    setQueryValidationActive(false);
   }, [filtersSignature, isOpen]);
 
   const handlePrefetchDump = useCallback(
@@ -268,6 +271,11 @@ const DumpExportModal = ({
         if (shouldAutoStart) {
           startAfterPrefetchRef.current = true;
         }
+        return;
+      }
+
+      if (hasQueryError) {
+        setQueryValidationActive(true);
         return;
       }
 
@@ -380,6 +388,11 @@ const DumpExportModal = ({
       setStatus("error");
       statusRef.current = "error";
       setErrorMessage(t("dump.error"));
+      return;
+    }
+
+    if (hasQueryError) {
+      setQueryValidationActive(true);
       return;
     }
 
@@ -781,39 +794,61 @@ const DumpExportModal = ({
         </div>
 
         <div className="mt-5 space-y-3">
-          <div>
+          <div
+            className={`rounded-lg border p-4 shadow-sm ${
+              darkMode
+                ? "border-gray-800/80 bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-gray-900/40"
+                : "border-gray-200 bg-gradient-to-br from-gray-50 via-white to-gray-50"
+            }`}
+          >
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold">
-                {t("dump.filters.title")}
-              </h4>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-3">
-            <div>
-              <label
-                className={`text-sm font-medium ${
-                  darkMode ? "text-gray-200" : "text-gray-700"
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-flex h-2 w-2 rounded-full ${
+                    darkMode ? "bg-blue-400/70" : "bg-blue-500/70"
+                  }`}
+                />
+                <h4 className="text-sm font-semibold">
+                  {t("dump.filters.title")}
+                </h4>
+              </div>
+              <span
+                className={`text-[11px] ${
+                  darkMode ? "text-gray-400" : "text-gray-500"
                 }`}
               >
-                {t("dump.filters.queryLabel")}
-              </label>
+                DSL
+              </span>
+            </div>
+            <div
+              className={`mt-2 text-[11px] ${
+                darkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              {t("dump.filters.queryLabel")}
+            </div>
+            <div className="mt-3">
               <div
-                className={`mt-1 w-full transition-colors ${
+                className={`mt-2 w-full transition-colors ${
                   darkMode
                     ? "border-gray-700 bg-gray-900"
                     : "border-gray-200 bg-white"
-                } ${hasQueryError ? "border-red-500 ring-1 ring-red-500/30" : ""} ${
-                  inputsDisabled ? "opacity-60 cursor-not-allowed" : ""
-                }`}
+                } ${
+                  shouldShowQueryError
+                    ? "border-red-500 ring-1 ring-red-500/30"
+                    : "hover:border-blue-500/50"
+                } ${inputsDisabled ? "opacity-60 cursor-not-allowed" : ""}`}
               >
                 <CodeMirror
                   value={queryInput}
-                  onChange={(value) => setQueryInput(value)}
+                  onChange={(value) => {
+                    setQueryInput(value);
+                  }}
                   theme={darkMode ? "dark" : "light"}
                   color="blue"
                   extensions={queryExtensions}
                   placeholder={t("dump.filters.queryPlaceholder")}
-                  minHeight="48px"
+                  minHeight="56px"
                   spellCheck={false}
                   editable={!inputsDisabled}
                   className="text-sm"
@@ -825,8 +860,8 @@ const DumpExportModal = ({
                   }}
                 />
               </div>
-              {hasQueryError ? (
-                <p className="mt-1 text-xs text-red-500">
+              {shouldShowQueryError ? (
+                <p className="mt-2 text-xs text-red-500">
                   {t("keyList.searchSyntaxError", { error: queryError })}
                 </p>
               ) : null}
