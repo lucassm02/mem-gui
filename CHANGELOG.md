@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/) and uses the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
+## [1.3.1] - 2026-01-27
+
+### Added
+
+- **Query language** for key/value/ttl filtering with ordering and limits.
+- **Key list UI** refreshed for a clearer and faster browsing experience.
+- **Export filtering** by DSL.
+- **Query history** to recall recent searches.
+- **Help button** for quick access to guidance.
+- **Connection reactivation** to resume existing sessions.
+- **Fallback language** when a translation key is missing.
+
+### Changed
+
+- **Key search component** streamlined with targeted improvements.
+- **Private key selection** no longer filters by file.
+- **Internal refactors** to remove ineffective overengineering.
+
+### Fixed
+
+- **Translation strings** corrected across locale files.
+
+## [1.3.0-beta] - 2026-01-21
+
+### Added
+
+- **Query language** for key/value/ttl filtering with ordering and limits.
+- **Key list UI** refreshed for a clearer and faster browsing experience.
+
 ## [1.2.0] - 2026-01-16
 
 ### Added

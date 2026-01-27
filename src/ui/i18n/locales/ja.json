@@ -156,7 +156,11 @@
     "clearAll": "すべて削除",
     "export": "ダンプをエクスポート",
     "import": "ダンプをインポート",
-    "searchPlaceholder": "キーまたは正規表現を入力...",
+    "searchPlaceholder": "クエリを入力...",
+    "searchButton": "検索",
+    "searchResults": "{{count}} 件",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "キー",
       "value": "値",
@@ -173,6 +177,51 @@
       "cancel": "キャンセル"
     },
     "flushSuccess": "すべてのキーを正常に削除しました。"
+  },
+  "savedQueries": {
+    "saveButton": "Save query",
+    "namePlaceholder": "Name this query",
+    "savedTitle": "Saved searches",
+    "recentTitle": "Recent queries",
+    "emptySaved": "No saved queries yet.",
+    "emptyRecent": "No recent queries yet.",
+    "pin": "Pin to this environment",
+    "unpin": "Unpin from this environment",
+    "pinHint": "Connect to pin queries per environment.",
+    "clearHistory": "Clear history",
+    "deleteTitle": "Delete saved query?",
+    "deleteMessage": "Remove \"{{name}}\" from saved searches?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "invalidQuery": "Fix the query syntax before saving.",
+      "saveFailed": "Unable to save the query."
+    }
+  },
+  "queryGuide": {
+    "title": "????",
+    "buttonLabel": "?????",
+    "description": "??/????????????????/?????????",
+    "sections": {
+      "filters": {
+        "title": "?????",
+        "item1": "<code>key</code> ??? <code>value</code> ? <code>= != > >= < <=</code> ???????",
+        "item2": "???????: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (????)?",
+        "item3": "<code>and</code>, <code>or</code>, <code>not</code> ????????????",
+        "item4": "<code>is number|boolean|null|json</code> ?????????"
+      },
+      "ordering": {
+        "title": "??????????",
+        "item1": "<code>order by key asc</code> ??? <code>order by value desc</code> ????????",
+        "item2": "<code>limit 10 offset 0</code> ??????????"
+      },
+      "examples": {
+        "title": "?",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
   },
   "createKeyModal": {
     "title": "新しいキー",
@@ -213,6 +262,21 @@
   "dump": {
     "title": "ダンプをエクスポート",
     "description": "サーバーへの負荷を避けるため、ダンプのエクスポートはバッチで実行されます。",
+    "filters": {
+      "title": "フィルター",
+      "description": "クエリ、プレフィックス、サイズ、TTLでエクスポートを絞り込みます。",
+      "hint": "空欄で全件をエクスポートします。",
+      "queryLabel": "クエリ",
+      "queryPlaceholder": "例: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "キーのプレフィックス",
+      "prefixPlaceholder": "例: session:",
+      "sizeLabel": "サイズ (バイト)",
+      "sizeMin": "最小サイズ",
+      "sizeMax": "最大サイズ",
+      "ttlLabel": "TTL (秒)",
+      "ttlMin": "最小 TTL",
+      "ttlMax": "最大 TTL"
+    },
     "preparing": "ダンプを準備中...",
     "running": "ダンプを実行中...",
     "done": "ダンプが完了しました。",

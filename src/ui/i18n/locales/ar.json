@@ -156,7 +156,11 @@
     "clearAll": "مسح الكل",
     "export": "تصدير dump",
     "import": "استيراد dump",
-    "searchPlaceholder": "اكتب مفتاحًا أو تعبيرًا نظاميًا...",
+    "searchPlaceholder": "اكتب استعلاما...",
+    "searchButton": "بحث",
+    "searchResults": "{{count}} نتائج",
+    "searchDuration": "{{duration}} مللي ثانية",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "المفتاح",
       "value": "القيمة",
@@ -173,6 +177,51 @@
       "cancel": "إلغاء"
     },
     "flushSuccess": "تم مسح جميع المفاتيح بنجاح."
+  },
+  "savedQueries": {
+    "saveButton": "Save query",
+    "namePlaceholder": "Name this query",
+    "savedTitle": "Saved searches",
+    "recentTitle": "Recent queries",
+    "emptySaved": "No saved queries yet.",
+    "emptyRecent": "No recent queries yet.",
+    "pin": "Pin to this environment",
+    "unpin": "Unpin from this environment",
+    "pinHint": "Connect to pin queries per environment.",
+    "clearHistory": "Clear history",
+    "deleteTitle": "Delete saved query?",
+    "deleteMessage": "Remove \"{{name}}\" from saved searches?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "invalidQuery": "Fix the query syntax before saving.",
+      "saveFailed": "Unable to save the query."
+    }
+  },
+  "queryGuide": {
+    "title": "??? ?????",
+    "buttonLabel": "?????? ?????",
+    "description": "???? ????? ????????/????? ???? ?????? ???????/????.",
+    "sections": {
+      "filters": {
+        "title": "???????",
+        "item1": "???? <code>key</code> ?? <code>value</code> ?? <code>= != > >= < <=</code>.",
+        "item2": "??????? ????: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
+        "item3": "???? ???????? <code>and</code>, <code>or</code>, <code>not</code> ????????.",
+        "item4": "???? ?? ??????? ?? <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "??????? ????????",
+        "item1": "???? ???????? <code>order by key asc</code> ?? <code>order by value desc</code>.",
+        "item2": "???? ??????? ?? <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "?????",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
   },
   "createKeyModal": {
     "title": "مفتاح جديد",
@@ -213,6 +262,21 @@
   "dump": {
     "title": "تصدير dump",
     "description": "يتم تصدير الـ dump على دفعات لتجنب تحميل زائد على الخادم.",
+    "filters": {
+      "title": "عوامل التصفية",
+      "description": "خصص التصدير باستخدام الاستعلام أو البادئة أو الحجم أو مدة TTL.",
+      "hint": "اتركها فارغة لتصدير كل المفاتيح.",
+      "queryLabel": "الاستعلام",
+      "queryPlaceholder": "مثال: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "بادئة المفتاح",
+      "prefixPlaceholder": "مثال: session:",
+      "sizeLabel": "الحجم (بايت)",
+      "sizeMin": "أقل حجم",
+      "sizeMax": "أقصى حجم",
+      "ttlLabel": "TTL (ثوان)",
+      "ttlMin": "أقل TTL",
+      "ttlMax": "أقصى TTL"
+    },
     "preparing": "جارٍ تحضير dump...",
     "running": "جارٍ تنفيذ dump...",
     "done": "اكتمل dump.",

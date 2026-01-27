@@ -156,7 +156,11 @@
     "clearAll": "全部清除",
     "export": "导出 dump",
     "import": "导入 dump",
-    "searchPlaceholder": "输入键或正则...",
+    "searchPlaceholder": "输入查询...",
+    "searchButton": "搜索",
+    "searchResults": "{{count}} 条结果",
+    "searchDuration": "{{duration}} 毫秒",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "键",
       "value": "值",
@@ -173,6 +177,51 @@
       "cancel": "取消"
     },
     "flushSuccess": "所有键已成功清除。"
+  },
+  "savedQueries": {
+    "saveButton": "Save query",
+    "namePlaceholder": "Name this query",
+    "savedTitle": "Saved searches",
+    "recentTitle": "Recent queries",
+    "emptySaved": "No saved queries yet.",
+    "emptyRecent": "No recent queries yet.",
+    "pin": "Pin to this environment",
+    "unpin": "Unpin from this environment",
+    "pinHint": "Connect to pin queries per environment.",
+    "clearHistory": "Clear history",
+    "deleteTitle": "Delete saved query?",
+    "deleteMessage": "Remove \"{{name}}\" from saved searches?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "invalidQuery": "Fix the query syntax before saving.",
+      "saveFailed": "Unable to save the query."
+    }
+  },
+  "queryGuide": {
+    "title": "????",
+    "buttonLabel": "????",
+    "description": "? key/value ????????????/?????",
+    "sections": {
+      "filters": {
+        "title": "??",
+        "item1": "? <code>= != > >= < <=</code> ?? <code>key</code> ? <code>value</code>?",
+        "item2": "??????<code>contains</code>?<code>startswith</code>?<code>endswith</code>?<code>match</code>?????",
+        "item3": "?? <code>and</code>?<code>or</code>?<code>not</code> ??????",
+        "item4": "? <code>is number|boolean|null|json</code> ?????"
+      },
+      "ordering": {
+        "title": "?????",
+        "item1": "?? <code>order by key asc</code> ? <code>order by value desc</code> ???",
+        "item2": "?? <code>limit 10 offset 0</code> ???"
+      },
+      "examples": {
+        "title": "??",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
   },
   "createKeyModal": {
     "title": "新建键",
@@ -213,6 +262,21 @@
   "dump": {
     "title": "导出 dump",
     "description": "导出 dump 会分批进行，以避免服务器负载过高。",
+    "filters": {
+      "title": "筛选",
+      "description": "使用查询、前缀、大小或 TTL 来缩小导出范围。",
+      "hint": "留空将导出全部。",
+      "queryLabel": "查询",
+      "queryPlaceholder": "例如: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "键前缀",
+      "prefixPlaceholder": "例如: session:",
+      "sizeLabel": "大小 (字节)",
+      "sizeMin": "最小大小",
+      "sizeMax": "最大大小",
+      "ttlLabel": "TTL (秒)",
+      "ttlMin": "最小 TTL",
+      "ttlMax": "最大 TTL"
+    },
     "preparing": "正在准备 dump...",
     "running": "dump 导出中...",
     "done": "dump 导出完成。",

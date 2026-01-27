@@ -156,7 +156,11 @@
     "clearAll": "모두 지우기",
     "export": "덤프 내보내기",
     "import": "덤프 가져오기",
-    "searchPlaceholder": "키 또는 정규식을 입력...",
+    "searchPlaceholder": "쿼리를 입력...",
+    "searchButton": "검색",
+    "searchResults": "{{count}}건",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "키",
       "value": "값",
@@ -173,6 +177,51 @@
       "cancel": "취소"
     },
     "flushSuccess": "모든 키를 성공적으로 삭제했습니다."
+  },
+  "savedQueries": {
+    "saveButton": "Save query",
+    "namePlaceholder": "Name this query",
+    "savedTitle": "Saved searches",
+    "recentTitle": "Recent queries",
+    "emptySaved": "No saved queries yet.",
+    "emptyRecent": "No recent queries yet.",
+    "pin": "Pin to this environment",
+    "unpin": "Unpin from this environment",
+    "pinHint": "Connect to pin queries per environment.",
+    "clearHistory": "Clear history",
+    "deleteTitle": "Delete saved query?",
+    "deleteMessage": "Remove \"{{name}}\" from saved searches?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "invalidQuery": "Fix the query syntax before saving.",
+      "saveFailed": "Unable to save the query."
+    }
+  },
+  "queryGuide": {
+    "title": "?? ??",
+    "buttonLabel": "?? ???",
+    "description": "?/? ??? ??? ??/??? ?????.",
+    "sections": {
+      "filters": {
+        "title": "??",
+        "item1": "<code>key</code> ?? <code>value</code> ? <code>= != > >= < <=</code> ? ?????.",
+        "item2": "??? ???: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (???).",
+        "item3": "<code>and</code>, <code>or</code>, <code>not</code> ? ??? ?????.",
+        "item4": "<code>is number|boolean|null|json</code> ? ??? ?????."
+      },
+      "ordering": {
+        "title": "?? ? ???",
+        "item1": "<code>order by key asc</code> ?? <code>order by value desc</code> ? ?????.",
+        "item2": "<code>limit 10 offset 0</code> ?? ???? ????."
+      },
+      "examples": {
+        "title": "??",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
   },
   "createKeyModal": {
     "title": "새 키",
@@ -213,6 +262,21 @@
   "dump": {
     "title": "덤프 내보내기",
     "description": "서버 과부하를 피하기 위해 덤프 내보내기는 배치로 실행됩니다.",
+    "filters": {
+      "title": "필터",
+      "description": "쿼리, 접두어, 크기 또는 TTL로 내보내기를 제한합니다.",
+      "hint": "비워 두면 전체를 내보냅니다.",
+      "queryLabel": "쿼리",
+      "queryPlaceholder": "예: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "키 접두어",
+      "prefixPlaceholder": "예: session:",
+      "sizeLabel": "크기 (바이트)",
+      "sizeMin": "최소 크기",
+      "sizeMax": "최대 크기",
+      "ttlLabel": "TTL (초)",
+      "ttlMin": "최소 TTL",
+      "ttlMax": "최대 TTL"
+    },
     "preparing": "덤프 준비 중...",
     "running": "덤프 진행 중...",
     "done": "덤프가 완료되었습니다.",

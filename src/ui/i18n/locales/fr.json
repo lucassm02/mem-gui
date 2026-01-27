@@ -156,7 +156,11 @@
     "clearAll": "Tout effacer",
     "export": "Exporter le dump",
     "import": "Importer le dump",
-    "searchPlaceholder": "Tapez une clé ou une regex...",
+    "searchPlaceholder": "Tapez une requete...",
+    "searchButton": "Rechercher",
+    "searchResults": "{{count}} resultats",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "Clé",
       "value": "Valeur",
@@ -173,6 +177,51 @@
       "cancel": "Annuler"
     },
     "flushSuccess": "Toutes les clés ont été supprimées avec succès."
+  },
+  "savedQueries": {
+    "saveButton": "Save query",
+    "namePlaceholder": "Name this query",
+    "savedTitle": "Saved searches",
+    "recentTitle": "Recent queries",
+    "emptySaved": "No saved queries yet.",
+    "emptyRecent": "No recent queries yet.",
+    "pin": "Pin to this environment",
+    "unpin": "Unpin from this environment",
+    "pinHint": "Connect to pin queries per environment.",
+    "clearHistory": "Clear history",
+    "deleteTitle": "Delete saved query?",
+    "deleteMessage": "Remove \"{{name}}\" from saved searches?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "invalidQuery": "Fix the query syntax before saving.",
+      "saveFailed": "Unable to save the query."
+    }
+  },
+  "queryGuide": {
+    "title": "Langage de recherche",
+    "buttonLabel": "Aide de recherche",
+    "description": "Cr?ez des filtres pour cl?s/valeurs et ajoutez ordre/limite.",
+    "sections": {
+      "filters": {
+        "title": "Filtres",
+        "item1": "Comparez <code>key</code> ou <code>value</code> avec <code>= != > >= < <=</code>.",
+        "item2": "Op?rateurs texte : <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
+        "item3": "Combinez avec <code>and</code>, <code>or</code>, <code>not</code> et des parenth?ses.",
+        "item4": "V?rifiez les types avec <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "Tri et pagination",
+        "item1": "Triez avec <code>order by key asc</code> ou <code>order by value desc</code>.",
+        "item2": "Paginer avec <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "Exemples",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
   },
   "createKeyModal": {
     "title": "Nouvelle clé",
@@ -213,6 +262,21 @@
   "dump": {
     "title": "Exporter le dump",
     "description": "L'export du dump se fait par lots pour éviter de surcharger le serveur.",
+    "filters": {
+      "title": "Filtres",
+      "description": "Affinez l'export avec une requête, un préfixe, la taille ou le TTL.",
+      "hint": "Laissez vide pour tout exporter.",
+      "queryLabel": "Requête",
+      "queryPlaceholder": "Ex: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "Préfixe de clé",
+      "prefixPlaceholder": "Ex: session:",
+      "sizeLabel": "Taille (octets)",
+      "sizeMin": "Taille min",
+      "sizeMax": "Taille max",
+      "ttlLabel": "TTL (secondes)",
+      "ttlMin": "TTL min",
+      "ttlMax": "TTL max"
+    },
     "preparing": "Préparation du dump...",
     "running": "Export du dump en cours...",
     "done": "Export du dump terminé.",

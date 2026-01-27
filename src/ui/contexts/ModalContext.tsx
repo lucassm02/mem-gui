@@ -28,13 +28,16 @@ export interface ModalContextType {
   closeViewDataModal: () => void;
   openConnectionModal: (connectionToEdit?: Connection | null) => void;
   openSetupGuideModal: () => void;
+  openQueryGuideModal: () => void;
   closeConnectionModal: () => void;
   closeSetupGuideModal: () => void;
+  closeQueryGuideModal: () => void;
   showLoading: () => void;
   dismissLoading: () => void;
   showAlert: (message: string, type?: AlertType) => void;
   dismissAlert: () => void;
   setupGuideModalIsOpen: boolean;
+  queryGuideModalIsOpen: boolean;
   createModalIsOpen: boolean;
   editModalIsOpen: boolean;
   connectionModalIsOpen: boolean;

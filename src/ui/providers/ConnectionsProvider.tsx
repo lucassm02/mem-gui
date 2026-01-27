@@ -2,57 +2,20 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-import { Connection, ConnectionsContext, KeyData } from "../contexts";
+import {
+  Connection,
+  ConnectionsContext,
+  KeyData,
+  ServerData
+} from "../contexts";
 import { useStorage } from "../hooks";
 import { useModal } from "../hooks/useModal";
+import { DEFAULT_KEY_QUERY } from "@/ui/constants/keyQuery";
 import api, { clearConnectionId, setConnectionId } from "@/ui/services/api";
 import {
   getConnectionIdentity,
   isSameConnection as isSameConnectionByIdentity
 } from "@/ui/utils/connectionIdentity";
-
-export interface ServerData {
-  status: string;
-  connectionId: string;
-  host: string;
-  port: number;
-  lastActive: string;
-  serverInfo: ServerInfo;
-}
-
-export interface ServerInfo {
-  pid: string;
-  uptime: string;
-  version: string;
-  max_connections: string;
-  curr_connections: string;
-  total_connections: string;
-  threads: string;
-  cmd_get: string;
-  cmd_set: string;
-  get_hits: string;
-  get_misses: string;
-  bytes_read: string;
-  bytes_written: string;
-  limit_maxbytes: string;
-  bytes: string;
-  expired_unfetched: string;
-  evictions: string;
-  reclaimed: string;
-  cpu_usage: string;
-  latency: string;
-  requests_per_second: string;
-  slabs: Slab[];
-}
-
-export interface Slab {
-  id: number;
-  chunk_size: number;
-  total_chunks: number;
-  used_chunks: number;
-  free_chunks: number;
-  get_hits: number;
-}
 
 export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [savedConnections, setSavedConnections] = useState<Connection[]>([]);
@@ -72,6 +35,11 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [totalKeyCount, setTotalKeyCount] = useState<number | undefined>(
     undefined
   );
+  const [lastQueryMetrics, setLastQueryMetrics] = useState<{
+    durationMs: number;
+    count: number;
+    query: string;
+  } | null>(null);
   const [serverData, setServerData] = useState<ServerData | null>(null);
   const [error] = useState("");
   const activeConnectionIdRef = useRef(currentConnection.id);
@@ -388,7 +356,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const handleLoadKeys = useCallback(
     async (
       showLoadingModal = true,
-      search?: string,
+      query?: string,
       limit?: number,
       options?: { force?: boolean }
     ) => {
@@ -417,9 +385,12 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const fetchKeys = async (attempt: number): Promise<KeyData[]> => {
+        const normalizedQuery = query?.trim()
+          ? query.trim()
+          : DEFAULT_KEY_QUERY;
         const response = await api.get("/keys", {
           params: {
-            search: search || undefined,
+            query: normalizedQuery,
             limit: limit || undefined
           }
         });
@@ -431,16 +402,26 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
           return fetchKeys(1);
         }
 
-        return [...payload].sort((a, b) => a.key.localeCompare(b.key));
+        return payload;
       };
 
       try {
         isLoadingKeysRef.current = true;
         loadingKeysConnectionRef.current = connectionId;
         if (showLoadingModal) showLoading();
-        const sortedKeys = await fetchKeys(0);
+        const startedAt =
+          typeof performance !== "undefined" ? performance.now() : Date.now();
+        const fetchedKeys = await fetchKeys(0);
+        const finishedAt =
+          typeof performance !== "undefined" ? performance.now() : Date.now();
+        const durationMs = Math.max(0, Math.round(finishedAt - startedAt));
         if (connectionId === activeConnectionIdRef.current) {
-          setKeys(sortedKeys);
+          setKeys(fetchedKeys);
+          setLastQueryMetrics({
+            durationMs,
+            count: fetchedKeys.length,
+            query: query?.trim() ? query.trim() : DEFAULT_KEY_QUERY
+          });
         }
         if (showLoadingModal) dismissLoading();
         return true;
@@ -702,6 +683,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
     setIsConnected(false);
     setKeys([]);
     setTotalKeyCount(undefined);
+    setLastQueryMetrics(null);
     setCurrentConnection({
       host: "",
       port: 11211,
@@ -864,6 +846,7 @@ export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
         serverData,
         handleGetByKey,
         totalKeyCount,
+        lastQueryMetrics,
         refreshKeyCount
       }}
     >

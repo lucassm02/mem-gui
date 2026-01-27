@@ -156,7 +156,11 @@
     "clearAll": "Clear All",
     "export": "Export Dump",
     "import": "Import Dump",
-    "searchPlaceholder": "Type a key or regex...",
+    "searchPlaceholder": "Type a query...",
+    "searchButton": "Search",
+    "searchResults": "{{count}} results",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "Key",
       "value": "Value",
@@ -173,6 +177,51 @@
       "cancel": "Cancel"
     },
     "flushSuccess": "All keys were cleared successfully."
+  },
+  "savedQueries": {
+    "saveButton": "Save query",
+    "namePlaceholder": "Name this query",
+    "savedTitle": "Saved searches",
+    "recentTitle": "Recent queries",
+    "emptySaved": "No saved queries yet.",
+    "emptyRecent": "No recent queries yet.",
+    "pin": "Pin to this environment",
+    "unpin": "Unpin from this environment",
+    "pinHint": "Connect to pin queries per environment.",
+    "clearHistory": "Clear history",
+    "deleteTitle": "Delete saved query?",
+    "deleteMessage": "Remove \"{{name}}\" from saved searches?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "invalidQuery": "Fix the query syntax before saving.",
+      "saveFailed": "Unable to save the query."
+    }
+  },
+  "queryGuide": {
+    "title": "Search language",
+    "buttonLabel": "Search help",
+    "description": "Build filters for keys/values and add order/limit clauses.",
+    "sections": {
+      "filters": {
+        "title": "Filters",
+        "item1": "Compare <code>key</code>, <code>value</code>, or <code>ttl</code> with <code>= != > >= < <=</code> or <code>in (...)</code>.",
+        "item2": "Text operators: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
+        "item3": "Combine with <code>and</code>, <code>or</code>, <code>not</code> and parentheses.",
+        "item4": "Check types with <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "Ordering & pagination",
+        "item1": "Sort with <code>order by key asc</code>, <code>order by value desc</code>, or <code>order by ttl asc</code>.",
+        "item2": "Paginate with <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "Examples",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
   },
   "createKeyModal": {
     "title": "New Key",
@@ -213,6 +262,21 @@
   "dump": {
     "title": "Export dump",
     "description": "Dump export runs in batches to avoid overloading the server.",
+    "filters": {
+      "title": "Filters",
+      "description": "Refine the export with a query, prefix, size, or TTL.",
+      "hint": "Leave blank to export everything.",
+      "queryLabel": "Query",
+      "queryPlaceholder": "Ex: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "Key prefix",
+      "prefixPlaceholder": "Ex: session:",
+      "sizeLabel": "Size (bytes)",
+      "sizeMin": "Min size",
+      "sizeMax": "Max size",
+      "ttlLabel": "TTL (seconds)",
+      "ttlMin": "Min TTL",
+      "ttlMax": "Max TTL"
+    },
     "preparing": "Preparing dump...",
     "running": "Dump in progress...",
     "done": "Dump completed.",

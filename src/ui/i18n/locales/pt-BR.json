@@ -87,7 +87,7 @@
     "test": "Testar",
     "testing": "Testando...",
     "testSuccess": "Conexão realizada com sucesso!",
-    "authRequired": "Informe usuÃ¡rio e senha.",
+    "authRequired": "Informe usuário e senha.",
     "sshAuthRequired": "Informe a senha ou a chave privada do SSH.",
     "sshPrivateKeyLoadError": "Não foi possível ler o arquivo da chave privada.",
     "sshStorageWarning": "Ative a criptografia do storage para usar SSH.",
@@ -156,7 +156,11 @@
     "clearAll": "Limpar Tudo",
     "export": "Exportar dump",
     "import": "Importar dump",
-    "searchPlaceholder": "Digite uma chave ou regex...",
+    "searchPlaceholder": "Digite uma query...",
+    "searchButton": "Buscar",
+    "searchResults": "{{count}} resultados",
+    "searchDuration": "{{duration}} ms",
+    "searchSyntaxError": "Syntax error: {{error}}",
     "columns": {
       "key": "Chave",
       "value": "Valor",
@@ -173,6 +177,51 @@
       "cancel": "Cancelar"
     },
     "flushSuccess": "Todas as chaves foram removidas com sucesso."
+  },
+  "savedQueries": {
+    "saveButton": "Salvar query",
+    "namePlaceholder": "Nomeie esta query",
+    "savedTitle": "Buscas salvas",
+    "recentTitle": "Queries recentes",
+    "emptySaved": "Nenhuma query salva ainda.",
+    "emptyRecent": "Nenhuma query recente.",
+    "pin": "Fixar neste ambiente",
+    "unpin": "Desafixar deste ambiente",
+    "pinHint": "Conecte para fixar queries por ambiente.",
+    "clearHistory": "Limpar histórico",
+    "deleteTitle": "Excluir query salva?",
+    "deleteMessage": "Remover \"{{name}}\" das buscas salvas?",
+    "deleteConfirm": "Excluir",
+    "errors": {
+      "nameRequired": "Informe um nome.",
+      "invalidQuery": "Corrija a sintaxe da query antes de salvar.",
+      "saveFailed": "Não foi possível salvar a query."
+    }
+  },
+  "queryGuide": {
+    "title": "Linguagem de busca",
+    "buttonLabel": "Ajuda da busca",
+    "description": "Monte filtros para chaves/valores e adicione ordenação/limite.",
+    "sections": {
+      "filters": {
+        "title": "Filtros",
+        "item1": "Compare <code>key</code>, <code>value</code> ou <code>ttl</code> com <code>= != > >= < <=</code> ou <code>in (...)</code>.",
+        "item2": "Operadores de texto: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
+        "item3": "Combine com <code>and</code>, <code>or</code>, <code>not</code> e parênteses.",
+        "item4": "Cheque tipos com <code>is number|boolean|null|json</code>."
+      },
+      "ordering": {
+        "title": "Ordenação e paginação",
+        "item1": "Ordene com <code>order by key asc</code>, <code>order by value desc</code> ou <code>order by ttl asc</code>.",
+        "item2": "Pagine com <code>limit 10 offset 0</code>."
+      },
+      "examples": {
+        "title": "Exemplos",
+        "item1": "<code>key startswith \"session:\" and not value contains \"debug\"</code>",
+        "item2": "<code>value > 100 order by value desc limit 20</code>",
+        "item3": "<code>{{defaultQuery}}</code>"
+      }
+    }
   },
   "createKeyModal": {
     "title": "Nova Chave",
@@ -213,6 +262,21 @@
   "dump": {
     "title": "Exportar",
     "description": "O dump será gerado em lotes para evitar sobrecarga do servidor.",
+    "filters": {
+      "title": "Filtros",
+      "description": "Refine a exportação com query, prefixo, tamanho ou TTL.",
+      "hint": "Deixe em branco para exportar tudo.",
+      "queryLabel": "Query",
+      "queryPlaceholder": "Ex: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "Prefixo da chave",
+      "prefixPlaceholder": "Ex: session:",
+      "sizeLabel": "Tamanho (bytes)",
+      "sizeMin": "Tamanho mínimo",
+      "sizeMax": "Tamanho máximo",
+      "ttlLabel": "TTL (segundos)",
+      "ttlMin": "TTL mínimo",
+      "ttlMax": "TTL máximo"
+    },
     "preparing": "Preparando dump...",
     "running": "Dump em andamento...",
     "done": "Dump finalizado.",

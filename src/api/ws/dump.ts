@@ -2,11 +2,20 @@ import http from "http";
 import { WebSocketServer, WebSocket, type RawData } from "ws";
 
 import { makeKeyController } from "@/api/controllers";
-import { connectionManager, logger } from "@/api/utils";
+import { ensureConnection, logger } from "@/api/utils";
+
+type DumpFilters = {
+  query?: string;
+  prefix?: string;
+  minSize?: number;
+  maxSize?: number;
+  minTtl?: number;
+  maxTtl?: number;
+};
 
 type ClientMessage =
-  | { type: "start"; batchSize?: number }
-  | { type: "prefetch"; batchSize?: number }
+  | { type: "start"; batchSize?: number; filters?: DumpFilters }
+  | { type: "prefetch"; batchSize?: number; filters?: DumpFilters }
   | { type: "cancel" };
 
 const keyController = makeKeyController();
@@ -87,7 +96,7 @@ export function registerDumpWebsocket() {
           return;
         }
 
-        const connection = connectionManager().get(connectionId);
+        const connection = await ensureConnection(connectionId);
         if (!connection) {
           sendMessage(socket, {
             type: "dump-error",
@@ -102,14 +111,18 @@ export function registerDumpWebsocket() {
 
         try {
           const payload = await keyController.prefetchDump(connection, {
-            batchSize: message.batchSize
+            batchSize: message.batchSize,
+            filters: message.filters
           });
           sendMessage(socket, { type: "dump-prefetch", ...payload });
         } catch (error) {
           logger.error("Erro ao preparar dump", error as Error);
           sendMessage(socket, {
             type: "dump-error",
-            message: "Dump prefetch failed"
+            message:
+              error instanceof Error && error.message
+                ? error.message
+                : "Dump prefetch failed"
           });
         } finally {
           running = false;
@@ -121,7 +134,7 @@ export function registerDumpWebsocket() {
         return;
       }
 
-      const connection = connectionManager().get(connectionId);
+      const connection = await ensureConnection(connectionId);
       if (!connection) {
         sendMessage(socket, {
           type: "dump-error",
@@ -137,6 +150,7 @@ export function registerDumpWebsocket() {
       try {
         await keyController.streamDump(connection, {
           batchSize: message.batchSize,
+          filters: message.filters,
           shouldCancel: () =>
             cancelRequested || socket.readyState !== WebSocket.OPEN,
           onStart: (payload) => {
@@ -156,7 +170,10 @@ export function registerDumpWebsocket() {
         logger.error("Erro ao exportar dump", error as Error);
         sendMessage(socket, {
           type: "dump-error",
-          message: "Dump failed"
+          message:
+            error instanceof Error && error.message
+              ? error.message
+              : "Dump failed"
         });
       } finally {
         running = false;

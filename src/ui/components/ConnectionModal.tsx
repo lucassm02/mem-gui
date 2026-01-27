@@ -624,7 +624,6 @@ const ConnectionModal = ({ onSubmit, onTest }: Props) => {
                             <input
                               ref={sshPrivateKeyInputRef}
                               type="file"
-                              accept=".pem,.key,.ppk"
                               onChange={handleSshPrivateKeyFileChange}
                               className="hidden"
                             />
