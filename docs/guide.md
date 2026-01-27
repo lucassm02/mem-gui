@@ -6,6 +6,7 @@ MemGUI is a Memcached GUI client and desktop app for managing cached data with a
 
 - Memcached key management (create, edit JSON or text, delete, inspect)
 - Dump import/export for backup and migration
+- Dump export with query filtering and preflight total count
 - SSH connections with host key verification (v1.2.0)
 - Storage encryption for local data and SSH secrets (v1.2.0)
 - Bulk delete with confirmation for safe cleanup
@@ -58,6 +59,8 @@ Note: SSH connections, storage encryption, and dump import/export are available 
 
 - In the key list, choose Export Dump to back up keys.
 - Export runs in batches to avoid server overload.
+- Use the query DSL to export a filtered subset (optional).
+- Click "Calculate total" to preview how many keys will be exported.
 - Use Import Dump to restore keys from a JSON dump file.
 
 ## Search and Filter
@@ -68,14 +71,15 @@ Note: SSH connections, storage encryption, and dump import/export are available 
 
 ### Query Language
 
-The search field now accepts a small DSL so you can filter by key and value, add ordering, and control limits.
+The search field now accepts a small DSL so you can filter by key, value, or TTL, add ordering, and control limits.
 
 Basics:
 
-- `key` and `value` predicates support `=`, `!=`, `>`, `>=`, `<`, `<=`, `match`, `contains`, `startsWith`, `endsWith`.
+- `key` and `value` predicates support `=`, `!=`, `>`, `>=`, `<`, `<=`, `in (...)`, `match`, `contains`, `startswith`, `endswith`.
+- `ttl` predicates support `=`, `!=`, `>`, `>=`, `<`, `<=`, `in (...)` with integer literals only.
 - `is number|boolean|null|json` lets you gate comparisons by value type.
 - Combine with `and`, `or`, `not` and parentheses.
-- Optional `order by key|value asc|desc` and `limit N offset M`.
+- Optional `order by key|value|ttl asc|desc` and `limit N offset M`.
 
 Examples:
 
@@ -84,11 +88,19 @@ key match /^age$/ and is number and value > 18 and value < 60
 ```
 
 ```text
-key startsWith "user:" and value contains "active" order by key desc limit 50 offset 0
+key startswith "user:" and value contains "active" order by key desc limit 50 offset 0
 ```
 
 ```text
 is json and key contains "profile" order by value asc limit 20
+```
+
+```text
+ttl > 10 and ttl < 100 order by ttl asc
+```
+
+```text
+key in ("session:", "data:", "cache:")
 ```
 
 Notes:
@@ -98,6 +110,7 @@ Notes:
 - Numeric comparisons only match when the value can be parsed as a number.
 - `json`, `number`, `boolean`, and `null` are reserved keywords; use quotes to match them as strings.
 - `is` only accepts `number`, `boolean`, `null`, or `json`. Strings are the default value type.
+- `ttl` comparisons only accept integers (including `in (...)` lists).
 
 ## Bulk Delete
 

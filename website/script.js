@@ -31,6 +31,32 @@ document.querySelectorAll("nav a").forEach((link) => {
   });
 });
 
+const revealItems = Array.from(document.querySelectorAll("[data-reveal]"));
+const prefersReducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
+
+if (!prefersReducedMotion && revealItems.length > 0) {
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("reveal-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.18 }
+  );
+
+  revealItems.forEach((item, index) => {
+    item.style.transitionDelay = `${Math.min(index * 60, 240)}ms`;
+    revealObserver.observe(item);
+  });
+} else {
+  revealItems.forEach((item) => item.classList.add("reveal-visible"));
+}
+
 // Fecha o menu ao scrollar
 window.addEventListener("scroll", () => {
   if (nav.classList.contains("active")) {
