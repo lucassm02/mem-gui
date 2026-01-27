@@ -2,12 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/) and uses the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
-## [unreleased]
+## [1.3.0-beta] - 2026-01-21
 
 ### Added
 
 - **Query language** for key/value filtering with ordering and limits.
 - **Key list UI** refreshed for a clearer and faster browsing experience.
+
+## [1.2.0] - 2026-01-16
 
 ### Added
 
