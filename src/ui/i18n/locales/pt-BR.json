@@ -178,6 +178,26 @@
     },
     "flushSuccess": "Todas as chaves foram removidas com sucesso."
   },
+  "savedQueries": {
+    "saveButton": "Salvar query",
+    "namePlaceholder": "Nomeie esta query",
+    "savedTitle": "Buscas salvas",
+    "recentTitle": "Queries recentes",
+    "emptySaved": "Nenhuma query salva ainda.",
+    "emptyRecent": "Nenhuma query recente.",
+    "pin": "Fixar neste ambiente",
+    "unpin": "Desafixar deste ambiente",
+    "pinHint": "Conecte para fixar queries por ambiente.",
+    "clearHistory": "Limpar histÃ³rico",
+    "deleteTitle": "Excluir query salva?",
+    "deleteMessage": "Remover \"{{name}}\" das buscas salvas?",
+    "deleteConfirm": "Excluir",
+    "errors": {
+      "nameRequired": "Informe um nome.",
+      "invalidQuery": "Corrija a sintaxe da query antes de salvar.",
+      "saveFailed": "NÃ£o foi possÃ­vel salvar a query."
+    }
+  },
   "queryGuide": {
     "title": "Linguagem de busca",
     "buttonLabel": "Ajuda da busca",

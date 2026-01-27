@@ -178,6 +178,26 @@
     },
     "flushSuccess": "すべてのキーを正常に削除しました。"
   },
+  "savedQueries": {
+    "saveButton": "Save query",
+    "namePlaceholder": "Name this query",
+    "savedTitle": "Saved searches",
+    "recentTitle": "Recent queries",
+    "emptySaved": "No saved queries yet.",
+    "emptyRecent": "No recent queries yet.",
+    "pin": "Pin to this environment",
+    "unpin": "Unpin from this environment",
+    "pinHint": "Connect to pin queries per environment.",
+    "clearHistory": "Clear history",
+    "deleteTitle": "Delete saved query?",
+    "deleteMessage": "Remove \"{{name}}\" from saved searches?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "nameRequired": "Please enter a name.",
+      "invalidQuery": "Fix the query syntax before saving.",
+      "saveFailed": "Unable to save the query."
+    }
+  },
   "queryGuide": {
     "title": "????",
     "buttonLabel": "?????",
