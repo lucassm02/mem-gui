@@ -266,7 +266,7 @@
       "title": "Filter",
       "description": "Export mit Abfrage, Präfix, Größe oder TTL eingrenzen.",
       "hint": "Leer lassen, um alles zu exportieren.",
-      "queryLabel": "Abfrage (DSL)",
+      "queryLabel": "Abfrage",
       "queryPlaceholder": "z. B.: key startswith \"session:\" and value contains \"active\"",
       "prefixLabel": "Schlüssel-Präfix",
       "prefixPlaceholder": "z. B.: session:",

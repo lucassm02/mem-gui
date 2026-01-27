@@ -266,7 +266,7 @@
       "title": "Filtros",
       "description": "Refina la exportación con una consulta, prefijo, tamaño o TTL.",
       "hint": "Deja en blanco para exportar todo.",
-      "queryLabel": "Consulta (DSL)",
+      "queryLabel": "Consulta",
       "queryPlaceholder": "Ej: key startswith \"session:\" and value contains \"active\"",
       "prefixLabel": "Prefijo de clave",
       "prefixPlaceholder": "Ej: session:",

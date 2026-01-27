@@ -266,7 +266,7 @@
       "title": "필터",
       "description": "쿼리, 접두어, 크기 또는 TTL로 내보내기를 제한합니다.",
       "hint": "비워 두면 전체를 내보냅니다.",
-      "queryLabel": "쿼리 (DSL)",
+      "queryLabel": "쿼리",
       "queryPlaceholder": "예: key startswith \"session:\" and value contains \"active\"",
       "prefixLabel": "키 접두어",
       "prefixPlaceholder": "예: session:",

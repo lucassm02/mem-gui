@@ -266,7 +266,7 @@
       "title": "عوامل التصفية",
       "description": "خصص التصدير باستخدام الاستعلام أو البادئة أو الحجم أو مدة TTL.",
       "hint": "اتركها فارغة لتصدير كل المفاتيح.",
-      "queryLabel": "الاستعلام (DSL)",
+      "queryLabel": "الاستعلام",
       "queryPlaceholder": "مثال: key startswith \"session:\" and value contains \"active\"",
       "prefixLabel": "بادئة المفتاح",
       "prefixPlaceholder": "مثال: session:",

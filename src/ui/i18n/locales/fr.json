@@ -266,7 +266,7 @@
       "title": "Filtres",
       "description": "Affinez l'export avec une requête, un préfixe, la taille ou le TTL.",
       "hint": "Laissez vide pour tout exporter.",
-      "queryLabel": "Requête (DSL)",
+      "queryLabel": "Requête",
       "queryPlaceholder": "Ex: key startswith \"session:\" and value contains \"active\"",
       "prefixLabel": "Préfixe de clé",
       "prefixPlaceholder": "Ex: session:",

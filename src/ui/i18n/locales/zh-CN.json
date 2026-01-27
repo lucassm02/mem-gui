@@ -266,7 +266,7 @@
       "title": "筛选",
       "description": "使用查询、前缀、大小或 TTL 来缩小导出范围。",
       "hint": "留空将导出全部。",
-      "queryLabel": "查询 (DSL)",
+      "queryLabel": "查询",
       "queryPlaceholder": "例如: key startswith \"session:\" and value contains \"active\"",
       "prefixLabel": "键前缀",
       "prefixPlaceholder": "例如: session:",

@@ -266,7 +266,7 @@
       "title": "フィルター",
       "description": "クエリ、プレフィックス、サイズ、TTLでエクスポートを絞り込みます。",
       "hint": "空欄で全件をエクスポートします。",
-      "queryLabel": "クエリ (DSL)",
+      "queryLabel": "クエリ",
       "queryPlaceholder": "例: key startswith \"session:\" and value contains \"active\"",
       "prefixLabel": "キーのプレフィックス",
       "prefixPlaceholder": "例: session:",
