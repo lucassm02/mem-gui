@@ -160,6 +160,15 @@ type DumpKeySnapshot = {
   cachedumpCount: number;
 };
 
+type DumpFilterOptions = {
+  query?: string;
+  prefix?: string;
+  minSize?: number;
+  maxSize?: number;
+  minTtl?: number;
+  maxTtl?: number;
+};
+
 class KeyController {
   private static indexUpdateEmitter = new EventEmitter();
   private static indexUpdateLocks = new Set<string>();
@@ -587,6 +596,7 @@ class KeyController {
     connection: MemcachedConnection,
     options: {
       batchSize?: number;
+      filters?: DumpFilterOptions;
       onStart?: (payload: DumpStartPayload) => void | Promise<void>;
       onBatch: (payload: DumpBatchPayload) => void | Promise<void>;
       onComplete?: (payload: DumpSummaryPayload) => void | Promise<void>;
@@ -596,7 +606,10 @@ class KeyController {
   ): Promise<void> {
     const startedAt = Date.now();
     touchConnection(connection);
-    const { keys, keysInfo } = await this.resolveDumpKeys(connection);
+    const { keys, keysInfo } = await this.resolveDumpKeys(
+      connection,
+      options.filters
+    );
     const total = keys.length;
     const batchSize = this.resolveDumpBatchSize(options.batchSize);
     const batchCount = total > 0 ? Math.ceil(total / batchSize) : 0;
@@ -767,10 +780,13 @@ class KeyController {
 
   async prefetchDump(
     connection: MemcachedConnection,
-    options: { batchSize?: number } = {}
+    options: { batchSize?: number; filters?: DumpFilterOptions } = {}
   ): Promise<DumpPrefetchPayload> {
     touchConnection(connection);
-    const snapshot = await this.getDumpKeySnapshot(connection);
+    const snapshot = await this.resolveDumpSnapshot(
+      connection,
+      options.filters
+    );
     const total = snapshot.keys.length;
     const batchSize = this.resolveDumpBatchSize(options.batchSize);
     const batchCount = total > 0 ? Math.ceil(total / batchSize) : 0;
@@ -1199,6 +1215,9 @@ class KeyController {
     };
 
     const compareValue = (a: KeyPayload, b: KeyPayload): number => {
+      if (orderBy.field === "ttl") {
+        return a.timeUntilExpiration - b.timeUntilExpiration;
+      }
       if (valueOrderMode === "number") {
         const aNum = parseNumericValue(a.value);
         const bNum = parseNumericValue(b.value);
@@ -1286,7 +1305,7 @@ class KeyController {
         if (!item) {
           continue;
         }
-        if (orderBy.field === "value") {
+        if (orderBy.field === "value" || orderBy.field === "ttl") {
           insertOrdered(item);
           continue;
         }
@@ -1297,7 +1316,10 @@ class KeyController {
       }
     }
 
-    if (orderBy.field === "value" && maxNeeded === undefined) {
+    if (
+      (orderBy.field === "value" || orderBy.field === "ttl") &&
+      maxNeeded === undefined
+    ) {
       results.sort(compare);
     }
 
@@ -1422,6 +1444,20 @@ class KeyController {
   ): Promise<KeyPayload[]> {
     try {
       const payloads: KeyPayload[] = [];
+      const resolveTtl = (key: string): number | null => {
+        if (!keysInfoMap) {
+          return null;
+        }
+        const info = keysInfoMap.get(key);
+        if (!info) {
+          return null;
+        }
+        const expiration = info.expiration;
+        if (!Number.isFinite(expiration) || expiration <= 0) {
+          return 0;
+        }
+        return Math.max(expiration - currentUnixTime, 0);
+      };
 
       for (const multiChunk of chunkArray(keys, MULTI_GET_BATCH_SIZE)) {
         const chunkValues = await memcachedGetMulti(connection, multiChunk);
@@ -1437,7 +1473,11 @@ class KeyController {
           const normalizedValue = normalizeValue(value);
           if (
             filter &&
-            !evaluateKeyQuery(filter, { key, value: normalizedValue })
+            !evaluateKeyQuery(filter, {
+              key,
+              value: normalizedValue,
+              ttl: resolveTtl(key)
+            })
           ) {
             continue;
           }
@@ -1758,10 +1798,211 @@ class KeyController {
   }
 
   private async resolveDumpKeys(
-    connection: MemcachedConnection
+    connection: MemcachedConnection,
+    filters?: DumpFilterOptions
   ): Promise<{ keys: string[]; keysInfo: Key[] | null }> {
-    const snapshot = await this.getDumpKeySnapshot(connection);
+    const snapshot = await this.resolveDumpSnapshot(connection, filters);
     return { keys: snapshot.keys, keysInfo: snapshot.keysInfo };
+  }
+
+  private async resolveDumpSnapshot(
+    connection: MemcachedConnection,
+    filters?: DumpFilterOptions
+  ): Promise<DumpKeySnapshot> {
+    const snapshot = await this.getDumpKeySnapshot(connection);
+    const normalized = this.normalizeDumpFilters(filters);
+    if (!normalized) {
+      return snapshot;
+    }
+
+    return this.applyDumpFilters(connection, snapshot, normalized);
+  }
+
+  private normalizeDumpFilters(
+    filters?: DumpFilterOptions
+  ): DumpFilterOptions | null {
+    if (!filters) {
+      return null;
+    }
+
+    const normalized: DumpFilterOptions = {};
+
+    if (typeof filters.query === "string") {
+      const query = filters.query.trim();
+      if (query) {
+        normalized.query = query;
+      }
+    }
+
+    if (typeof filters.prefix === "string") {
+      const prefix = filters.prefix.trim();
+      if (prefix) {
+        normalized.prefix = prefix;
+      }
+    }
+
+    const parseNumber = (value: unknown, label: string): number | undefined => {
+      if (value === undefined || value === null) {
+        return undefined;
+      }
+      if (typeof value === "string" && value.trim().length === 0) {
+        return undefined;
+      }
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        throw new Error(`Invalid ${label}`);
+      }
+      return Math.floor(parsed);
+    };
+
+    const minSize = parseNumber(filters.minSize, "minimum size");
+    const maxSize = parseNumber(filters.maxSize, "maximum size");
+    const minTtl = parseNumber(filters.minTtl, "minimum TTL");
+    const maxTtl = parseNumber(filters.maxTtl, "maximum TTL");
+
+    if (minSize !== undefined) {
+      normalized.minSize = minSize;
+    }
+    if (maxSize !== undefined) {
+      normalized.maxSize = maxSize;
+    }
+    if (minTtl !== undefined) {
+      normalized.minTtl = minTtl;
+    }
+    if (maxTtl !== undefined) {
+      normalized.maxTtl = maxTtl;
+    }
+
+    if (
+      normalized.minSize !== undefined &&
+      normalized.maxSize !== undefined &&
+      normalized.minSize > normalized.maxSize
+    ) {
+      throw new Error("Invalid size range");
+    }
+
+    if (
+      normalized.minTtl !== undefined &&
+      normalized.maxTtl !== undefined &&
+      normalized.minTtl > normalized.maxTtl
+    ) {
+      throw new Error("Invalid TTL range");
+    }
+
+    if (Object.keys(normalized).length === 0) {
+      return null;
+    }
+
+    return normalized;
+  }
+
+  private async applyDumpFilters(
+    connection: MemcachedConnection,
+    snapshot: DumpKeySnapshot,
+    filters: DumpFilterOptions
+  ): Promise<DumpKeySnapshot> {
+    let keys = snapshot.keys;
+    let keysInfo = snapshot.keysInfo;
+
+    if (filters.prefix) {
+      keys = keys.filter((key) => key.startsWith(filters.prefix));
+    }
+
+    const hasSizeFilter =
+      filters.minSize !== undefined || filters.maxSize !== undefined;
+    const hasTtlFilter =
+      filters.minTtl !== undefined || filters.maxTtl !== undefined;
+
+    let serverUnixTime: number | undefined;
+
+    if (hasTtlFilter && !keysInfo) {
+      throw new Error("TTL filtering requires cachedump metadata");
+    }
+
+    if (keysInfo && (hasSizeFilter || hasTtlFilter)) {
+      serverUnixTime = await this.getServerUnixTime(connection);
+      const infoMap = new Map(keysInfo.map((info) => [info.key, info]));
+      const filteredKeys: string[] = [];
+
+      for (const key of keys) {
+        const info = infoMap.get(key);
+        if (!info) {
+          continue;
+        }
+
+        const size = info.size;
+        const expiration = info.expiration;
+        const ttl =
+          expiration > 0 && serverUnixTime !== undefined
+            ? Math.max(expiration - serverUnixTime, 0)
+            : 0;
+
+        if (filters.minSize !== undefined && size < filters.minSize) {
+          continue;
+        }
+        if (filters.maxSize !== undefined && size > filters.maxSize) {
+          continue;
+        }
+        if (filters.minTtl !== undefined && ttl < filters.minTtl) {
+          continue;
+        }
+        if (filters.maxTtl !== undefined && ttl > filters.maxTtl) {
+          continue;
+        }
+
+        filteredKeys.push(key);
+      }
+
+      keys = filteredKeys;
+      const keySet = new Set(keys);
+      keysInfo = keysInfo.filter((info) => keySet.has(info.key));
+    } else if (!keysInfo && hasSizeFilter) {
+      serverUnixTime = await this.getServerUnixTime(connection);
+      const payload = await this.getKeysValue(
+        keys,
+        connection,
+        undefined,
+        serverUnixTime
+      );
+      keys = payload
+        .filter((item) => {
+          if (filters.minSize !== undefined && item.size < filters.minSize) {
+            return false;
+          }
+          if (filters.maxSize !== undefined && item.size > filters.maxSize) {
+            return false;
+          }
+          return true;
+        })
+        .map((item) => item.key);
+    }
+
+    if (filters.query) {
+      const parsed = parseKeyQuery(filters.query);
+      if ("error" in parsed) {
+        throw new Error(parsed.error);
+      }
+      const payload = await this.queryKeysInBatches(
+        keys,
+        connection,
+        parsed.query,
+        {
+          keysInfo: keysInfo ?? undefined,
+          serverUnixTime
+        }
+      );
+      keys = payload.map((item) => item.key);
+      if (keysInfo) {
+        const keySet = new Set(keys);
+        keysInfo = keysInfo.filter((info) => keySet.has(info.key));
+      }
+    }
+
+    return {
+      ...snapshot,
+      keys,
+      keysInfo
+    };
   }
 
   private async getDumpKeySnapshot(

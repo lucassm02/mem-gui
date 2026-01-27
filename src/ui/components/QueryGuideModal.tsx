@@ -47,7 +47,9 @@ const QueryGuideModal = () => {
             <h3 className="text-md font-semibold">
               {t("queryGuide.sections.filters.title")}
             </h3>
-            <ul className={`mt-2 space-y-1 list-disc list-inside ${bodyTextClass}`}>
+            <ul
+              className={`mt-2 space-y-1 list-disc list-inside ${bodyTextClass}`}
+            >
               <li>
                 <Trans
                   i18nKey="queryGuide.sections.filters.item1"
@@ -79,7 +81,9 @@ const QueryGuideModal = () => {
             <h3 className="text-md font-semibold">
               {t("queryGuide.sections.ordering.title")}
             </h3>
-            <ul className={`mt-2 space-y-1 list-disc list-inside ${bodyTextClass}`}>
+            <ul
+              className={`mt-2 space-y-1 list-disc list-inside ${bodyTextClass}`}
+            >
               <li>
                 <Trans
                   i18nKey="queryGuide.sections.ordering.item1"
@@ -99,7 +103,9 @@ const QueryGuideModal = () => {
             <h3 className="text-md font-semibold">
               {t("queryGuide.sections.examples.title")}
             </h3>
-            <ul className={`mt-2 space-y-1 list-disc list-inside ${bodyTextClass}`}>
+            <ul
+              className={`mt-2 space-y-1 list-disc list-inside ${bodyTextClass}`}
+            >
               <li>
                 <Trans
                   i18nKey="queryGuide.sections.examples.item1"

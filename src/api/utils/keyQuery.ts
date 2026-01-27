@@ -1,5 +1,6 @@
 type Token =
   | { type: "paren"; value: "(" | ")" }
+  | { type: "comma" }
   | {
       type: "operator";
       value: "=" | "!=" | ">" | ">=" | "<" | "<=";
@@ -16,6 +17,7 @@ type ComparisonOperator =
   | ">="
   | "<"
   | "<="
+  | "in"
   | "match"
   | "contains"
   | "startswith"
@@ -30,11 +32,13 @@ type Literal =
 
 type ValueType = "number" | "string" | "boolean" | "null" | "json";
 
+type KeyQueryLiteral = Literal | { kind: "list"; items: Literal[] };
+
 export type KeyQueryPredicate =
   | {
-      kind: "key" | "value";
+      kind: "key" | "value" | "ttl";
       operator: ComparisonOperator;
-      literal: Literal;
+      literal: KeyQueryLiteral;
     }
   | {
       kind: "is";
@@ -48,7 +52,7 @@ export type KeyQueryFilter =
   | { type: "predicate"; predicate: KeyQueryPredicate };
 
 export type KeyQueryOrder = {
-  field: "key" | "value";
+  field: "key" | "value" | "ttl";
   direction: "asc" | "desc";
 };
 
@@ -69,6 +73,7 @@ const RESERVED_WORDS = new Set([
   "not",
   "key",
   "value",
+  "ttl",
   "is",
   "order",
   "by",
@@ -76,6 +81,7 @@ const RESERVED_WORDS = new Set([
   "offset",
   "asc",
   "desc",
+  "in",
   "match",
   "contains",
   "startswith",
@@ -105,6 +111,11 @@ const tokenize = (input: string): Token[] => {
 
     if (char === "(" || char === ")") {
       tokens.push({ type: "paren", value: char });
+      index += 1;
+      continue;
+    }
+    if (char === ",") {
+      tokens.push({ type: "comma" });
       index += 1;
       continue;
     }
@@ -316,12 +327,18 @@ class Parser {
       };
     }
 
-    if (keyword !== "key" && keyword !== "value") {
+    if (keyword !== "key" && keyword !== "value" && keyword !== "ttl") {
       throw new Error("Invalid predicate");
     }
 
     const operator = this.parseComparator();
-    const literal = this.parseLiteral();
+    let literal: KeyQueryLiteral;
+    if (operator === "in") {
+      const list = this.parseLiteralList(keyword);
+      literal = { kind: "list", items: list };
+    } else {
+      literal = this.parseLiteral();
+    }
 
     if (keyword === "key") {
       if (
@@ -334,7 +351,11 @@ class Parser {
       }
     }
 
-    if (
+    if (operator === "in") {
+      if (literal.kind !== "list") {
+        throw new Error("Invalid list");
+      }
+    } else if (
       literal.kind === "regex" &&
       operator !== "match" &&
       operator !== "contains" &&
@@ -342,6 +363,32 @@ class Parser {
       operator !== "endswith"
     ) {
       throw new Error("Regex predicates require match");
+    }
+
+    if (keyword === "ttl") {
+      if (
+        operator === "match" ||
+        operator === "contains" ||
+        operator === "startswith" ||
+        operator === "endswith"
+      ) {
+        throw new Error("Invalid operator for ttl");
+      }
+
+      const ensureIntegerLiteral = (value: Literal) => {
+        if (value.kind !== "number" || !Number.isInteger(value.value)) {
+          throw new Error("TTL requires integer values");
+        }
+      };
+
+      if (literal.kind === "list") {
+        if (literal.items.length === 0) {
+          throw new Error("Invalid list");
+        }
+        literal.items.forEach(ensureIntegerLiteral);
+      } else {
+        ensureIntegerLiteral(literal);
+      }
     }
 
     return {
@@ -368,6 +415,7 @@ class Parser {
     if (token.type === "identifier") {
       const value = token.value.toLowerCase();
       if (
+        value === "in" ||
         value === "match" ||
         value === "contains" ||
         value === "startswith" ||
@@ -379,6 +427,39 @@ class Parser {
     }
 
     throw new Error("Invalid operator");
+  }
+
+  private parseLiteralList(kind: "key" | "value" | "ttl"): Literal[] {
+    if (!this.matchParen("(")) {
+      throw new Error("Invalid list");
+    }
+
+    const items: Literal[] = [];
+    while (true) {
+      const literal = this.parseLiteral();
+      if (literal.kind === "regex") {
+        throw new Error("Invalid literal");
+      }
+      if (kind === "ttl") {
+        if (literal.kind !== "number" || !Number.isInteger(literal.value)) {
+          throw new Error("TTL requires integer values");
+        }
+      }
+      items.push(literal);
+      if (this.matchComma()) {
+        continue;
+      }
+      if (this.matchParen(")")) {
+        break;
+      }
+      throw new Error("Invalid list");
+    }
+
+    if (items.length === 0) {
+      throw new Error("Invalid list");
+    }
+
+    return items;
   }
 
   private parseLiteral(): Literal {
@@ -456,6 +537,15 @@ class Parser {
     return false;
   }
 
+  matchComma(): boolean {
+    const token = this.peek();
+    if (token?.type === "comma") {
+      this.consume();
+      return true;
+    }
+    return false;
+  }
+
   peek(): Token | undefined {
     return this.tokens[this.index];
   }
@@ -500,7 +590,7 @@ export const parseKeyQuery = (input: string): ParseResult => {
             throw new Error("Invalid order clause");
           }
           const field = parser.expectIdentifier();
-          if (field !== "key" && field !== "value") {
+          if (field !== "key" && field !== "value" && field !== "ttl") {
             throw new Error("Invalid order field");
           }
           let direction: "asc" | "desc" = "asc";
@@ -583,6 +673,10 @@ const resolveLiteralAsString = (literal: Literal): string => {
   }
 };
 
+const isLiteralList = (
+  literal: KeyQueryLiteral
+): literal is { kind: "list"; items: Literal[] } => literal.kind === "list";
+
 const resolveValueType = (value: string): ValueType => {
   const trimmed = value.trim();
   if (!trimmed) {
@@ -645,6 +739,9 @@ const evaluateValuePredicate = (
   operator: ComparisonOperator,
   literal: Literal
 ) => {
+  if (operator === "in") {
+    return false;
+  }
   if (operator === "match") {
     if (literal.kind === "regex") {
       return literal.value.test(value);
@@ -716,9 +813,42 @@ const evaluateValuePredicate = (
   return operator === "=" ? value === target : value !== target;
 };
 
+const evaluateValueEqualsLiteral = (value: string, literal: Literal) =>
+  evaluateValuePredicate(value, "=", literal);
+
+const evaluateTtlPredicate = (
+  ttl: number | null | undefined,
+  operator: ComparisonOperator,
+  literal: Literal
+) => {
+  if (ttl === null || ttl === undefined) {
+    return false;
+  }
+  if (literal.kind !== "number") {
+    return false;
+  }
+
+  switch (operator) {
+    case "=":
+      return ttl === literal.value;
+    case "!=":
+      return ttl !== literal.value;
+    case ">":
+      return ttl > literal.value;
+    case ">=":
+      return ttl >= literal.value;
+    case "<":
+      return ttl < literal.value;
+    case "<=":
+      return ttl <= literal.value;
+    default:
+      return false;
+  }
+};
+
 export const evaluateKeyQuery = (
   filter: KeyQueryFilter | undefined,
-  context: { key: string; value: string }
+  context: { key: string; value: string; ttl?: number | null }
 ): boolean => {
   if (!filter) {
     return true;
@@ -737,11 +867,53 @@ export const evaluateKeyQuery = (
           return resolveValueType(context.value) === node.predicate.valueType;
         }
         if (node.predicate.kind === "key") {
+          if (node.predicate.operator === "in") {
+            if (!isLiteralList(node.predicate.literal)) {
+              return false;
+            }
+            return node.predicate.literal.items.some(
+              (item) => resolveLiteralAsString(item) === context.key
+            );
+          }
+          if (isLiteralList(node.predicate.literal)) {
+            return false;
+          }
           return evaluateKeyPredicate(
             context.key,
             node.predicate.operator,
             node.predicate.literal
           );
+        }
+        if (node.predicate.kind === "ttl") {
+          if (node.predicate.operator === "in") {
+            if (!isLiteralList(node.predicate.literal)) {
+              return false;
+            }
+            return node.predicate.literal.items.some(
+              (item) =>
+                item.kind === "number" &&
+                evaluateTtlPredicate(context.ttl ?? null, "=", item)
+            );
+          }
+          if (isLiteralList(node.predicate.literal)) {
+            return false;
+          }
+          return evaluateTtlPredicate(
+            context.ttl ?? null,
+            node.predicate.operator,
+            node.predicate.literal
+          );
+        }
+        if (node.predicate.operator === "in") {
+          if (!isLiteralList(node.predicate.literal)) {
+            return false;
+          }
+          return node.predicate.literal.items.some((item) =>
+            evaluateValueEqualsLiteral(context.value, item)
+          );
+        }
+        if (isLiteralList(node.predicate.literal)) {
+          return false;
         }
         return evaluateValuePredicate(
           context.value,
@@ -789,6 +961,17 @@ export const evaluateKeyQueryKeyOnly = (
       }
       case "predicate":
         if (node.predicate.kind === "key") {
+          if (node.predicate.operator === "in") {
+            if (!isLiteralList(node.predicate.literal)) {
+              return null;
+            }
+            return node.predicate.literal.items.some(
+              (item) => resolveLiteralAsString(item) === key
+            );
+          }
+          if (isLiteralList(node.predicate.literal)) {
+            return null;
+          }
           return evaluateKeyPredicate(
             key,
             node.predicate.operator,
@@ -829,8 +1012,14 @@ export const inferValueOrderMode = (
           if (op === ">" || op === ">=" || op === "<" || op === "<=") {
             return true;
           }
+          if (op === "in" && isLiteralList(node.predicate.literal)) {
+            return node.predicate.literal.items.some(
+              (item) => item.kind === "number"
+            );
+          }
           if (
             (op === "=" || op === "!=") &&
+            !isLiteralList(node.predicate.literal) &&
             node.predicate.literal.kind === "number"
           ) {
             return true;

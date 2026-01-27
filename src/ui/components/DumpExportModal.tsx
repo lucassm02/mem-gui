@@ -1,16 +1,20 @@
+import { EditorView } from "@codemirror/view";
 import {
   ArrowDownTrayIcon,
   ArrowPathIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon
 } from "@heroicons/react/24/outline";
+import CodeMirror from "@uiw/react-codemirror";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { parseKeyQuery } from "@/api/utils/keyQuery";
 import { KeyData } from "@/ui/contexts";
 import { useDarkMode } from "@/ui/hooks/useDarkMode";
 import { useElectron } from "@/ui/hooks/useElectron";
 import { toneButton } from "@/ui/utils/buttonTone";
+import { queryLanguage } from "@/ui/utils/queryLanguage";
 
 type DumpStatus =
   | "idle"
@@ -83,6 +87,10 @@ type PrefetchOptions = {
   force?: boolean;
 };
 
+type DumpFilters = {
+  query?: string;
+};
+
 const DEFAULT_BATCH_SIZE = 50;
 
 const buildDumpFilename = (
@@ -110,6 +118,15 @@ const resolveWsUrl = (path: string, connectionId: string) => {
   return `${wsBase}${path}?connectionId=${encodeURIComponent(connectionId)}`;
 };
 
+const getQueryErrorMessage = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return "";
+  }
+  const parsed = parseKeyQuery(trimmed);
+  return "error" in parsed ? parsed.error : "";
+};
+
 const DumpExportModal = ({
   isOpen,
   connectionId,
@@ -134,6 +151,7 @@ const DumpExportModal = ({
   const [saveMessage, setSaveMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveHandleName, setSaveHandleName] = useState("");
+  const [queryInput, setQueryInput] = useState("");
 
   const socketRef = useRef<WebSocket | null>(null);
   const dataRef = useRef<KeyData[]>([]);
@@ -168,9 +186,64 @@ const DumpExportModal = ({
     }
   }, [status, t]);
 
+  const queryError = useMemo(
+    () => getQueryErrorMessage(queryInput),
+    [queryInput]
+  );
+  const queryExtensions = useMemo(
+    () => [queryLanguage, EditorView.lineWrapping],
+    []
+  );
+  const hasQueryError = queryError.length > 0;
+  const inputsDisabled =
+    status === "running" || status === "connecting" || status === "prefetching";
+  const actionDisabled = !connectionId || hasQueryError;
+
+  const buildDumpFilters = useCallback((): DumpFilters | undefined => {
+    const filters: DumpFilters = {};
+    const query = queryInput.trim();
+    if (query) {
+      filters.query = query;
+    }
+    return Object.keys(filters).length > 0 ? filters : undefined;
+  }, [queryInput]);
+
+  const filtersSignature = useMemo(() => {
+    const filters = buildDumpFilters();
+    return filters ? JSON.stringify(filters) : "";
+  }, [buildDumpFilters]);
+
   useEffect(() => {
     statusRef.current = status;
   }, [status]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    if (
+      statusRef.current === "running" ||
+      statusRef.current === "connecting" ||
+      statusRef.current === "prefetching"
+    ) {
+      return;
+    }
+
+    statusRef.current = "idle";
+    setStatus("idle");
+    setProgress(0);
+    setSuccessRate(0);
+    setProcessed(0);
+    setTotal(0);
+    setBatchIndex(0);
+    setBatchCount(0);
+    setErrorMessage("");
+    setSaveMessage("");
+    setDownloadName("");
+    dataRef.current = [];
+    payloadRef.current = null;
+    startedAtRef.current = "";
+  }, [filtersSignature, isOpen]);
 
   const handlePrefetchDump = useCallback(
     (options: PrefetchOptions = {}) => {
@@ -198,6 +271,7 @@ const DumpExportModal = ({
         return;
       }
 
+      const filters = buildDumpFilters();
       startAfterPrefetchRef.current = shouldAutoStart;
 
       socketRef.current?.close();
@@ -231,7 +305,11 @@ const DumpExportModal = ({
 
       socket.onopen = () => {
         socket.send(
-          JSON.stringify({ type: "prefetch", batchSize: DEFAULT_BATCH_SIZE })
+          JSON.stringify({
+            type: "prefetch",
+            batchSize: DEFAULT_BATCH_SIZE,
+            filters
+          })
         );
       };
 
@@ -294,7 +372,7 @@ const DumpExportModal = ({
         }
       };
     },
-    [connectionId, t]
+    [buildDumpFilters, connectionId, t]
   );
 
   const startDumpInternal = useCallback(() => {
@@ -332,6 +410,7 @@ const DumpExportModal = ({
     setDownloadName("");
     startedAtRef.current = new Date().toISOString();
 
+    const filters = buildDumpFilters();
     const wsUrl = resolveWsUrl("/ws/dump", connectionId);
     if (!wsUrl) {
       setStatus("error");
@@ -345,7 +424,11 @@ const DumpExportModal = ({
 
     socket.onopen = () => {
       socket.send(
-        JSON.stringify({ type: "start", batchSize: DEFAULT_BATCH_SIZE })
+        JSON.stringify({
+          type: "start",
+          batchSize: DEFAULT_BATCH_SIZE,
+          filters
+        })
       );
     };
 
@@ -465,7 +548,15 @@ const DumpExportModal = ({
         setErrorMessage(`${t("dump.error")} (${event.code})`);
       }
     };
-  }, [connectionId, connectionHost, connectionName, connectionPort, t, total]);
+  }, [
+    buildDumpFilters,
+    connectionHost,
+    connectionId,
+    connectionName,
+    connectionPort,
+    t,
+    total
+  ]);
 
   useEffect(() => {
     startDumpInternalRef.current = startDumpInternal;
@@ -498,15 +589,11 @@ const DumpExportModal = ({
     startedAtRef.current = "";
     startAfterPrefetchRef.current = false;
 
-    if (connectionId) {
-      handlePrefetchDump({ force: true });
-    }
-
     return () => {
       socketRef.current?.close();
       socketRef.current = null;
     };
-  }, [isOpen, connectionId, handlePrefetchDump]);
+  }, [isOpen, connectionId]);
 
   const handleCancel = () => {
     startAfterPrefetchRef.current = false;
@@ -693,6 +780,60 @@ const DumpExportModal = ({
           ) : null}
         </div>
 
+        <div className="mt-5 space-y-3">
+          <div>
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold">
+                {t("dump.filters.title")}
+              </h4>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3">
+            <div>
+              <label
+                className={`text-sm font-medium ${
+                  darkMode ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
+                {t("dump.filters.queryLabel")}
+              </label>
+              <div
+                className={`mt-1 w-full transition-colors ${
+                  darkMode
+                    ? "border-gray-700 bg-gray-900"
+                    : "border-gray-200 bg-white"
+                } ${hasQueryError ? "border-red-500 ring-1 ring-red-500/30" : ""} ${
+                  inputsDisabled ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                <CodeMirror
+                  value={queryInput}
+                  onChange={(value) => setQueryInput(value)}
+                  theme={darkMode ? "dark" : "light"}
+                  color="blue"
+                  extensions={queryExtensions}
+                  placeholder={t("dump.filters.queryPlaceholder")}
+                  minHeight="48px"
+                  spellCheck={false}
+                  editable={!inputsDisabled}
+                  className="text-sm"
+                  basicSetup={{
+                    lineNumbers: false,
+                    foldGutter: false,
+                    highlightActiveLine: false,
+                    highlightSelectionMatches: false
+                  }}
+                />
+              </div>
+              {hasQueryError ? (
+                <p className="mt-1 text-xs text-red-500">
+                  {t("keyList.searchSyntaxError", { error: queryError })}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
         {supportsSavePicker ? (
           <div className="mt-6 flex flex-col gap-3">
             <label
@@ -857,9 +998,9 @@ const DumpExportModal = ({
               <button
                 onClick={handlePrefetchDump}
                 className={`${toneButton("neutral", darkMode)} ${
-                  connectionId ? "" : "opacity-50 cursor-not-allowed"
+                  actionDisabled ? "opacity-50 cursor-not-allowed" : ""
                 }`}
-                disabled={!connectionId}
+                disabled={actionDisabled}
               >
                 <ArrowPathIcon className="w-5 h-5" />
                 {t("dump.prefetch")}
@@ -867,9 +1008,9 @@ const DumpExportModal = ({
               <button
                 onClick={handleStartDump}
                 className={`${toneButton("success", darkMode)} ${
-                  connectionId ? "" : "opacity-50 cursor-not-allowed"
+                  actionDisabled ? "opacity-50 cursor-not-allowed" : ""
                 }`}
-                disabled={!connectionId}
+                disabled={actionDisabled}
               >
                 <ArrowDownTrayIcon className="w-5 h-5" />
                 {t("dump.start")}

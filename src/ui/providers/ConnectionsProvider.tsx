@@ -2,15 +2,20 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-import { Connection, ConnectionsContext, KeyData, ServerData } from "../contexts";
+import {
+  Connection,
+  ConnectionsContext,
+  KeyData,
+  ServerData
+} from "../contexts";
 import { useStorage } from "../hooks";
 import { useModal } from "../hooks/useModal";
+import { DEFAULT_KEY_QUERY } from "@/ui/constants/keyQuery";
 import api, { clearConnectionId, setConnectionId } from "@/ui/services/api";
 import {
   getConnectionIdentity,
   isSameConnection as isSameConnectionByIdentity
 } from "@/ui/utils/connectionIdentity";
-import { DEFAULT_KEY_QUERY } from "@/ui/constants/keyQuery";
 
 export const ConnectionsProvider = ({ children }: { children: ReactNode }) => {
   const [savedConnections, setSavedConnections] = useState<Connection[]>([]);

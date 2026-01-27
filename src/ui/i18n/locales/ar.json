@@ -262,6 +262,21 @@
   "dump": {
     "title": "تصدير dump",
     "description": "يتم تصدير الـ dump على دفعات لتجنب تحميل زائد على الخادم.",
+    "filters": {
+      "title": "عوامل التصفية",
+      "description": "خصص التصدير باستخدام الاستعلام أو البادئة أو الحجم أو مدة TTL.",
+      "hint": "اتركها فارغة لتصدير كل المفاتيح.",
+      "queryLabel": "الاستعلام (DSL)",
+      "queryPlaceholder": "مثال: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "بادئة المفتاح",
+      "prefixPlaceholder": "مثال: session:",
+      "sizeLabel": "الحجم (بايت)",
+      "sizeMin": "أقل حجم",
+      "sizeMax": "أقصى حجم",
+      "ttlLabel": "TTL (ثوان)",
+      "ttlMin": "أقل TTL",
+      "ttlMax": "أقصى TTL"
+    },
     "preparing": "جارٍ تحضير dump...",
     "running": "جارٍ تنفيذ dump...",
     "done": "اكتمل dump.",

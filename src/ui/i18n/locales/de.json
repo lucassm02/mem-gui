@@ -262,6 +262,21 @@
   "dump": {
     "title": "Dump exportieren",
     "description": "Der Dump-Export erfolgt in Batches, um den Server nicht zu überlasten.",
+    "filters": {
+      "title": "Filter",
+      "description": "Export mit Abfrage, Präfix, Größe oder TTL eingrenzen.",
+      "hint": "Leer lassen, um alles zu exportieren.",
+      "queryLabel": "Abfrage (DSL)",
+      "queryPlaceholder": "z. B.: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "Schlüssel-Präfix",
+      "prefixPlaceholder": "z. B.: session:",
+      "sizeLabel": "Größe (Bytes)",
+      "sizeMin": "Min. Größe",
+      "sizeMax": "Max. Größe",
+      "ttlLabel": "TTL (Sekunden)",
+      "ttlMin": "Min. TTL",
+      "ttlMax": "Max. TTL"
+    },
     "preparing": "Dump wird vorbereitet...",
     "running": "Dump wird ausgeführt...",
     "done": "Dump abgeschlossen.",

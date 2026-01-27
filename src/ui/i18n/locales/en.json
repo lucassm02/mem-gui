@@ -205,14 +205,14 @@
     "sections": {
       "filters": {
         "title": "Filters",
-        "item1": "Compare <code>key</code> or <code>value</code> with <code>= != > >= < <=</code>.",
+        "item1": "Compare <code>key</code>, <code>value</code>, or <code>ttl</code> with <code>= != > >= < <=</code> or <code>in (...)</code>.",
         "item2": "Text operators: <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>match</code> (regex).",
         "item3": "Combine with <code>and</code>, <code>or</code>, <code>not</code> and parentheses.",
         "item4": "Check types with <code>is number|boolean|null|json</code>."
       },
       "ordering": {
         "title": "Ordering & pagination",
-        "item1": "Sort with <code>order by key asc</code> or <code>order by value desc</code>.",
+        "item1": "Sort with <code>order by key asc</code>, <code>order by value desc</code>, or <code>order by ttl asc</code>.",
         "item2": "Paginate with <code>limit 10 offset 0</code>."
       },
       "examples": {
@@ -262,6 +262,21 @@
   "dump": {
     "title": "Export dump",
     "description": "Dump export runs in batches to avoid overloading the server.",
+    "filters": {
+      "title": "Filters",
+      "description": "Refine the export with a query, prefix, size, or TTL.",
+      "hint": "Leave blank to export everything.",
+      "queryLabel": "Query (DSL)",
+      "queryPlaceholder": "Ex: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "Key prefix",
+      "prefixPlaceholder": "Ex: session:",
+      "sizeLabel": "Size (bytes)",
+      "sizeMin": "Min size",
+      "sizeMax": "Max size",
+      "ttlLabel": "TTL (seconds)",
+      "ttlMin": "Min TTL",
+      "ttlMax": "Max TTL"
+    },
     "preparing": "Preparing dump...",
     "running": "Dump in progress...",
     "done": "Dump completed.",

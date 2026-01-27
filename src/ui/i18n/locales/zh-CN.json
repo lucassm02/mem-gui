@@ -262,6 +262,21 @@
   "dump": {
     "title": "导出 dump",
     "description": "导出 dump 会分批进行，以避免服务器负载过高。",
+    "filters": {
+      "title": "筛选",
+      "description": "使用查询、前缀、大小或 TTL 来缩小导出范围。",
+      "hint": "留空将导出全部。",
+      "queryLabel": "查询 (DSL)",
+      "queryPlaceholder": "例如: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "键前缀",
+      "prefixPlaceholder": "例如: session:",
+      "sizeLabel": "大小 (字节)",
+      "sizeMin": "最小大小",
+      "sizeMax": "最大大小",
+      "ttlLabel": "TTL (秒)",
+      "ttlMin": "最小 TTL",
+      "ttlMax": "最大 TTL"
+    },
     "preparing": "正在准备 dump...",
     "running": "dump 导出中...",
     "done": "dump 导出完成。",

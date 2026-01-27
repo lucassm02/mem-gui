@@ -262,6 +262,21 @@
   "dump": {
     "title": "ダンプをエクスポート",
     "description": "サーバーへの負荷を避けるため、ダンプのエクスポートはバッチで実行されます。",
+    "filters": {
+      "title": "フィルター",
+      "description": "クエリ、プレフィックス、サイズ、TTLでエクスポートを絞り込みます。",
+      "hint": "空欄で全件をエクスポートします。",
+      "queryLabel": "クエリ (DSL)",
+      "queryPlaceholder": "例: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "キーのプレフィックス",
+      "prefixPlaceholder": "例: session:",
+      "sizeLabel": "サイズ (バイト)",
+      "sizeMin": "最小サイズ",
+      "sizeMax": "最大サイズ",
+      "ttlLabel": "TTL (秒)",
+      "ttlMin": "最小 TTL",
+      "ttlMax": "最大 TTL"
+    },
     "preparing": "ダンプを準備中...",
     "running": "ダンプを実行中...",
     "done": "ダンプが完了しました。",

@@ -262,6 +262,21 @@
   "dump": {
     "title": "덤프 내보내기",
     "description": "서버 과부하를 피하기 위해 덤프 내보내기는 배치로 실행됩니다.",
+    "filters": {
+      "title": "필터",
+      "description": "쿼리, 접두어, 크기 또는 TTL로 내보내기를 제한합니다.",
+      "hint": "비워 두면 전체를 내보냅니다.",
+      "queryLabel": "쿼리 (DSL)",
+      "queryPlaceholder": "예: key startswith \"session:\" and value contains \"active\"",
+      "prefixLabel": "키 접두어",
+      "prefixPlaceholder": "예: session:",
+      "sizeLabel": "크기 (바이트)",
+      "sizeMin": "최소 크기",
+      "sizeMax": "최대 크기",
+      "ttlLabel": "TTL (초)",
+      "ttlMin": "최소 TTL",
+      "ttlMax": "최대 TTL"
+    },
     "preparing": "덤프 준비 중...",
     "running": "덤프 진행 중...",
     "done": "덤프가 완료되었습니다.",
